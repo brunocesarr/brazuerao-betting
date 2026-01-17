@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { TeamPrediction } from '@/types'
 import { getCurrentBrazilianLeague } from '@/services/brazuerao.service'
+import Image from 'next/image'
 
 export default function BettingPage() {
   const { data: session, status } = useSession()
@@ -35,6 +36,7 @@ export default function BettingPage() {
           teamId: index.toString(),
           teamName: team.name,
           position: team.posicao,
+          shieldUrl: team.logo,
         }))
       )
     } catch (error) {
@@ -207,7 +209,16 @@ export default function BettingPage() {
                           <span className="ml-2 text-gray-400">º</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="flex items-center px-6 py-4">
+                        {pred.shieldUrl && (
+                          <Image
+                            src={pred.shieldUrl}
+                            alt={pred.teamName}
+                            width={24}
+                            height={24}
+                            className="mr-2"
+                          />
+                        )}
                         <span className="text-lg font-semibold text-gray-900">
                           {pred.teamName}
                         </span>

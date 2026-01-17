@@ -11,6 +11,7 @@ export interface TeamPrediction {
   teamId: string
   teamName: string
   position: number
+  shieldUrl?: string
 }
 
 export interface BetData {
@@ -25,15 +26,15 @@ export interface LeaderboardEntry {
   year: number
 }
 
-export interface Standing {
-  position: number
-  teamId: string
-  teamName: string
-  points?: number
-  played?: number
-  won?: number
-  drawn?: number
-  lost?: number
+export interface Season {
+  id: number
+  year: string
+  name: string
+  editor: boolean
+}
+
+export interface SeasonsResponse {
+  seasons: Season[]
 }
 
 export interface UserScoreAPIResponse {

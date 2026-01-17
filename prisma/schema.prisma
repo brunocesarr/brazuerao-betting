@@ -7,19 +7,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  bets      Bet[]
-}
-
-model Team {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  shortName String
-  logo      String?
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  password      String
+  photoUrl      String?
+  createdAt     DateTime       @default(now())
+  bets          Bet[]
+  userBetGroups UserBetGroup[]
 }
 
 model Bet {
@@ -27,36 +22,42 @@ model Bet {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   predictions Json // Array of {teamId: number, position: number}
-  year        Int      @default(2024)
+  year        Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@unique([userId, year])
-  @@index([userId])
 }
 
-model ActualStanding {
-  id         String   @id @default(cuid())
-  teamId     Int
-  position   Int
-  year       Int
-  points     Int?
-  played     Int?
-  won        Int?
-  drawn      Int?
-  lost       Int?
-
-  @@unique([teamId, year])
-  @@index([year])
+model BetGroup {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  userBetGroups UserBetGroup[]
 }
 
-model Score {
-  id             String   @id @default(cuid())
-  userId         String
-  year           Int
-  correctGuesses Int      @default(0)
-  createdAt      DateTime @default(now())
+model RoleGroup {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  userBetGroups UserBetGroup[]
+}
 
-  @@unique([userId, year])
-  @@index([year, correctGuesses])
+model RequestStatus {
+  id            String         @id @default(cuid())
+  status        String         @unique // PENDING, APPROVED, REJECTED
+  userBetGroups UserBetGroup[]
+}
+
+model UserBetGroup {
+  groupId         String
+  userId          String
+  roleGroupId     String
+  requestStatusId String
+  createdAt       DateTime @default(now())
+
+  group         BetGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  roleGroup     RoleGroup     @relation(fields: [roleGroupId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestStatus RequestStatus @relation(fields: [requestStatusId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
 }

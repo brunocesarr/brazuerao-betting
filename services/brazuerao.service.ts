@@ -11,10 +11,7 @@ async function getUserScore(classification: string[]) {
 async function getCurrentBrazilianLeague(
   year: number = new Date().getFullYear()
 ) {
-  const { data: brazilianLeague } = await appBrazuerao.get<any[]>(
-    `/brazilian-league?year=${year}`
-  )
-  return brazilianLeague
+  return await getBrazilianLeague(year)
 }
 
 export { getUserScore, getCurrentBrazilianLeague }

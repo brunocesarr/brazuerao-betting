@@ -1,4 +1,4 @@
-import { apiBrazuerao } from '@/repositories/apiBrazuerao'
+import { apiBrazuerao, appBrazuerao } from '@/repositories/apiBrazuerao'
 import { UserScoreAPIResponse } from '@/types'
 
 async function getIndividualUserScore(classification: string[]) {
@@ -29,11 +29,11 @@ async function getIndividualUserScore(classification: string[]) {
 
 async function getBrazilianLeague(year?: number) {
   try {
-    const { data: brasilianLeagueApiGE } = await apiBrazuerao.get<any[]>(
-      '/v1/brazilian-league'
-    )
+    const {
+      data: { data: table },
+    } = await appBrazuerao.get(`/standings/${year ?? new Date().getFullYear()}`)
 
-    return brasilianLeagueApiGE.map((teamPositionInfo) => {
+    return table.map((teamPositionInfo: any) => {
       const teamPositionApiInfo = {
         posicao: teamPositionInfo.position,
         jogos: teamPositionInfo.played,
