@@ -11,23 +11,32 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url)
-  let year = new Date().getFullYear()
-  const yearParam = searchParams.get('year')
-  if (yearParam != null) {
-    year = parseInt(yearParam)
+  let season = new Date().getFullYear()
+  const seasonParam = searchParams.get('season')
+  if (seasonParam != null) {
+    season = parseInt(seasonParam)
   }
 
   try {
     const bet = await prisma.bet.findUnique({
       where: {
-        userId_year: {
+        userId_season: {
           userId: session.user.id,
-          year,
+          season,
         },
       },
     })
+    const formattedBet = bet
+      ? {
+          ...bet,
+          predictions:
+            typeof bet.predictions === 'string'
+              ? JSON.parse(bet.predictions)
+              : bet.predictions,
+        }
+      : null
 
-    return NextResponse.json({ bet })
+    return NextResponse.json({ bet: formattedBet })
   } catch (error) {
     return NextResponse.json(
       { error: 'Falha ao buscar aposta' },
@@ -45,26 +54,36 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { predictions, year } = body
+    const { predictions, season } = body
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
 
     const bet = await prisma.bet.upsert({
       where: {
-        userId_year: {
-          userId: session.user.id,
-          year: year,
+        userId_season: {
+          userId: user.id,
+          season,
         },
       },
       update: {
-        predictions,
+        predictions: predictions,
         updatedAt: new Date(),
       },
       create: {
-        userId: session.user.id,
-        predictions,
-        year: year,
+        userId: user.id,
+        predictions: predictions,
+        season,
       },
     })
+    return NextResponse.json({ bet })
   } catch (error) {
+    console.error('Error saving bet:', error)
     return NextResponse.json(
       { error: 'Falha ao salvar aposta' },
       { status: 500 }

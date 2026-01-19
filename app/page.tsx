@@ -1,7 +1,12 @@
-import CountdownTimer from '@/components/CountdownTimer'
+'use client'
+
+import CountdownTimer from '@/components/home/CountdownTimer'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 export default function Home() {
+  const { status } = useSession()
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -20,23 +25,35 @@ export default function Home() {
             <h1 className="mb-6 text-6xl leading-tight font-bold md:text-7xl">
               Brazuerao Apostas
               <span className="block bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-3xl text-transparent">
-                Serie A
+                O Brazuerao está de cara nova!
               </span>
             </h1>
 
             <p className="text-primary-100 mx-auto mb-12 max-w-2xl text-xl leading-relaxed md:text-2xl">
-              Faça suas previsões sobre a classificação final e compita!
+              Conheça o novo site!
+              <br />
+              Aproveite e faça suas previsões sobre a classificação final e
+              compita!
             </p>
 
             <CountdownTimer targetDate={new Date('2026-01-28T17:59:59')} />
 
             <div className="mb-16 flex flex-col justify-center gap-4 sm:flex-row">
-              <Link
-                href="/register"
-                className="flex-1 transform rounded-xl border-1 border-white/10 bg-transparent px-8 py-4 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-2xl"
-              >
-                Comece a apostar agora
-              </Link>
+              {status === 'authenticated' ? (
+                <Link
+                  href="/betting"
+                  className="flex-1 transform rounded-xl border-1 border-white/10 bg-transparent px-8 py-4 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-2xl"
+                >
+                  Continue apostando
+                </Link>
+              ) : (
+                <Link
+                  href="/register"
+                  className="flex-1 transform rounded-xl border-1 border-white/10 bg-transparent px-8 py-4 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-2xl"
+                >
+                  Comece a apostar agora
+                </Link>
+              )}
               <Link
                 href="/leaderboard"
                 className="flex-1 transform rounded-xl border-1 border-white/10 bg-transparent px-8 py-4 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-2xl"
@@ -82,7 +99,7 @@ export default function Home() {
               Como funciona?
             </h2>
             <p className="mx-auto max-w-2xl text-xl text-gray-600">
-              Tres passos simples para entrar na competicao
+              Três passos simples para entrar na competição
             </p>
           </div>
 
@@ -108,8 +125,9 @@ export default function Home() {
                 2. Compita
               </h3>
               <p className="leading-relaxed text-gray-600">
-                Ganhe pontos seguindo nossas regras. Veja como você pode
-                pontuar:{' '}
+                Ganhe pontos.
+                <br />
+                Veja como você pode pontuar:{' '}
                 <Link
                   href="/rules"
                   className="text-primary-600 hover:underline"
@@ -128,8 +146,7 @@ export default function Home() {
                 3. Vença
               </h3>
               <p className="leading-relaxed text-gray-600">
-                Suba na classificação e prove que você é o maior especialista do
-                Brasileirão
+                Prove que você é o maior especialista do Brasileirão
               </p>
             </div>
           </div>
@@ -137,23 +154,24 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="from-primary-600 to-primary-800 relative overflow-hidden bg-gradient-to-br py-20 text-white">
+      <section className="from-primary-600 to-primary-700 relative overflow-hidden bg-gradient-to-b py-20 text-white">
         <div className="bg-pattern absolute inset-0 opacity-10"></div>
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <h2 className="mb-6 text-4xl font-bold md:text-5xl">
-            Pronto para mostrar suas habilidades?
-          </h2>
-          <p className="text-primary-100 mx-auto mb-10 max-w-2xl text-xl">
-            Junte-se a milhares de fãs fazendo suas previsões para o Brasileirão
-            2026
-          </p>
-          <Link
-            href="/register"
-            className="text-primary-700 hover:bg-primary-50 hover:shadow-3xl inline-block transform rounded-xl bg-white px-10 py-4 text-lg font-bold shadow-2xl transition-all duration-300 hover:scale-105"
-          >
-            Criar conta gratuita
-          </Link>
-        </div>
+        {status !== 'authenticated' && (
+          <div className="relative z-10 container mx-auto px-4 text-center">
+            <h2 className="mb-6 text-4xl font-bold md:text-5xl">
+              Pronto para mostrar suas habilidades?
+            </h2>
+            <p className="text-primary-100 mx-auto mb-10 max-w-2xl text-xl">
+              Junte-se a nós fazendo suas previsões para o Brasileirão 2026
+            </p>
+            <Link
+              href="/register"
+              className="text-primary-700 hover:bg-primary-50 hover:shadow-3xl inline-block transform rounded-xl bg-white px-10 py-4 text-lg font-bold shadow-2xl transition-all duration-300 hover:scale-105"
+            >
+              Criar conta gratuita
+            </Link>
+          </div>
+        )}
       </section>
     </div>
   )

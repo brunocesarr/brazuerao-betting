@@ -20,13 +20,29 @@ model User {
 model Bet {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   predictions Json // Array of {teamId: number, position: number}
-  year        Int
+  season      Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([userId, year])
+  @@unique([userId, season])
+}
+
+model ScoringRule {
+  id          String   @id @default(cuid())
+
+  // Rule identification
+  ruleType    String // e.g., "EXACT_CHAMPION", "EXACT_POSITION", "ZONE_MATCH"
+  description String
+  points      Int
+
+  // Optional: additional conditions
+  priority    Int @default(0)
+  ranges      Json? // Array of {rangeStart: number, rangeEnd: number}
+
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
 }
 
 model BetGroup {

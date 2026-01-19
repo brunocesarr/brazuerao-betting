@@ -34,8 +34,11 @@ export default function SimpleCountdown({ targetDate }: SimpleCountdownProps) {
   }, [])
 
   return (
-    <div className="mb-12 flex items-center justify-center rounded-xl bg-slate-950/10 p-8">
-      <div className="flex gap-4 text-center">
+    <div className="mb-12 flex flex-col items-center justify-center gap-6 rounded-xl bg-slate-950/10 p-8 backdrop-blur-sm">
+      <p className="text-lg text-gray-400">
+        Contagem regressiva para o encerramento das apostas
+      </p>
+      <div className="grid grid-cols-2 gap-4 text-center md:flex">
         {Object.entries(timeLeft).map(([label, value]) => (
           <div
             key={label}

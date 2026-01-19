@@ -4,19 +4,51 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { TeamPrediction } from '@/types'
-import { getCurrentBrazilianLeague } from '@/services/brazuerao.service'
-import Image from 'next/image'
+import {
+  getCurrentBrazilianLeague,
+  saveUserPredictions,
+} from '@/services/brazuerao.service'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import SortableTableRow from '@/components/betting/SortableTableRow'
+import { getBetByUserId } from '@/repositories/brazuerao.repository'
 
 export default function BettingPage() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
+  const [savedPredictions, setSavedPredictions] = useState<TeamPrediction[]>([])
   const [predictions, setPredictions] = useState<TeamPrediction[]>([])
+  const [hasChanges, setHasChanges] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{
     type: 'success' | 'error'
     text: string
   } | null>(null)
-  const [hasChanges, setHasChanges] = useState(false)
+
+  // Configure drag sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px of movement before drag starts
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -25,25 +57,83 @@ export default function BettingPage() {
   }, [status, router])
 
   useEffect(() => {
-    fetchBrazilianLeague()
+    const checkForChanges = () => {
+      if (!savedPredictions) {
+        setHasChanges(false)
+        return
+      }
+      setHasChanges(
+        JSON.stringify(predictions) !== JSON.stringify(savedPredictions)
+      )
+    }
+
+    checkForChanges()
+  }, [predictions, savedPredictions])
+
+  useEffect(() => {
+    fetchSavedBet()
   }, [])
 
-  const fetchBrazilianLeague = async () => {
+  const fetchSavedBet = async () => {
     try {
-      const league = await getCurrentBrazilianLeague()
-      setPredictions(
-        league.map((team, index) => ({
-          teamId: index.toString(),
-          teamName: team.name,
-          position: team.posicao,
-          shieldUrl: team.logo,
-        }))
+      setLoading(true)
+      const [bet, table] = await Promise.all([
+        getBetByUserId(),
+        getCurrentBrazilianLeague(),
+      ])
+
+      const initialPredictions: TeamPrediction[] = table.map(
+        (team: any, index: number) => {
+          let position = team.position
+          if (bet && bet.predictions) {
+            const savedTeam = bet.predictions.find(
+              (pred: TeamPrediction) => pred.teamName === team.name
+            )
+            if (savedTeam) {
+              position = savedTeam.position
+            }
+          }
+
+          return {
+            teamId: index,
+            teamName: team.name,
+            position: position,
+            shieldUrl: team.shield,
+          }
+        }
       )
+
+      setPredictions(initialPredictions)
+      setSavedPredictions(bet ? initialPredictions : [])
     } catch (error) {
-      console.error('Failed to fetch brazilian league:', error)
+      console.error('Failed to fetch saved bet:', error)
+      setSavedPredictions([])
+      setPredictions([])
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    setPredictions((items) => {
+      const oldIndex = items.findIndex((item) => item.teamId === active.id)
+      const newIndex = items.findIndex((item) => item.teamId === over.id)
+
+      const newItems = arrayMove(items, oldIndex, newIndex)
+
+      // Update positions
+      newItems.forEach((pred, idx) => {
+        pred.position = idx + 1
+      })
+
+      return newItems
+    })
   }
 
   const moveTeam = (index: number, direction: 'up' | 'down') => {
@@ -61,7 +151,6 @@ export default function BettingPage() {
     })
 
     setPredictions(newPredictions)
-    setHasChanges(true)
   }
 
   const handleSubmit = async () => {
@@ -69,38 +158,24 @@ export default function BettingPage() {
     setMessage(null)
 
     try {
-      const response = await fetch('/api/bets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          predictions,
-          year: new Date().getFullYear(),
-        }),
-      })
+      saveUserPredictions(predictions.map((p) => p.teamName))
+      setSavedPredictions(predictions)
 
-      if (response.ok) {
-        setMessage({
-          type: 'success',
-          text: '✓ Sua previsão foi salva com sucesso!',
-        })
-        setHasChanges(false)
-      } else {
-        setMessage({
-          type: 'error',
-          text: '✗ Falha ao salvar sua previsão. Tente novamente.',
-        })
-      }
+      setMessage({
+        type: 'success',
+        text: '✓ Sua previsão foi salva com sucesso!',
+      })
     } catch (error) {
       setMessage({
         type: 'error',
-        text: '✗ Ocorreu um erro. Tente novamente.',
+        text: '✗ Falha ao salvar sua previsão. Tente novamente.',
       })
     } finally {
       setLoading(false)
     }
   }
 
-  if (status === 'loading') {
+  if (status === 'loading' || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -113,15 +188,13 @@ export default function BettingPage() {
 
   const getPositionColor = (position: number) => {
     if (position <= 4) return 'bg-blue-50 border-blue-200'
-    if (position <= 12) return 'bg-green-50 border-green-200'
-    if (position <= 16) return 'bg-gray-50 border-gray-200'
+    if (position <= 16) return 'bg-green-50 border-green-200'
     return 'bg-red-50 border-red-200'
   }
 
   const getPositionBadge = (position: number) => {
     if (position <= 4) return { text: 'Libertadores', color: 'bg-blue-500' }
-    if (position <= 12) return { text: 'Sul-Americana', color: 'bg-green-500' }
-    if (position <= 16) return { text: 'Meio da tabela', color: 'bg-gray-500' }
+    if (position <= 16) return { text: 'Sul-Americana', color: 'bg-green-500' }
     return { text: 'Rebaixamento', color: 'bg-red-500' }
   }
 
@@ -134,7 +207,7 @@ export default function BettingPage() {
             Sua previsão para o Brasileirão 2026
           </h1>
           <p className="text-lg text-gray-600">
-            Ordene os times na ordem que você acha que vão terminar
+            Arraste os times para ordenar como você acha que vão terminar
           </p>
         </div>
 
@@ -156,127 +229,86 @@ export default function BettingPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <div className="flex items-center">
               <div className="mr-2 h-4 w-4 rounded bg-blue-500"></div>
-              <span className="text-sm text-gray-700">Libertadores (1-4)</span>
+              <span className="text-sm text-gray-700">
+                Zona classificação (1-4)
+              </span>
             </div>
             <div className="flex items-center">
               <div className="mr-2 h-4 w-4 rounded bg-green-500"></div>
-              <span className="text-sm text-gray-700">Sul-Americana (5-6)</span>
-            </div>
-            <div className="flex items-center">
-              <div className="mr-2 h-4 w-4 rounded bg-orange-500"></div>
-              <span className="text-sm text-gray-700">Danger (13-16)</span>
+              <span className="text-sm text-gray-700">
+                Zona meio de tabela (5-16)
+              </span>
             </div>
             <div className="flex items-center">
               <div className="mr-2 h-4 w-4 rounded bg-red-500"></div>
-              <span className="text-sm text-gray-700">Relegation (17-20)</span>
+              <span className="text-sm text-gray-700">
+                Zona de rebaixamento (17-20)
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Standings Table */}
-        <div className="card mb-6 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="from-primary-600 to-primary-700 bg-gradient-to-r text-white">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">
-                    Posição
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">
-                    Time
-                  </th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold">
-                    Zona
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold">
-                    Mover
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {predictions.map((pred, index) => {
-                  const badge = getPositionBadge(pred.position)
-                  return (
-                    <tr
-                      key={pred.teamId}
-                      className={`transition-all duration-200 hover:shadow-md ${getPositionColor(pred.position)}`}
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <span className="w-8 text-2xl font-bold text-gray-700">
-                            {pred.position}
-                          </span>
-                          <span className="ml-2 text-gray-400">º</span>
-                        </div>
-                      </td>
-                      <td className="flex items-center px-6 py-4">
-                        {pred.shieldUrl && (
-                          <Image
-                            src={pred.shieldUrl}
-                            alt={pred.teamName}
-                            width={24}
-                            height={24}
-                            className="mr-2"
-                          />
-                        )}
-                        <span className="text-lg font-semibold text-gray-900">
-                          {pred.teamName}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className={`inline-block ${badge.color} rounded-full px-3 py-1 text-xs font-semibold text-white`}
-                        >
-                          {badge.text}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => moveTeam(index, 'up')}
-                            disabled={index === 0}
-                            className="bg-primary-500 hover:bg-primary-600 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
-                            title="Mover para cima"
-                          >
-                            <svg
-                              className="h-5 w-5"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => moveTeam(index, 'down')}
-                            disabled={index === predictions.length - 1}
-                            className="bg-primary-500 hover:bg-primary-600 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
-                            title="Mover para baixo"
-                          >
-                            <svg
-                              className="h-5 w-5"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+        {/* Drag Instructions */}
+        <div className="mb-4 rounded-lg bg-blue-50 p-4 text-center">
+          <p className="text-sm text-blue-800">
+            💡 <strong>Dica:</strong> Clique e arraste o ícone de linhas (☰)
+            para reordenar os times ou use os botões de setas
+          </p>
         </div>
+
+        {/* Standings Table with Drag & Drop */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="card mb-6 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="from-primary-600 to-primary-700 bg-gradient-to-r text-white">
+                  <tr>
+                    <th className="px-3 py-4 text-center text-sm font-semibold">
+                      <svg
+                        className="mx-auto h-5 w-5"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M9 2h6v2H9V2zm0 4h6v2H9V6zm0 4h6v2H9v-2zm0 4h6v2H9v-2zm0 4h6v2H9v-2z" />
+                      </svg>
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold">
+                      Posição
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold">
+                      Time
+                    </th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold">
+                      Mover
+                    </th>
+                  </tr>
+                </thead>
+                <SortableContext
+                  items={predictions.map((p) => p.teamId)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <tbody className="divide-y divide-gray-200">
+                    {predictions.map((pred, index) => (
+                      <SortableTableRow
+                        key={pred.teamId}
+                        pred={pred}
+                        index={index}
+                        getPositionColor={getPositionColor}
+                        getPositionBadge={getPositionBadge}
+                        moveTeam={moveTeam}
+                        predictionsLength={predictions.length}
+                      />
+                    ))}
+                  </tbody>
+                </SortableContext>
+              </table>
+            </div>
+          </div>
+        </DndContext>
 
         {/* Save Button */}
         <div className="text-center">
@@ -311,7 +343,7 @@ export default function BettingPage() {
               </span>
             ) : (
               <>
-                💾 Salvar minha previsão
+                Salvar
                 {!hasChanges && (
                   <span className="ml-2 text-sm opacity-75">
                     (Sem alterações)
@@ -320,7 +352,7 @@ export default function BettingPage() {
               </>
             )}
           </button>
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-gray-500/80">
             Você pode editar sua previsão a qualquer momento antes do início da
             temporada
           </p>

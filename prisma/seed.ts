@@ -15,6 +15,32 @@ const initialRequestStatuses = [
 
 const roleGroups = [{ name: 'ADMIN' }, { name: 'USER' }]
 
+const betRules = [
+  {
+    ruleType: 'EXACT_CHAMPION',
+    description: 'Acertar o campeão',
+    points: 3,
+    priority: 1,
+  },
+  {
+    ruleType: 'EXACT_POSITION',
+    description: 'Acertar a posição exata de um time na tabela',
+    points: 2,
+    priority: 2,
+  },
+  {
+    ruleType: 'ZONE_MATCH',
+    description: 'Acertar se um time ficará em uma zona especifica da tabela',
+    points: 1,
+    priority: 3,
+    ranges: [
+      { rangeStart: 1, rangeEnd: 4 }, // Zona de classificação
+      { rangeStart: 5, rangeEnd: 16 }, // Zona intermediária
+      { rangeStart: 17, rangeEnd: 20 }, // Zona de rebaixamento
+    ],
+  },
+]
+
 const requestStatusSeed = async () => {
   for (const requestStatus of initialRequestStatuses) {
     let data = await prisma.requestStatus.findFirst({
@@ -53,9 +79,35 @@ const roleGroupSeed = async () => {
   }
 }
 
+const betRulesSeed = async () => {
+  for (const betRule of betRules) {
+    let data = await prisma.scoringRule.findFirst({
+      where: { description: betRule.description },
+    })
+
+    if (data) {
+      await prisma.scoringRule.update({
+        where: { id: data.id },
+        data: {
+          ...betRule,
+          ranges: JSON.stringify(betRule.ranges),
+        },
+      })
+    } else {
+      await prisma.scoringRule.create({
+        data: {
+          ...betRule,
+          ranges: JSON.stringify(betRule.ranges),
+        },
+      })
+    }
+  }
+}
+
 const seed = async () => {
   await requestStatusSeed()
   await roleGroupSeed()
+  await betRulesSeed()
 }
 
 seed()

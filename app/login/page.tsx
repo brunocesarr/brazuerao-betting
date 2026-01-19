@@ -38,7 +38,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="from-primary-50 to-primary-50 flex min-h-screen items-center justify-center bg-gradient-to-br via-white px-4 py-12 sm:px-6 lg:px-8">
+    <div className="from-primary-50 flex items-center justify-center bg-gradient-to-b via-white to-black px-4 py-12 sm:px-6 md:min-h-screen lg:px-8">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-8 flex flex-col items-center gap-2 text-center">
@@ -60,7 +60,6 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold text-gray-900">
             Bem-vindo de volta!
           </h2>
-          <p className="text-gray-600">Faça login para fazer suas previsões</p>
         </div>
 
         {/* Form Card */}
@@ -80,7 +79,7 @@ export default function LoginPage() {
                 htmlFor="email"
                 className="mb-2 block text-sm font-semibold text-gray-700"
               >
-                Email Address
+                Email
               </label>
               <input
                 id="email"
@@ -99,7 +98,7 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="mb-2 block text-sm font-semibold text-gray-700"
               >
-                Password
+                Senha
               </label>
               <input
                 id="password"
@@ -159,11 +158,6 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>🔒 Seus dados estão seguros e criptografados</p>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: `Brazuerao Apostas - ${new Date().getFullYear()}`,
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning data-lt-installed="true">
       <body>
         <Providers children={children} />
+        <Footer />
       </body>
     </html>
   )

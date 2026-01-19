@@ -38,7 +38,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="from-primary-50 to-primary-50 flex min-h-screen items-center justify-center bg-gradient-to-br via-white px-4 py-12 sm:px-6 lg:px-8">
+    <div className="from-primary-50 flex items-center justify-center bg-gradient-to-b via-white to-black px-4 py-12 sm:px-6 md:min-h-screen lg:px-8">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -88,7 +88,7 @@ export default function RegisterPage() {
                 htmlFor="email"
                 className="mb-2 block text-sm font-semibold text-gray-700"
               >
-                Endereço de email
+                Email
               </label>
               <input
                 id="email"
@@ -174,16 +174,16 @@ export default function RegisterPage() {
         {/* Benefits */}
         <div className="card mt-8 p-6">
           <h3 className="mb-3 font-semibold text-gray-900">
-            O que você ganha:
+            Entre e aproveite:
           </h3>
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-center">
               <span className="text-primary-500 mr-2">✓</span>
-              Previsões ilimitadas durante toda a temporada
+              Compita entre amigos
             </li>
             <li className="flex items-center">
               <span className="text-primary-500 mr-2">✓</span>
-              Classificação em tempo real
+              Defina suas prendas para o perdedor
             </li>
             <li className="flex items-center">
               <span className="text-primary-500 mr-2">✓</span>

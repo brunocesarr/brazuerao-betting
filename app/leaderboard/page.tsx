@@ -74,37 +74,8 @@ export default function LeaderboardPage() {
   const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <div className="from-primary-900 via-primary-800 to-primary-700 min-h-screen bg-gradient-to-b">
       <div className="container mx-auto max-w-6xl px-4 py-8">
-        {/* Round Selection */}
-        <div className="mb-8 text-center">
-          <h2 className="mb-4 text-sm tracking-wider text-gray-400 uppercase">
-            RODADA
-          </h2>
-          <div className="inline-flex gap-2 rounded-lg bg-gray-800/50 p-1 backdrop-blur-sm">
-            <button
-              onClick={() => setActiveTab('regular')}
-              className={`rounded-lg px-6 py-3 font-semibold transition-all duration-300 ${
-                activeTab === 'regular'
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Fase Regular
-            </button>
-            <button
-              onClick={() => setActiveTab('final')}
-              className={`rounded-lg px-6 py-3 font-semibold transition-all duration-300 ${
-                activeTab === 'final'
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Fase Final
-            </button>
-          </div>
-        </div>
-
         {/* Top 3 Podium */}
         {top3.length >= 3 && (
           <div className="mx-auto mb-12 grid max-w-5xl grid-cols-3 gap-6">
@@ -200,18 +171,16 @@ export default function LeaderboardPage() {
         {/* Rankings Table */}
         <div className="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800/50 backdrop-blur-sm">
           {/* Table Header */}
-          <div className="grid grid-cols-12 gap-4 border-b border-gray-700 bg-gray-800/80 px-6 py-4">
-            <div className="col-span-1 text-sm font-semibold text-gray-400 uppercase">
-              Nº
-            </div>
-            <div className="col-span-5 text-sm font-semibold text-gray-400 uppercase">
-              Usuário
+          <div className="grid grid-cols-12 items-center gap-4 border-b border-gray-700 bg-gray-800/80 px-6 py-4">
+            <div className="col-span-1 text-sm font-semibold text-gray-400 uppercase"></div>
+            <div className="col-span-3 text-sm font-semibold text-gray-400 uppercase">
+              Nome
             </div>
             <div className="col-span-2 text-center">
               <div className="flex items-center justify-center gap-2">
                 <div className="h-4 w-4 rounded-full bg-green-500"></div>
                 <span className="text-sm font-semibold text-gray-400 uppercase">
-                  Điểm
+                  Pontuação
                 </span>
               </div>
             </div>
@@ -219,12 +188,25 @@ export default function LeaderboardPage() {
               <div className="flex items-center justify-center gap-2">
                 <div className="h-4 w-4 rounded-full bg-gray-400"></div>
                 <span className="text-sm font-semibold text-gray-400 uppercase">
-                  Tổng
+                  Acertou o campeão
                 </span>
               </div>
             </div>
-            <div className="col-span-2 text-center text-sm font-semibold text-gray-400 uppercase">
-              Dự Đoán
+            <div className="col-span-2 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-4 w-4 rounded-full bg-gray-400"></div>
+                <span className="text-sm font-semibold text-gray-400 uppercase">
+                  Nº de Times na Posição Correta
+                </span>
+              </div>
+            </div>
+            <div className="col-span-2 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-4 w-4 rounded-full bg-gray-400"></div>
+                <span className="text-sm font-semibold text-gray-400 uppercase">
+                  Nº de Times na Zona Correta
+                </span>
+              </div>
             </div>
           </div>
 
@@ -302,10 +284,16 @@ export default function LeaderboardPage() {
                       <span className="ml-1 text-sm text-gray-400">PONTOS</span>
                     </div>
 
-                    {/* Predictions */}
+                    {/* Total */}
                     <div className="col-span-2 flex items-center justify-center">
-                      <span className="font-bold text-white">20</span>
-                      <span className="ml-1 text-sm text-gray-400">JOGOS</span>
+                      <span className="text-xl font-bold text-white">20</span>
+                      <span className="ml-1 text-sm text-gray-400">PONTOS</span>
+                    </div>
+
+                    {/* Total */}
+                    <div className="col-span-2 flex items-center justify-center">
+                      <span className="text-xl font-bold text-white">20</span>
+                      <span className="ml-1 text-sm text-gray-400">PONTOS</span>
                     </div>
                   </div>
                 )
@@ -323,9 +311,14 @@ export default function LeaderboardPage() {
                 Como é a pontuação
               </h3>
               <p className="text-sm leading-relaxed text-gray-300">
-                Você ganha 1 ponto para cada time cuja posição você previu
-                corretamente. Quanto mais precisas as previsões, maior sua
-                posição na classificação!
+                Veja como você pode pontuar:{' '}
+                <Link
+                  href="/rules"
+                  className="text-blue-400 hover:underline"
+                  scroll
+                >
+                  regras
+                </Link>
               </p>
             </div>
           </div>

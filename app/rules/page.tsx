@@ -1,5 +1,37 @@
+'use client'
+
+import { getBrazueraoBetRules } from '@/services/brazuerao.service'
+import { useEffect, useState } from 'react'
+
 // app/regras/page.tsx
 export default function RegrasSimples() {
+  const [rules, setRules] = useState<any[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    async function fetchRules() {
+      try {
+        const rules = await getBrazueraoBetRules()
+        console.log('Regras buscadas:', rules)
+        setRules(rules)
+      } catch (error) {
+        console.error('Erro ao buscar regras:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRules()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-slate-600">Carregando regras...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-12">
       <div className="mx-auto max-w-4xl">
@@ -26,36 +58,59 @@ export default function RegrasSimples() {
 
           <SecaoRegra titulo="2. Sistema de Pontuação">
             <ul className="list-inside list-disc space-y-2">
-              <li>Campeão correto: 3 pontos</li>
-              <li>Time em posicao correta: 2 ponto</li>
-              <li>Time em zona de classificação correta: 1 pontos</li>
+              {rules &&
+                rules
+                  .sort((a, b) => a.priority - b.priority)
+                  .map((rule) => (
+                    <li key={rule.id}>
+                      {rule.description}:{' '}
+                      {rule.points > 1
+                        ? `${rule.points} pontos`
+                        : `${rule.points} ponto`}
+                    </li>
+                  ))}
             </ul>
           </SecaoRegra>
 
           <SecaoRegra titulo="3. Classificação">
             <ul className="list-inside list-disc space-y-2">
-              <li>Posição 1: Campeão</li>
-              <li>Posições 1-4: Zona de classificação</li>
-              <li>Posições 5-16: Zona central</li>
-              <li>Posições 17-20: Zona de rebaixamento</li>
+              {rules.some((rule) => rule.ruleType === 'EXACT_CHAMPION') && (
+                <li>Posição 1: Campeão</li>
+              )}
+              {rules
+                .filter((rule) => rule.ruleType === 'ZONE_MATCH')
+                .map((rule) => (
+                  <li key={rule.id}>
+                    Zonas de classificação:
+                    <ul className="mt-1 ml-6 list-inside list-disc">
+                      {rule.ranges.map((range: any, index: number) => (
+                        <li key={index}>
+                          Posições {range.rangeStart}º a {range.rangeEnd}º
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
             </ul>
           </SecaoRegra>
 
           <SecaoRegra titulo="4. Critérios de Desempate">
             <ol className="list-inside list-decimal space-y-2">
               <li>Número de pontos</li>
-              <li>Campeão correto</li>
-              <li>Número de times em posição correta</li>
-              <li>Número de times em zona correta</li>
+              {rules &&
+                rules
+                  .sort((a, b) => a.priority - b.priority)
+                  .map((rule) => <li key={rule.id}>{rule.description}</li>)}
             </ol>
           </SecaoRegra>
 
           <SecaoRegra titulo="5. Prendas">
             <ul className="list-inside list-disc space-y-2">
-              <li>Gols e infrações que levam a gols</li>
-              <li>Decisões de pênalti</li>
-              <li>Incidentes de cartão vermelho direto</li>
-              <li>Identificação equivocada de jogador</li>
+              <li>
+                <b>A prenda é prenda! Deve ser paga.</b>
+              </li>
+              <li>O grupo define as prendas a serem aplicadas</li>
+              <li>O grupo define quando as prendas são aplicadas</li>
             </ul>
             <p className="mt-3 text-right text-xs">
               Podem ser revistas e alteradas até a data limite da aposta.
