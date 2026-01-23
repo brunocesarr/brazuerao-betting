@@ -6,7 +6,7 @@ import {
   getBrazilianLeague,
   saveUserBet,
 } from '@/services/brazuerao.service'
-import { TeamPrediction } from '@/types/models'
+import { TeamPrediction } from '@/types'
 import {
   closestCenter,
   DndContext,
@@ -95,7 +95,7 @@ export default function BettingPage() {
           }
 
           return {
-            teamId: index,
+            teamId: String(index),
             teamName: team.name,
             position: position,
             shieldUrl: team.shield,

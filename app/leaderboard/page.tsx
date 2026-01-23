@@ -4,7 +4,7 @@ import {
   getAllBetRules,
   getIndividualUserScore,
 } from '@/services/brazuerao.service'
-import { LeaderboardEntry } from '@/types/models'
+import { LeaderboardEntry } from '@/types'
 import { ChevronDown, ChevronUp, Edit2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'

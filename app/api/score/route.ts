@@ -16,7 +16,10 @@ export async function GET(request: NextRequest) {
     }
 
     const score = await getUserScore(session.user.id)
-    return NextResponse.json({ score })
+    return NextResponse.json({
+      score: score.reduce((total, item) => total + item.score, 0),
+      scoreByRule: score,
+    })
   } catch (error) {
     console.error('Error fetching leaderboard:', error)
     return NextResponse.json(

@@ -1,5 +1,5 @@
 import { fetchBrasileiraoSeasons } from '@/lib/sofascore'
-import { SeasonsAPIResponse } from '@/types/api-models'
+import { SeasonsAPIResponse } from '@/types/api'
 import { NextResponse } from 'next/server'
 
 export async function GET() {

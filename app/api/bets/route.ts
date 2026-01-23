@@ -4,7 +4,7 @@ import {
   existsUser,
   getUserBet,
 } from '@/repositories/brazuerao.repository'
-import { UserBetAPIResponse } from '@/types/api-models'
+import { UserBetAPIResponse } from '@/types/api'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 

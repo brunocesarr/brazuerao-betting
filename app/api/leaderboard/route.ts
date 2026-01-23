@@ -5,8 +5,8 @@ import {
   getUserBet,
 } from '@/repositories/brazuerao.repository'
 import { getBrazilianLeague } from '@/services/brazuerao.service'
-import { TeamPositionAPIResponse } from '@/types/api-models'
-import { BetRuleDBModel } from '@/types/database-models'
+import { TeamPositionAPIResponse } from '@/types/api'
+import { BetRuleDBModel } from '@/types/entities'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 

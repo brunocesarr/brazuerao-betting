@@ -1,4 +1,4 @@
-import { existsUser } from '@/repositories/brazuerao.repository'
+import { getUserById } from '@/repositories/brazuerao.repository'
 import { compare } from 'bcryptjs'
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
@@ -7,6 +7,7 @@ import { prisma } from './prisma'
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: '/login',
@@ -49,18 +50,39 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.id = (await existsUser({ id: user.id })) ? user.id : null
+        token.id = user.id
+        token.email = user.email
+        token.name = user.name
       }
+
+      if (trigger === 'update' && session) {
+        token.name = session.name
+        return {
+          ...token,
+          ...session,
+        }
+      }
+
+      if (token.id) {
+        const dbUser = await getUserById(token.id as string)
+        if (dbUser) {
+          token.name = dbUser.name
+          token.email = dbUser.email
+        }
+      }
+
       return token
     },
+
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = (await existsUser({ id: token.id as string }))
-          ? token.id
-          : null
+      if (token && session.user) {
+        session.user.id = token.id as string
+        session.user.email = token.email as string
+        session.user.name = token.name as string
       }
+
       return session
     },
   },

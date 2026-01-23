@@ -1,4 +1,4 @@
-import { SeasonAPIResponse } from '@/types/api-models'
+import { SeasonAPIResponse } from '@/types/api'
 import axios, { AxiosRequestConfig } from 'axios'
 
 let cachedSeasons: SeasonAPIResponse[] | null = null

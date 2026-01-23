@@ -1,5 +1,5 @@
 import { getAllBetRules } from '@/repositories/brazuerao.repository'
-import { RulesAPIResponse } from '@/types/api-models'
+import { RulesAPIResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
