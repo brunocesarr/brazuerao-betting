@@ -71,7 +71,9 @@ export default function BettingPage() {
   }, [predictions, savedPredictions])
 
   useEffect(() => {
-    fetchSavedBet()
+    if (status === 'authenticated') {
+      fetchSavedBet()
+    }
   }, [])
 
   const fetchSavedBet = async () => {
@@ -199,14 +201,14 @@ export default function BettingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#1a1a1a] py-8">
       <div className="container mx-auto max-w-5xl px-4">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="mb-3 text-4xl font-bold text-gray-900">
+          <h1 className="mb-3 text-4xl font-bold text-gray-50">
             Sua previsão para o Brasileirão 2026
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-300">
             Arraste os times para ordenar como você acha que vão terminar
           </p>
         </div>
@@ -352,7 +354,7 @@ export default function BettingPage() {
               </>
             )}
           </button>
-          <p className="mt-4 text-sm text-gray-500/80">
+          <p className="mt-4 text-sm text-gray-200/90">
             Você pode editar sua previsão a qualquer momento antes do início da
             temporada
           </p>

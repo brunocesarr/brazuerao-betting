@@ -38,7 +38,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
+    <div className=" bg-[#1a1a1a]">
       <div className="min-h-screen mx-auto max-w-2xl px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white">Conta</h1>
@@ -64,6 +64,6 @@ export default function ProfilePage() {
       </div>
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
-    </>
+    </div>
   )
 }

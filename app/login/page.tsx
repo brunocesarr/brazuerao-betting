@@ -115,7 +115,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-3 text-base"
+              className="btn-primary w-full py-3 text-base hover:cursor-pointer"
             >
               {loading ? (
                 <span className="flex items-center justify-center">

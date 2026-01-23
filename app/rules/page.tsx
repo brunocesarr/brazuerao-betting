@@ -33,14 +33,14 @@ export default function RegrasSimples() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-12">
+    <div className="min-h-screen  bg-[#1a1a1a] px-4 py-12">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <header className="mb-12 text-center">
-          <h1 className="mb-4 text-5xl font-bold text-slate-900">
+          <h1 className="mb-4 text-5xl font-bold text-white">
             Regulamento da Competição
           </h1>
-          <p className="text-xl text-slate-600">
+          <p className="text-xl text-slate-100">
             Regras oficiais do Brazuerao 2026
           </p>
         </header>
