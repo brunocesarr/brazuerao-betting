@@ -1,7 +1,7 @@
+import Footer from '@/components/Footer'
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
-import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: `Brazuerao Apostas - ${new Date().getFullYear()}`,
@@ -14,7 +14,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning data-lt-installed="true">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      data-lt-installed="true"
+      data-scroll-behavior="smooth"
+    >
       <body>
         <Providers children={children} />
         <Footer />

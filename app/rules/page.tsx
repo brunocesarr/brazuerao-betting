@@ -1,6 +1,6 @@
 'use client'
 
-import { getBrazueraoBetRules } from '@/services/brazuerao.service'
+import { getAllBetRules } from '@/services/brazuerao.service'
 import { useEffect, useState } from 'react'
 
 // app/regras/page.tsx
@@ -11,7 +11,7 @@ export default function RegrasSimples() {
   useEffect(() => {
     async function fetchRules() {
       try {
-        const rules = await getBrazueraoBetRules()
+        const rules = await getAllBetRules()
         console.log('Regras buscadas:', rules)
         setRules(rules)
       } catch (error) {

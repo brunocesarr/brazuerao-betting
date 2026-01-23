@@ -1,40 +1,103 @@
+import { appBrazuerao } from '@/repositories/apiBrazuerao'
 import {
-  getIndividualUserScore,
-  getBrazilianLeague,
-  getAllBetRules,
-  getBetByUserId,
-  saveUserBet,
-} from '@/repositories/brazuerao.repository'
+  RulesAPIResponse,
+  TeamPositionAPIResponse,
+  UserScoreAPIResponse,
+} from '@/types/api-models'
 
-async function getUserScore(classification: string[]) {
-  return await getIndividualUserScore(classification)
+async function getIndividualUserScore() {
+  try {
+    const {
+      data: { score: userScore },
+    } = await appBrazuerao.get('/score')
+    if (!userScore) return []
+    return userScore as UserScoreAPIResponse[]
+  } catch (error) {
+    console.error(
+      `Error in Brazuerao API. Erro message: ${(error as Error).message}`
+    )
+    const errorMessage = `Brazuerao API: ${(error as Error).message}`
+    throw new Error(errorMessage)
+  }
 }
 
-async function getCurrentBrazilianLeague(
-  year: number = new Date().getFullYear()
-) {
-  return await getBrazilianLeague(year)
+async function getBrazilianLeague(year?: number) {
+  try {
+    const {
+      data: { data: table },
+    } = await appBrazuerao.get(`/standings/${year ?? new Date().getFullYear()}`)
+
+    return table.map((teamPositionInfo: any) => {
+      const teamPositionApiInfo = {
+        position: teamPositionInfo.position,
+        played: teamPositionInfo.played,
+        name: teamPositionInfo.team,
+        shield: teamPositionInfo.shield,
+      }
+
+      return teamPositionApiInfo
+    }) as TeamPositionAPIResponse[]
+  } catch (error) {
+    console.error(
+      `Error in Brazuerao API. Erro message: ${(error as Error).message}`
+    )
+    const errorMessage = `Brazuerao API: ${(error as Error).message}`
+    throw new Error(errorMessage)
+  }
 }
 
-async function getBrazueraoBetRules() {
-  return await getAllBetRules()
+async function getAllBetRules() {
+  try {
+    const {
+      data: { rules },
+    } = await appBrazuerao.get('/rules')
+    return rules as RulesAPIResponse[]
+  } catch (error) {
+    console.error(
+      `Error in Brazuerao API. Erro message: ${(error as Error).message}`
+    )
+    const errorMessage = `Brazuerao API: ${(error as Error).message}`
+    throw new Error(errorMessage)
+  }
 }
 
-async function getCurrentBet() {
-  return await getBetByUserId()
+async function getBetByUserId() {
+  try {
+    const {
+      data: { bet },
+    } = await appBrazuerao.get(`/bets`)
+    return bet
+  } catch (error) {
+    console.error(
+      `Error in Brazuerao API. Erro message: ${(error as Error).message}`
+    )
+    const errorMessage = `Brazuerao API: ${(error as Error).message}`
+    throw new Error(errorMessage)
+  }
 }
 
-async function saveUserPredictions(
-  predictions: string[],
-  season: number = new Date().getFullYear()
-) {
-  return await saveUserBet(predictions, season)
+async function saveUserBet(predictions: string[]) {
+  try {
+    const {
+      data: { bet },
+    } = await appBrazuerao.post(`/bets`, {
+      predictions,
+      season: new Date().getFullYear(),
+    })
+    return bet
+  } catch (error) {
+    console.error(
+      `Error in Brazuerao API. Erro message: ${(error as Error).message}`
+    )
+    const errorMessage = `Brazuerao API: ${(error as Error).message}`
+    throw new Error(errorMessage)
+  }
 }
 
 export {
-  getUserScore,
-  getCurrentBrazilianLeague,
-  getBrazueraoBetRules,
-  getCurrentBet,
-  saveUserPredictions,
+  getAllBetRules,
+  getBetByUserId,
+  getBrazilianLeague,
+  getIndividualUserScore,
+  saveUserBet,
 }

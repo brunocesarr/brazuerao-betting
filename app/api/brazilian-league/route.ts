@@ -1,4 +1,4 @@
-import { getBrazilianLeague } from '@/repositories/brazuerao.repository'
+import { getBrazilianLeague } from '@/services/brazuerao.service'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {

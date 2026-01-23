@@ -1,6 +1,7 @@
 'use client'
 
 import CountdownTimer from '@/components/home/CountdownTimer'
+import { Dates } from '@/helpers/constants'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -36,7 +37,7 @@ export default function Home() {
               compita!
             </p>
 
-            <CountdownTimer targetDate={new Date('2026-01-28T17:59:59')} />
+            <CountdownTimer targetDate={new Date(Dates.EXPIRATION_DATE_BET)} />
 
             <div className="mb-16 flex flex-col justify-center gap-4 sm:flex-row">
               {status === 'authenticated' ? (

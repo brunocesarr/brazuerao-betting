@@ -1,8 +1,8 @@
 'use client'
 
+import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useSession, signOut } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 

@@ -1,7 +1,7 @@
-import { Season } from '@/types'
+import { SeasonAPIResponse } from '@/types/api-models'
 import axios, { AxiosRequestConfig } from 'axios'
 
-let cachedSeasons: Season[] | null = null
+let cachedSeasons: SeasonAPIResponse[] | null = null
 let cacheTimestamp: number | null = null
 const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
@@ -29,8 +29,7 @@ apiSofaScore.interceptors.request.use(
   }
 )
 
-export async function fetchBrasileiraoSeasons(): Promise<Season[]> {
-  // Check if cache is still valid
+export async function fetchBrasileiraoSeasons(): Promise<SeasonAPIResponse[]> {
   if (
     cachedSeasons &&
     cacheTimestamp &&
@@ -40,9 +39,9 @@ export async function fetchBrasileiraoSeasons(): Promise<Season[]> {
   }
 
   try {
-    const { data } = await apiSofaScore.get('/v1/unique-tournament/325/seasons')
+    const { data }: { data: { seasons: SeasonAPIResponse[] } } =
+      await apiSofaScore.get('/v1/unique-tournament/325/seasons')
 
-    // Cache the results
     cachedSeasons = data.seasons
     cacheTimestamp = Date.now()
 
@@ -59,7 +58,7 @@ export async function fetchBrasileiraoSeasons(): Promise<Season[]> {
 export async function getSeasonIdByYear(year: number): Promise<number | null> {
   try {
     const seasons = await fetchBrasileiraoSeasons()
-    const season = seasons.find((s) => s.year === year.toString())
+    const season = seasons.find((s) => parseInt(s.year) === year)
     return season ? season.id : null
   } catch (error) {
     console.error('Error getting season ID:', error)

@@ -1,6 +1,7 @@
+import { existsUser } from '@/repositories/brazuerao.repository'
+import { compare } from 'bcryptjs'
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { compare } from 'bcryptjs'
 import { prisma } from './prisma'
 
 export const authOptions: NextAuthOptions = {
@@ -50,13 +51,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
+        token.id = (await existsUser({ id: user.id })) ? user.id : null
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string
+        session.user.id = (await existsUser({ id: token.id as string }))
+          ? token.id
+          : null
       }
       return session
     },

@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
 import { getSeasonIdByYear } from '@/lib/sofascore'
 import axios, { AxiosRequestConfig } from 'axios'
+import { NextResponse } from 'next/server'
 
 const URL_BASE_SOFASCORE = 'https://api.sofascore.com/api'
 const USER_AGENT =

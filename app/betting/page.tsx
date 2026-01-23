@@ -1,21 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { TeamPrediction } from '@/types'
+import SortableTableRow from '@/components/betting/SortableTableRow'
 import {
-  getCurrentBrazilianLeague,
-  saveUserPredictions,
+  getBetByUserId,
+  getBrazilianLeague,
+  saveUserBet,
 } from '@/services/brazuerao.service'
+import { TeamPrediction } from '@/types/models'
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core'
 import {
   arrayMove,
@@ -23,8 +22,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import SortableTableRow from '@/components/betting/SortableTableRow'
-import { getBetByUserId } from '@/repositories/brazuerao.repository'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function BettingPage() {
   const { status } = useSession()
@@ -79,7 +79,7 @@ export default function BettingPage() {
       setLoading(true)
       const [bet, table] = await Promise.all([
         getBetByUserId(),
-        getCurrentBrazilianLeague(),
+        getBrazilianLeague(),
       ])
 
       const initialPredictions: TeamPrediction[] = table.map(
@@ -158,7 +158,7 @@ export default function BettingPage() {
     setMessage(null)
 
     try {
-      saveUserPredictions(predictions.map((p) => p.teamName))
+      saveUserBet(predictions.map((p) => p.teamName))
       setSavedPredictions(predictions)
 
       setMessage({

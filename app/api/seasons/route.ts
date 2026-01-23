@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server'
 import { fetchBrasileiraoSeasons } from '@/lib/sofascore'
+import { SeasonsAPIResponse } from '@/types/api-models'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
@@ -8,16 +9,14 @@ export async function GET() {
     const formattedSeasons = seasons
       .map((season) => ({
         year: parseInt(season.year),
-        seasonId: season.id,
-        name: season.name,
+        id: season.id,
+        name: String(season.name),
       }))
       .sort((a, b) => b.year - a.year)
 
     return NextResponse.json({
-      success: true,
-      data: formattedSeasons,
-      count: formattedSeasons.length,
-    })
+      seasons: formattedSeasons,
+    } as SeasonsAPIResponse)
   } catch (error) {
     console.error('Error fetching seasons:', error)
     return NextResponse.json(
