@@ -1,4 +1,3 @@
-import Footer from '@/components/Footer'
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
@@ -22,7 +21,6 @@ export default function RootLayout({
     >
       <body>
         <Providers children={children} />
-        <Footer />
       </body>
     </html>
   )

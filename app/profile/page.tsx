@@ -5,15 +5,12 @@
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton'
-import { ToastContainer } from '@/components/ui/Toast'
 import { useProfile } from '@/lib/hooks/useProfile'
-import { useToast } from '@/lib/hooks/useToast'
 import { useEffect } from 'react'
 
 export default function ProfilePage() {
   const { user, isLoading, isUpdating, fetchProfile, updateProfile } =
     useProfile()
-  const { toasts, removeToast } = useToast()
 
   useEffect(() => {
     fetchProfile()
@@ -38,7 +35,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className=" bg-[#1a1a1a]">
+    <div className="bg-[#1a1a1a]">
       <div className="min-h-screen mx-auto max-w-2xl px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white">Conta</h1>
@@ -62,8 +59,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   )
 }

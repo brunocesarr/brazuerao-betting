@@ -1,6 +1,6 @@
 'use client'
 
-import { Toast as ToastType } from '@/lib/hooks/useToast'
+import { Toast as ToastType } from '@/lib/contexts/ToastContext'
 import { clsx } from 'clsx'
 import {
   AlertCircleIcon,
@@ -9,7 +9,7 @@ import {
   XCircleIcon,
   XIcon,
 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface ToastProps {
   toast: ToastType
@@ -39,10 +39,20 @@ const iconStyles = {
 
 export function Toast({ toast, onRemove }: ToastProps) {
   const Icon = icons[toast.type]
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    // Trigger animation on mount
+    setIsVisible(true)
+  }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      onRemove(toast.id)
+      setIsVisible(false)
+      // Remove after animation completes
+      setTimeout(() => {
+        onRemove(toast.id)
+      }, 300)
     }, 5000)
 
     return () => clearTimeout(timer)
@@ -51,9 +61,10 @@ export function Toast({ toast, onRemove }: ToastProps) {
   return (
     <div
       className={clsx(
-        'pointer-events-auto w-full max-w-sm rounded-lg border p-4 shadow-lg transition-all',
+        'pointer-events-auto w-full max-w-sm rounded-lg border p-4 shadow-lg',
         styles[toast.type],
-        'animate-in slide-in-from-top-5 fade-in duration-300'
+        'transition-all duration-300 ease-in-out',
+        isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
       )}
     >
       <div className="flex items-start gap-3">
@@ -80,7 +91,7 @@ export function ToastContainer({
   onRemove: (id: string) => void
 }) {
   return (
-    <div className="pointer-events-none fixed top-0 right-0 z-50 flex flex-col gap-2 p-4 sm:p-6">
+    <div className="pointer-events-none fixed bottom-0 right-0 z-50 flex flex-col gap-2 p-4 sm:p-6">
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} onRemove={onRemove} />
       ))}

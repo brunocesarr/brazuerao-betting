@@ -1,6 +1,7 @@
 'use client'
 
 import SortableTableRow from '@/components/betting/SortableTableRow'
+import { useToast } from '@/lib/contexts/ToastContext'
 import {
   getBetByUserId,
   getBrazilianLeague,
@@ -33,10 +34,7 @@ export default function BettingPage() {
   const [predictions, setPredictions] = useState<TeamPrediction[]>([])
   const [hasChanges, setHasChanges] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState<{
-    type: 'success' | 'error'
-    text: string
-  } | null>(null)
+  const { showToast } = useToast()
 
   // Configure drag sensors
   const sensors = useSensors(
@@ -156,21 +154,20 @@ export default function BettingPage() {
   }
 
   const handleSubmit = async () => {
-    setLoading(true)
-    setMessage(null)
-
     try {
+      setLoading(true)
+
       saveUserBet(predictions.map((p) => p.teamName))
       setSavedPredictions(predictions)
 
-      setMessage({
+      showToast({
+        message: 'Sua previsão foi salva com sucesso!',
         type: 'success',
-        text: '✓ Sua previsão foi salva com sucesso!',
       })
     } catch (error) {
-      setMessage({
+      showToast({
+        message: 'Falha ao salvar sua previsão. Tente novamente.',
         type: 'error',
-        text: '✗ Falha ao salvar sua previsão. Tente novamente.',
       })
     } finally {
       setLoading(false)
@@ -212,19 +209,6 @@ export default function BettingPage() {
             Arraste os times para ordenar como você acha que vão terminar
           </p>
         </div>
-
-        {/* Message */}
-        {message && (
-          <div
-            className={`animate-fade-in mb-6 rounded-xl border-2 p-4 ${
-              message.type === 'success'
-                ? 'border-green-200 bg-green-50 text-green-800'
-                : 'border-red-200 bg-red-50 text-red-800'
-            }`}
-          >
-            <p className="text-center font-medium">{message.text}</p>
-          </div>
-        )}
 
         {/* Legend */}
         <div className="card mb-6 p-6">

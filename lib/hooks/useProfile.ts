@@ -1,5 +1,5 @@
+import { useToast } from '@/lib/contexts/ToastContext'
 import { useSessionRefresh } from '@/lib/hooks/useSessionRefresh'
-import { useToast } from '@/lib/hooks/useToast'
 import { UserProfile as User } from '@/types'
 import { useCallback, useState } from 'react'
 
