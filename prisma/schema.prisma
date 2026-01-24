@@ -48,6 +48,7 @@ model ScoringRule {
 model BetGroup {
   id            String         @id @default(cuid())
   name          String         @unique
+  isPrivate     Boolean        @default(true)
   userBetGroups UserBetGroup[]
 }
 

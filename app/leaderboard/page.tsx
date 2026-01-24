@@ -4,14 +4,14 @@ import {
   getAllBetRules,
   getIndividualUserScore,
 } from '@/services/brazuerao.service'
-import { LeaderboardEntry } from '@/types'
+import { LeaderboardEntry, RulesAPIResponse } from '@/types'
 import { ChevronDown, ChevronUp, Edit2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 export default function LeaderboardPage() {
-  const [rules, setRules] = useState<any[]>([])
+  const [rules, setRules] = useState<RulesAPIResponse[]>([])
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
@@ -30,8 +30,8 @@ export default function LeaderboardPage() {
 
       setLeaderboard([
         {
-          userId: '',
-          username: 'Test',
+          userId: session?.user.id ?? '',
+          username: session?.user.name ?? '',
           score: [...score],
         },
       ])
@@ -44,7 +44,7 @@ export default function LeaderboardPage() {
   }
 
   const getRuleTypeByRuleId = (ruleId: string): string | undefined => {
-    return rules.find((rule) => rule.id === ruleId).ruleType
+    return rules.find((rule) => rule.id === ruleId)?.ruleType
   }
 
   const toggleRow = (userId: string) => {

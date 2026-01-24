@@ -1,29 +1,61 @@
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useSessionRefresh } from '@/lib/hooks/useSessionRefresh'
 import { UserProfile as User } from '@/types'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface UseProfileReturn {
   user: User | null
+  userGroups: any[]
   isLoading: boolean
   isUpdating: boolean
-  error: string | null
   fetchProfile: () => Promise<void>
   updateProfile: (name: string) => Promise<boolean>
 }
 
 export function useProfile(): UseProfileReturn {
   const [user, setUser] = useState<User | null>(null)
+  const [userGroups, setUserGroups] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const { showToast } = useToast()
   const { refreshSession } = useSessionRefresh()
+
+  useEffect(() => {
+    const fetchUserGroups = async () => {
+      try {
+        setIsLoading(true)
+
+        if (!user) {
+          setUserGroups([])
+          return
+        }
+
+        const response = await fetch('/api/groups')
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch profile')
+        }
+
+        setUserGroups(data.private)
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to fetch user groups'
+        showToast({
+          type: 'error',
+          message: errorMessage,
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUserGroups()
+  }, [user])
 
   const fetchProfile = useCallback(async () => {
     try {
       setIsLoading(true)
-      setError(null)
 
       const response = await fetch('/api/profile')
       const data = await response.json()
@@ -36,7 +68,6 @@ export function useProfile(): UseProfileReturn {
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to fetch profile'
-      setError(errorMessage)
       showToast({
         type: 'error',
         message: errorMessage,
@@ -50,7 +81,6 @@ export function useProfile(): UseProfileReturn {
     async (name: string): Promise<boolean> => {
       try {
         setIsUpdating(true)
-        setError(null)
 
         const response = await fetch('/api/profile', {
           method: 'PATCH',
@@ -79,7 +109,6 @@ export function useProfile(): UseProfileReturn {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to update profile'
-        setError(errorMessage)
         showToast({
           type: 'error',
           message: errorMessage,
@@ -94,9 +123,9 @@ export function useProfile(): UseProfileReturn {
 
   return {
     user,
+    userGroups,
     isLoading,
     isUpdating,
-    error,
     fetchProfile,
     updateProfile,
   }

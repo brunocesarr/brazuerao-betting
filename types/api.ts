@@ -82,7 +82,7 @@ export interface RulesAPIResponse {
   ranges?: {
     rangeStart: number
     rangeEnd: number
-  }
+  }[]
   isActive: boolean
   createdAt: Date
 }

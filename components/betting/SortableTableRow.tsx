@@ -10,14 +10,12 @@ export default function SortableTableRow({
   pred,
   index,
   getPositionColor,
-  getPositionBadge,
   moveTeam,
   predictionsLength,
 }: {
   pred: TeamPrediction
   index: number
   getPositionColor: (position: number) => string
-  getPositionBadge: (position: number) => { text: string; color: string }
   moveTeam: (index: number, direction: 'up' | 'down') => void
   predictionsLength: number
 }) {
@@ -37,8 +35,6 @@ export default function SortableTableRow({
     opacity: isDragging ? 0.5 : 1,
     cursor: isDragging ? 'grabbing' : 'grab',
   }
-
-  const badge = getPositionBadge(pred.position)
 
   return (
     <tr
@@ -106,7 +102,7 @@ export default function SortableTableRow({
           <button
             onClick={() => moveTeam(index, 'up')}
             disabled={index === 0}
-            className="bg-primary-500 hover:bg-primary-600 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
+            className="bg-primary-600 hover:bg-primary-700 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
             title="Mover para cima"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -120,7 +116,7 @@ export default function SortableTableRow({
           <button
             onClick={() => moveTeam(index, 'down')}
             disabled={index === predictionsLength - 1}
-            className="bg-primary-500 hover:bg-primary-600 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
+            className="bg-primary-600 hover:bg-primary-700 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
             title="Mover para baixo"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">

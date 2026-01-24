@@ -4,6 +4,7 @@ import { getBrazilianLeague } from '@/services/brazuerao.service'
 import { calculateScore } from '@/services/scoring.service'
 import { UserProfile } from '@/types'
 import { UserScoreAPIResponse } from '@/types/api'
+import { UserBetGroup } from '@/types/domain'
 import { BetRuleDBModel, UserBetDBModel } from '@/types/entities'
 import { hash } from 'bcryptjs'
 
@@ -172,12 +173,71 @@ const getUserScore = async (
   }
 }
 
+// MARK: - Groups
+const getAllPublicGroups = async (): Promise<UserBetGroup[]> => {
+  try {
+    const groups = await prisma.betGroup.findMany({
+      where: {
+        isPrivate: false,
+      },
+    })
+
+    return groups.map((group) => {
+      return {
+        groupId: group.id,
+        name: group.name,
+        isPrivate: group.isPrivate,
+      }
+    })
+  } catch (error) {
+    console.error('Get public groups error:', error)
+    throw new Error('Failed to get public groups')
+  }
+}
+
+const getUserGroups = async (userId: string): Promise<UserBetGroup[]> => {
+  try {
+    const userGroupRelations = await prisma.userBetGroup.findMany({
+      where: {
+        userId: userId,
+      },
+    })
+    const groups = await prisma.betGroup.findMany({
+      where: {
+        id: {
+          in: userGroupRelations.map((relation) => relation.groupId),
+        },
+      },
+    })
+
+    return userGroupRelations
+      .map((relation) => {
+        const group = groups.find((group) => group.id === relation.groupId)
+        if (!group) return null
+        return {
+          groupId: relation.groupId,
+          name: group.name,
+          isPrivate: group.isPrivate,
+          userId: relation.userId,
+          roleGroupId: relation.roleGroupId,
+          requestStatusId: relation.requestStatusId,
+        }
+      })
+      .filter((userGroup) => userGroup != null)
+  } catch (error) {
+    console.error('Get user groups error:', error)
+    throw new Error('Failed to get user groups')
+  }
+}
+
 export {
   createUser,
   createUserBet,
   existsUser,
   getAllBetRules,
+  getAllPublicGroups,
   getUserBet,
   getUserById,
+  getUserGroups,
   getUserScore,
 }

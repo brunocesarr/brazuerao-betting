@@ -15,7 +15,12 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
         <h1 className="text-2xl font-bold">{user.name}</h1>
         <p className="text-white-100/50">{user.email}</p>
         <p className="mt-1 text-sm text-white-100/70">
-          Membro desde {new Date(user.createdAt).toLocaleDateString()}
+          Membro desde{' '}
+          {new Date(user.createdAt).toLocaleDateString('pt-BR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
         </p>
       </div>
     </div>

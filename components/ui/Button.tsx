@@ -21,7 +21,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+      'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:cursor-pointer'
 
     const variants = {
       primary:
@@ -29,7 +29,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary:
         'bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-gray-500',
       outline:
-        'border-2 border-primary-300 bg-transparent hover:bg-gray-50 focus-visible:ring-gray-500',
+        'border-2 border-primary-600 bg-transparent text-primary-600 hover:bg-gray-50 focus-visible:ring-gray-500',
       ghost: 'hover:bg-gray-100 focus-visible:ring-gray-500',
       danger:
         'bg-red-600/80 text-white hover:bg-red-700 focus-visible:ring-red-500',

@@ -127,7 +127,6 @@ export default function BettingPage() {
 
       const newItems = arrayMove(items, oldIndex, newIndex)
 
-      // Update positions
       newItems.forEach((pred, idx) => {
         pred.position = idx + 1
       })
@@ -186,15 +185,9 @@ export default function BettingPage() {
   }
 
   const getPositionColor = (position: number) => {
-    if (position <= 4) return 'bg-blue-50 border-blue-200'
-    if (position <= 16) return 'bg-green-50 border-green-200'
-    return 'bg-red-50 border-red-200'
-  }
-
-  const getPositionBadge = (position: number) => {
-    if (position <= 4) return { text: 'Libertadores', color: 'bg-blue-500' }
-    if (position <= 16) return { text: 'Sul-Americana', color: 'bg-green-500' }
-    return { text: 'Rebaixamento', color: 'bg-red-500' }
+    if (position <= 4) return 'bg-blue-50/10 border-blue-200/50'
+    if (position <= 16) return 'bg-green-50/10 border-green-200/50'
+    return 'bg-red-50/10 border-red-200/50'
   }
 
   return (
@@ -210,33 +203,9 @@ export default function BettingPage() {
           </p>
         </div>
 
-        {/* Legend */}
-        <div className="card mb-6 p-6">
-          <div className="flex flex-wrap justify-center gap-4">
-            <div className="flex items-center">
-              <div className="mr-2 h-4 w-4 rounded bg-blue-500"></div>
-              <span className="text-sm text-gray-700">
-                Zona classificação (1-4)
-              </span>
-            </div>
-            <div className="flex items-center">
-              <div className="mr-2 h-4 w-4 rounded bg-green-500"></div>
-              <span className="text-sm text-gray-700">
-                Zona meio de tabela (5-16)
-              </span>
-            </div>
-            <div className="flex items-center">
-              <div className="mr-2 h-4 w-4 rounded bg-red-500"></div>
-              <span className="text-sm text-gray-700">
-                Zona de rebaixamento (17-20)
-              </span>
-            </div>
-          </div>
-        </div>
-
         {/* Drag Instructions */}
-        <div className="mb-4 rounded-lg bg-blue-50 p-4 text-center">
-          <p className="text-sm text-blue-800">
+        <div className="mb-4 rounded-lg from-primary-600 to-primary-700 bg-gradient-to-r p-4 text-center">
+          <p className="text-sm text-white">
             💡 <strong>Dica:</strong> Clique e arraste o ícone de linhas (☰)
             para reordenar os times ou use os botões de setas
           </p>
@@ -284,7 +253,6 @@ export default function BettingPage() {
                         pred={pred}
                         index={index}
                         getPositionColor={getPositionColor}
-                        getPositionBadge={getPositionBadge}
                         moveTeam={moveTeam}
                         predictionsLength={predictions.length}
                       />

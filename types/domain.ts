@@ -67,3 +67,15 @@ export interface UserProfile {
   photoUrl?: string
   createdAt: Date
 }
+
+/**
+ * User bet group information
+ */
+export interface UserBetGroup {
+  groupId: string
+  name: string
+  isPrivate: boolean
+  userId?: string
+  roleGroupId?: string
+  requestStatusId?: string
+}
