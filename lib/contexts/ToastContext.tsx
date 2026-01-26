@@ -1,5 +1,6 @@
 'use client'
 
+import { ToastContainer } from '@/components/ui/Toast'
 import { createContext, useCallback, useContext, useState } from 'react'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
@@ -49,6 +50,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, showToast, removeToast }}>
       {children}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
   )
 }

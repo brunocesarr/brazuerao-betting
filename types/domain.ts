@@ -3,6 +3,9 @@
  * Represents entities used within the application layers
  */
 
+import { RulesAPIResponse } from '@/types/api'
+import { RequestStatusDBModel, RoleGroupDBModel } from '@/types/entities'
+
 /**
  * Season in the Brazilian football league
  */
@@ -74,8 +77,27 @@ export interface UserProfile {
 export interface UserBetGroup {
   groupId: string
   name: string
+  challenge?: string | null
   isPrivate: boolean
+  allowPublicViewing: boolean
   userId?: string
   roleGroupId?: string
   requestStatusId?: string
 }
+
+/**
+ * User profile information
+ */
+export type RuleBet = RulesAPIResponse & {}
+
+/**
+ * Group role information
+ */
+export type GroupRole = RoleGroupDBModel & {}
+
+/**
+ * Request status information
+ */
+export type RequestStatus = RequestStatusDBModel & {}
+
+export type GroupTabType = 'my-groups' | 'find-groups'

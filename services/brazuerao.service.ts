@@ -1,10 +1,8 @@
+import { DefaultValues, RequestStatusEnum } from '@/helpers/constants'
 import { withAPIErrorHandling } from '@/lib/api-error'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
-import {
-  RulesAPIResponse,
-  TeamPositionAPIResponse,
-  UserScoreAPIResponse,
-} from '@/types/api'
+import { TeamPositionAPIResponse, UserScoreAPIResponse } from '@/types/api'
+import { GroupRole, RequestStatus, RuleBet, UserBetGroup } from '@/types/domain'
 
 const API_SOURCE = 'Brazuerao API'
 
@@ -48,10 +46,10 @@ async function getBrazilianLeague(
 /**
  * Fetches all active scoring rules
  */
-async function getAllBetRules(): Promise<RulesAPIResponse[]> {
+async function getAllBetRules(): Promise<RuleBet[]> {
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.get('/rules')
-    return (data?.rules ?? []) as RulesAPIResponse[]
+    return (data?.rules ?? []) as RuleBet[]
   }, `${API_SOURCE}/rules`)
 }
 
@@ -78,8 +76,67 @@ async function saveUserBet(predictions: string[]) {
   }, `${API_SOURCE}/bets`)
 }
 
+/**
+ * Fetches current groups from the Brazuerão API
+ */
+async function getAllBetGroups(): Promise<UserBetGroup[]> {
+  return withAPIErrorHandling(async () => {
+    const { data } = await appBrazuerao.get('/groups')
+    return data.groups
+  }, `${API_SOURCE}/groups`)
+}
+
+/**
+ * Fetches current group roles from the Brazuerão API
+ */
+async function getAllGroupRoles(): Promise<GroupRole[]> {
+  return withAPIErrorHandling(async () => {
+    if (DefaultValues.groupRoles.length > 0) {
+      DefaultValues.adminGroupRule = DefaultValues.groupRoles.find(
+        (rule) => rule.name.toUpperCase() === 'ADMIN'
+      )
+      return DefaultValues.groupRoles
+    }
+    const { data } = await appBrazuerao.get('/groups/roles')
+    DefaultValues.groupRoles = data.roles
+    DefaultValues.adminGroupRule = data.roles.find(
+      (rule: GroupRole) => rule.name.toUpperCase() === 'ADMIN'
+    )
+    return data.roles
+  }, `${API_SOURCE}/groups/roles`)
+}
+
+/**
+ * Fetches current request status from the Brazuerão API
+ */
+async function getAllRequestStatus(): Promise<RequestStatus[]> {
+  return withAPIErrorHandling(async () => {
+    if (DefaultValues.requestStatus.length > 0) {
+      DefaultValues.pendingRequestStatus = DefaultValues.requestStatus.find(
+        (status) => status.status === RequestStatusEnum.pending
+      )
+      DefaultValues.approvedRequestStatus = DefaultValues.requestStatus.find(
+        (status) => status.status === RequestStatusEnum.approved
+      )
+      return DefaultValues.requestStatus
+    }
+    const { data } = await appBrazuerao.get('/groups/request-status')
+    DefaultValues.requestStatus = data.requestStatus
+    DefaultValues.pendingRequestStatus = data.requestStatus.find(
+      (status: RequestStatus) => status.status === RequestStatusEnum.pending
+    )
+    DefaultValues.approvedRequestStatus = data.requestStatus.find(
+      (status: RequestStatus) => status.status === RequestStatusEnum.approved
+    )
+    return data.requestStatus
+  }, `${API_SOURCE}/groups/request-status`)
+}
+
 export {
+  getAllBetGroups,
   getAllBetRules,
+  getAllGroupRoles,
+  getAllRequestStatus,
   getBetByUserId,
   getBrazilianLeague,
   getIndividualUserScore,

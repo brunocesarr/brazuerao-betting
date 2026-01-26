@@ -13,6 +13,7 @@ model User {
   password      String
   photoUrl      String?
   createdAt     DateTime       @default(now())
+
   bets          Bet[]
   userBetGroups UserBetGroup[]
 }
@@ -31,30 +32,35 @@ model Bet {
 
 model ScoringRule {
   id          String   @id @default(cuid())
-
   // Rule identification
   ruleType    String // e.g., "EXACT_CHAMPION", "EXACT_POSITION", "ZONE_MATCH"
   description String
   points      Int
-
   // Optional: additional conditions
   priority    Int @default(0)
   ranges      Json? // Array of {rangeStart: number, rangeEnd: number}
 
   isActive    Boolean @default(true)
   createdAt   DateTime @default(now())
+
+  scoringRuleBetGroups ScoringRuleBetGroup[]
 }
 
 model BetGroup {
-  id            String         @id @default(cuid())
-  name          String         @unique
-  isPrivate     Boolean        @default(true)
+  id                  String         @id @default(cuid())
+  name                String         
+  challenge           String?         
+  isPrivate           Boolean        @default(true)
+  allowPublicViewing  Boolean        @default(false)
+
   userBetGroups UserBetGroup[]
+  scoringRuleBetGroups ScoringRuleBetGroup[]
 }
 
 model RoleGroup {
   id            String         @id @default(cuid())
   name          String         @unique
+
   userBetGroups UserBetGroup[]
 }
 
@@ -67,14 +73,25 @@ model RequestStatus {
 model UserBetGroup {
   groupId         String
   userId          String
-  roleGroupId     String
   requestStatusId String
+  roleGroupId     String   
   createdAt       DateTime @default(now())
 
   group         BetGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  roleGroup     RoleGroup     @relation(fields: [roleGroupId], references: [id], onDelete: Cascade)
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   requestStatus RequestStatus @relation(fields: [requestStatusId], references: [id], onDelete: Cascade)
+  roleGroup     RoleGroup     @relation(fields: [roleGroupId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, userId])
+}
+
+model ScoringRuleBetGroup {
+  groupId         String
+  ruleId          String
+  createdAt       DateTime @default(now())
+
+  group         BetGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  scoringRule   ScoringRule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, ruleId])
 }

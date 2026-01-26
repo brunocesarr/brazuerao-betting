@@ -13,9 +13,9 @@ import { useEffect, useState } from 'react'
 export default function LeaderboardPage() {
   const [rules, setRules] = useState<RulesAPIResponse[]>([])
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     getLeaderboard()
@@ -23,6 +23,10 @@ export default function LeaderboardPage() {
 
   const getLeaderboard = async () => {
     try {
+      setLoading(true)
+
+      if (status !== 'authenticated') return
+
       const [score, rules] = await Promise.all([
         getIndividualUserScore(),
         getAllBetRules(),

@@ -19,7 +19,7 @@ export default function RootLayout({
       data-lt-installed="true"
       data-scroll-behavior="smooth"
     >
-      <body>
+      <body cz-shortcut-listen="true">
         <Providers children={children} />
       </body>
     </html>

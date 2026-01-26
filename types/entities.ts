@@ -3,6 +3,7 @@
  * Matches the Prisma schema structure
  */
 
+import { RequestStatusEnum } from '@/helpers/constants'
 import { Prisma } from '@prisma/client'
 
 // ============================================================================
@@ -86,7 +87,7 @@ export interface RoleGroupDBModel {
  */
 export interface RequestStatusDBModel {
   id: string
-  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  status: RequestStatusEnum
 }
 
 /**

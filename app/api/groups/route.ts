@@ -1,20 +1,18 @@
 import { authOptions } from '@/lib/auth'
-import {
-  existsUser,
-  getAllPublicGroups,
-  getUserGroups,
-} from '@/repositories/brazuerao.repository'
+import { existsUser, getAllGroups } from '@/repositories/brazuerao.repository'
 import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
   try {
-    const publicGroups = await getAllPublicGroups()
+    const allGroups = await getAllGroups()
 
     const session = await getServerSession(authOptions)
     if (!session?.user) {
       return Response.json({
-        public: publicGroups,
+        groups: allGroups
+          .filter((group) => !group.isPrivate)
+          .filter((group) => group.allowPublicViewing),
       })
     }
 
@@ -23,15 +21,8 @@ export async function GET(request: Request) {
       throw new Error('User not found')
     }
 
-    const userGroups = await getUserGroups(session.user.id)
     return Response.json({
-      public: [
-        ...userGroups.map((userGroup) => !userGroup.isPrivate),
-        ...publicGroups.filter((group) =>
-          userGroups.some((userGroup) => userGroup.groupId !== group.userId)
-        ),
-      ],
-      private: [...userGroups.map((userGroup) => userGroup.isPrivate)],
+      groups: allGroups,
     })
   } catch (error) {
     console.error('Error fetching user groups:', error)

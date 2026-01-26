@@ -1,18 +1,18 @@
 'use client'
 
 import { getAllBetRules } from '@/services/brazuerao.service'
+import { RulesAPIResponse } from '@/types'
 import { useEffect, useState } from 'react'
 
 // app/regras/page.tsx
 export default function RegrasSimples() {
-  const [rules, setRules] = useState<any[]>([])
+  const [rules, setRules] = useState<RulesAPIResponse[]>([])
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     async function fetchRules() {
       try {
         const rules = await getAllBetRules()
-        console.log('Regras buscadas:', rules)
         setRules(rules)
       } catch (error) {
         console.error('Erro ao buscar regras:', error)
@@ -83,7 +83,7 @@ export default function RegrasSimples() {
                   <li key={rule.id}>
                     Zonas de classificação:
                     <ul className="mt-1 ml-6 list-inside list-disc">
-                      {rule.ranges.map((range: any, index: number) => (
+                      {rule.ranges?.map((range: any, index: number) => (
                         <li key={index}>
                           Posições {range.rangeStart}º a {range.rangeEnd}º
                         </li>

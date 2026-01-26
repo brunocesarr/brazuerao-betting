@@ -1,5 +1,6 @@
 'use client'
 
+import { useToast } from '@/lib/contexts/ToastContext'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -11,6 +12,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,8 +31,16 @@ export default function RegisterPage() {
         setError(data.error || 'Falha no registro')
       } else {
         router.push('/login?registered=true')
+        showToast({
+          type: 'success',
+          message: 'Registro feito com sucesso.',
+        })
       }
     } catch (error) {
+      showToast({
+        type: 'error',
+        message: 'Ocorreu um erro. Tente novamente.',
+      })
       setError('Ocorreu um erro. Tente novamente.')
     } finally {
       setLoading(false)
