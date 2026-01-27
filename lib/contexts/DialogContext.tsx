@@ -34,7 +34,6 @@ export function ConfirmDialogProvider({
   >(null)
 
   const confirm = (opts: ConfirmOptions): Promise<boolean> => {
-    console.log('aqui')
     setOptions(opts)
     setIsOpen(true)
 

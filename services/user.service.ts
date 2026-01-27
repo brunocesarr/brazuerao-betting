@@ -1,6 +1,6 @@
 import { withAPIErrorHandling } from '@/lib/api-error'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
-import { UserBetGroup } from '@/types/domain'
+import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 
 const API_SOURCE = 'Brazuerao API'
 
@@ -64,7 +64,7 @@ async function createNewBetGroup(
 async function deleteBetGroup(groupId: string) {
   return withAPIErrorHandling(async () => {
     await appBrazuerao.delete(`/user/groups/${groupId}`)
-  }, `${API_SOURCE}/user/groups`)
+  }, `${API_SOURCE}/user/groups/${groupId}`)
 }
 
 /**
@@ -74,14 +74,46 @@ async function joinBetGroup(groupId: string) {
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.post(`/user/groups/${groupId}`)
     return data as UserBetGroup
-  }, `${API_SOURCE}/user/groups`)
+  }, `${API_SOURCE}/user/groups/${groupId}`)
+}
+
+/**
+ * Fetch current requests for group from the Brazuerão API
+ */
+async function getCurrentRequestByBetGroup(groupId: string) {
+  return withAPIErrorHandling(async () => {
+    const { data } = await appBrazuerao.get(`/user/groups/${groupId}/requests`)
+    return data.requests as CurrentRequestBetGroup[]
+  }, `${API_SOURCE}/user/groups/${groupId}/requests`)
+}
+
+/**
+ * Updates user bet group from the Brazuerão API
+ */
+async function updateUserBetGroup(
+  userId: string,
+  groupId: string,
+  statusId: string
+) {
+  return withAPIErrorHandling(async () => {
+    const { data } = await appBrazuerao.patch(
+      `/user/groups/${groupId}/requests`,
+      {
+        userId,
+        statusId,
+      }
+    )
+    return data.request as CurrentRequestBetGroup | null
+  }, `${API_SOURCE}/user/groups/${groupId}/requests`)
 }
 
 export {
   createNewBetGroup,
   deleteBetGroup,
   getBetGroupsByUserId,
+  getCurrentRequestByBetGroup,
   getUserInfo,
   joinBetGroup,
+  updateUserBetGroup,
   updateUserInfo,
 }

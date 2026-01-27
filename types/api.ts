@@ -3,6 +3,8 @@
  * Organized by domain and data flow direction
  */
 
+import { CurrentRequestBetGroup } from '@/types/domain'
+
 // ============================================================================
 // SEASON MODELS
 // ============================================================================
@@ -65,6 +67,11 @@ export interface UserBetAPIResponse {
   createdAt: Date
   updatedAt: Date
 }
+
+/**
+ * Current requests for bet response from API
+ */
+export type CurrentRequestBetGroupAPIResponse = CurrentRequestBetGroup & {}
 
 // ============================================================================
 // SCORING & RULES MODELS

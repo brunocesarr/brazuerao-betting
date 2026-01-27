@@ -6,20 +6,25 @@ import { Globe, Lock, Send } from 'lucide-react'
 interface GroupCardProps {
   group: UserBetGroup
   variant: 'my-group' | 'available'
+  isSelected: boolean
+  onSelectGroup?: (groupId: string) => void
   onJoinRequest?: (groupId: string) => void
   onDeleteGroup?: (groupId: string) => void
   onExitGroup?: (groupId: string) => void
 }
 
 export default function GroupCard({
+  onSelectGroup,
   onDeleteGroup,
   onExitGroup,
   group,
   variant,
+  isSelected,
   onJoinRequest,
 }: GroupCardProps) {
   const isMyGroup = variant === 'my-group'
-  const isAdmin = group.roleGroupId === DefaultValues.adminGroupRule?.id
+  const isAdmin =
+    group.roleGroupId && group.roleGroupId === DefaultValues.adminGroupRule?.id
   const isPending =
     group.requestStatusId &&
     group.requestStatusId === DefaultValues.pendingRequestStatus?.id
@@ -31,7 +36,8 @@ export default function GroupCard({
     <div
       className={`rounded-lg border border-gray-300/80 p-5 hover:shadow-md transition-shadow ${
         isMyGroup ? 'bg-gradient-to-r from-white to-gray-100' : 'bg-white'
-      }`}
+      } ${isAdmin ? 'hover:cursor-pointer hover:ring-1 hover:ring-primary-100' : ''} ${isSelected ? 'ring-1 ring-primary-100' : ''}`}
+      onClick={() => onSelectGroup?.(group.groupId)}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">

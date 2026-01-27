@@ -6,12 +6,14 @@ import {
   createNewBetGroup,
   deleteBetGroup,
   getBetGroupsByUserId,
+  getCurrentRequestByBetGroup,
   getUserInfo,
   joinBetGroup,
+  updateUserBetGroup,
   updateUserInfo,
 } from '@/services/user.service'
 import { UserProfile as User } from '@/types'
-import { UserBetGroup } from '@/types/domain'
+import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import {
@@ -36,6 +38,12 @@ interface AuthContextType {
   ) => Promise<boolean>
   deleteGroup: (groupId: string) => Promise<boolean>
   joinGroup: (groupId: string) => Promise<boolean>
+  getCurrentRequests: (groupId: string) => Promise<CurrentRequestBetGroup[]>
+  handleCurrentRequest: (
+    userId: string,
+    groupId: string,
+    statusId: string
+  ) => Promise<CurrentRequestBetGroup | null>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -225,6 +233,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const handleCurrentRequest = async (
+    userId: string,
+    groupId: string,
+    statusId: string
+  ) => {
+    try {
+      const updatedInfo = await updateUserBetGroup(userId, groupId, statusId)
+      showToast({
+        type: 'success',
+        message: 'Acao realizada com sucesso.',
+      })
+      return updatedInfo
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Falha ao obter dados dos particantes do grupo.'
+      showToast({
+        type: 'error',
+        message: errorMessage,
+      })
+      return null
+    }
+  }
+
+  const getCurrentRequests = async (groupId: string) => {
+    try {
+      return await getCurrentRequestByBetGroup(groupId)
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Falha ao obter dados dos particantes do grupo.'
+      showToast({
+        type: 'error',
+        message: errorMessage,
+      })
+      return []
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -235,6 +284,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         createNewGroup,
         deleteGroup,
         joinGroup,
+        getCurrentRequests,
+        handleCurrentRequest,
       }}
     >
       {children}

@@ -3,6 +3,7 @@
 import CreateGroupModal from '@/components/user/groups/CreateGroupModal'
 import EmptyState from '@/components/user/groups/EmptyState'
 import FindGroupsTab from '@/components/user/groups/FindGroupsTab'
+import MyGroupRequestCards from '@/components/user/groups/MyGroupRequests'
 import MyGroupsTab from '@/components/user/groups/MyGroupsTab'
 import TabNavigation from '@/components/user/groups/TabNavigation'
 import { useAuth } from '@/lib/contexts/AuthContext'
@@ -38,6 +39,7 @@ export default function GroupManagementPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [rules, setRules] = useState<RuleBet[]>([])
   const [availableGroups, setAvailableGroups] = useState<UserBetGroup[]>([])
+  const [selectedGroup, setSelectedGroup] = useState<UserBetGroup | null>()
 
   useEffect(() => {
     fetchRules()
@@ -46,6 +48,7 @@ export default function GroupManagementPage() {
   useEffect(() => {
     if (activeTab === 'find-groups') {
       fetchAvailableGroups()
+      setSelectedGroup(null)
     } else if (activeTab === 'my-groups') {
       const { pathname } = window.location
       window.history.replaceState({}, '', pathname)
@@ -114,6 +117,11 @@ export default function GroupManagementPage() {
     await joinGroup(groupId)
   }
 
+  const handleDeleteGroup = async (groupId: string) => {
+    setSelectedGroup(null)
+    await deleteGroup(groupId)
+  }
+
   const filteredGroups = availableGroups.filter(
     (group) =>
       group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -135,8 +143,10 @@ export default function GroupManagementPage() {
     return activeTab === 'my-groups' ? (
       <MyGroupsTab
         groups={myGroups}
+        selectedGroupId={selectedGroup?.groupId}
         onCreateClick={() => setShowCreateModal(true)}
-        onDeleteGroup={deleteGroup}
+        onDeleteGroup={handleDeleteGroup}
+        onSelectGroup={setSelectedGroup}
       />
     ) : availableGroups.length > 0 ? (
       <FindGroupsTab
@@ -182,6 +192,12 @@ export default function GroupManagementPage() {
             onCreateGroup={handleCreateGroup}
           />
         </div>
+
+        {selectedGroup && (
+          <div className="mt-8 bg-white rounded-lg p-6">
+            <MyGroupRequestCards userBetGroup={selectedGroup} />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -5,7 +5,7 @@ import { getBrazilianLeague } from '@/services/brazuerao.service'
 import { calculateScore } from '@/services/scoring.service'
 import { UserProfile } from '@/types'
 import { UserScoreAPIResponse } from '@/types/api'
-import { UserBetGroup } from '@/types/domain'
+import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 import { BetRuleDBModel, UserBetDBModel } from '@/types/entities'
 import { hash } from 'bcryptjs'
 
@@ -424,6 +424,125 @@ const unfollowBetGroup = async (userId: string, groupId: string) => {
   }
 }
 
+const getCurrentRequestsByGroupId = async (userId: string, groupId: string) => {
+  try {
+    const [adminRole, userGroupRelations] = await Promise.all([
+      prisma.roleGroup.findFirstOrThrow({
+        where: { name: 'ADMIN' },
+      }),
+      prisma.userBetGroup.findMany({
+        where: {
+          groupId: groupId,
+        },
+      }),
+    ])
+
+    if (
+      !userGroupRelations.some(
+        (relation) =>
+          relation.userId === userId && relation.roleGroupId === adminRole.id
+      )
+    ) {
+      throw new Error('Insufficient role')
+    }
+
+    const [requestStatus, userInfos] = await Promise.all([
+      getAllRequestStatus(),
+      prisma.user.findMany({
+        where: {
+          id: {
+            in: userGroupRelations.map((relation) => relation.userId),
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      }),
+    ])
+
+    return userGroupRelations.map((relation) => {
+      const userInfo = userInfos.find((user) => user.id === relation.userId)
+      const status = requestStatus.find(
+        (option) => option.id === relation.requestStatusId
+      )?.status
+      return {
+        groupId: relation.groupId,
+        userId: relation.userId,
+        username: userInfo?.name,
+        email: userInfo?.email,
+        requestStatusId: relation.requestStatusId,
+        requestStatusDescription: status,
+        createdAt: relation.createdAt,
+      } as CurrentRequestBetGroup
+    })
+  } catch (error) {
+    console.error('Get current requests error:', error)
+    throw new Error('Failed to get current requests')
+  }
+}
+
+const updateUserBetGroup = async (
+  adminUserId: string,
+  userId: string,
+  groupId: string,
+  statusId: string
+) => {
+  try {
+    const adminRole = await prisma.roleGroup.findFirstOrThrow({
+      where: { name: 'ADMIN' },
+    })
+    await prisma.userBetGroup.findFirstOrThrow({
+      where: {
+        userId: adminUserId,
+        groupId: groupId,
+        roleGroupId: adminRole.id,
+      },
+    })
+
+    const [userInfo, requestStatus] = await Promise.all([
+      getUserById(userId),
+      getAllRequestStatus(),
+    ])
+
+    if (
+      requestStatus.find((status) => status.id === statusId)?.status ===
+      RequestStatusEnum.rejected
+    ) {
+      return unfollowBetGroup(userId, groupId)
+    }
+    const updatedUserBetGroup = await prisma.userBetGroup.update({
+      where: {
+        userId: userId,
+        groupId: groupId,
+        groupId_userId: {
+          userId: userId,
+          groupId: groupId,
+        },
+      },
+      data: {
+        requestStatusId: statusId,
+      },
+    })
+
+    return {
+      groupId: updatedUserBetGroup.groupId,
+      userId: updatedUserBetGroup.userId,
+      username: userInfo?.name,
+      email: userInfo?.email,
+      requestStatusId: updatedUserBetGroup.requestStatusId,
+      requestStatusDescription: requestStatus.find(
+        (status) => status.id === statusId
+      )?.status,
+      createdAt: updatedUserBetGroup.createdAt,
+    } as CurrentRequestBetGroup
+  } catch (error) {
+    console.error('Unfollowing group error:', error)
+    throw new Error('Failed to unfollow group')
+  }
+}
+
 export {
   createNewBetGroup,
   createUser,
@@ -434,10 +553,12 @@ export {
   getAllGroupRoles,
   getAllGroups,
   getAllRequestStatus,
+  getCurrentRequestsByGroupId,
   getUserBet,
   getUserById,
   getUserGroups,
   getUserScore,
   joinBetGroup,
   unfollowBetGroup,
+  updateUserBetGroup,
 }

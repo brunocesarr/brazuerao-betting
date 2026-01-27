@@ -3,6 +3,7 @@
  * Represents entities used within the application layers
  */
 
+import { RequestStatusEnum } from '@/helpers/constants'
 import { RulesAPIResponse } from '@/types/api'
 import { RequestStatusDBModel, RoleGroupDBModel } from '@/types/entities'
 
@@ -99,5 +100,18 @@ export type GroupRole = RoleGroupDBModel & {}
  * Request status information
  */
 export type RequestStatus = RequestStatusDBModel & {}
+
+/**
+ * Current Requests for bet group information
+ */
+export interface CurrentRequestBetGroup {
+  groupId: string
+  userId: string
+  username: string | undefined
+  email: string | undefined
+  requestStatusId: string
+  requestStatusDescription: RequestStatusEnum | undefined
+  createdAt: Date
+}
 
 export type GroupTabType = 'my-groups' | 'find-groups'
