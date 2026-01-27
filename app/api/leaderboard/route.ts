@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const [brazilianLeague, rules, userBet] = await Promise.all([
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     ])
 
     if (!userBet) {
-      throw new Error('User bet not found')
+      throw new Error('Aposta do usuário não encontrada')
     }
 
     const leaderboard = calculateScore(
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ leaderboard })
   } catch (error) {
-    console.error('Error fetching leaderboard:', error)
+    console.error('Erro ao buscar classificação:', error)
     return NextResponse.json(
       { error: 'Falha ao buscar classificação' },
       { status: 500 }

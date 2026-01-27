@@ -25,13 +25,13 @@ export async function GET(request: NextRequest) {
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const bet = await getUserBet(session.user.id, season)
     return NextResponse.json({ bet: bet as UserBetAPIResponse })
   } catch (error) {
-    console.error('Error getting bet:', error)
+    console.error('Erro ao obter aposta:', error)
     return NextResponse.json(
       { error: 'Falha ao buscar aposta' },
       { status: 500 }
@@ -52,13 +52,13 @@ export async function POST(request: NextRequest) {
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const bet = await createUserBet(session.user.id, predictions, season)
     return NextResponse.json({ bet })
   } catch (error) {
-    console.error('Error saving bet:', error)
+    console.error('Erro ao salvar aposta:', error)
     return NextResponse.json(
       { error: 'Falha ao salvar aposta' },
       { status: 500 }

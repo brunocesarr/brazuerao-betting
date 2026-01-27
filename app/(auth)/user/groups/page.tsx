@@ -74,7 +74,9 @@ export default function GroupManagementPage() {
       )
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to fetch available groups'
+        err instanceof Error
+          ? err.message
+          : 'Falha ao buscar grupos disponíveis'
       showToast({
         type: 'error',
         message: errorMessage,

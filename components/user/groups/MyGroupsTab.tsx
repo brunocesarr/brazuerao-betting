@@ -25,10 +25,10 @@ export default function MyGroupsTab({
 
   const handleDeleteGroup = async (groupId: string) => {
     const result = await confirm({
-      title: 'Atencao',
-      message: 'Deseja seguir com a acao?',
+      title: 'Atenção',
+      message: 'Deseja seguir com a ação?',
       confirmText: 'Sim',
-      cancelText: 'Nao',
+      cancelText: 'Não',
       variant: 'danger',
     })
 
@@ -61,7 +61,7 @@ export default function MyGroupsTab({
       ).length > 0 && (
         <div className="mb-4 rounded-lg from-primary-600/70 to-primary-600/60 bg-gradient-to-b p-4 text-center">
           <p className="text-sm text-white">
-            💡 <strong>Dica:</strong> Clique sobre os grupos que voce criou para
+            💡 <strong>Dica:</strong> Clique sobre os grupos que você criou para
             gerenciar os participantes.
           </p>
         </div>

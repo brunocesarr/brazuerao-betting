@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const score = await getUserScore(session.user.id)
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       scoreByRule: score,
     })
   } catch (error) {
-    console.error('Error fetching leaderboard:', error)
+    console.error('Erro ao buscar classificação:', error)
     return NextResponse.json(
       { error: 'Falha ao buscar classificação' },
       { status: 500 }

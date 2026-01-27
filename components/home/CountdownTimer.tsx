@@ -36,7 +36,7 @@ export default function SimpleCountdown({ targetDate }: SimpleCountdownProps) {
   return (
     <div className="mb-12 flex flex-col items-center justify-center gap-6 rounded-xl bg-slate-950/10 p-8 backdrop-blur-sm">
       <p className="text-lg text-gray-400">
-        Contagem regressiva para o comeco do Brasileirao{' '}
+        Contagem regressiva para o começo do Brasileirão{' '}
         {new Date().getFullYear()}
       </p>
       <div className="grid grid-cols-2 gap-4 text-center md:flex">

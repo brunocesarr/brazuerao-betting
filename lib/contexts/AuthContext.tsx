@@ -242,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const updatedInfo = await updateUserBetGroup(userId, groupId, statusId)
       showToast({
         type: 'success',
-        message: 'Acao realizada com sucesso.',
+        message: 'Ação realizada com sucesso.',
       })
       return updatedInfo
     } catch (err) {

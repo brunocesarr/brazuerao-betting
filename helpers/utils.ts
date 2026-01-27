@@ -8,11 +8,11 @@ const existsUser = async (id?: string): Promise<boolean> => {
       where: { id },
     })
     if (!user) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
     return true
   } catch (error) {
-    console.error('Get user error:', error)
+    console.error('Erro ao obter usuário:', error)
     return false
   }
 }

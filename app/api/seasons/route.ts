@@ -18,9 +18,9 @@ export async function GET() {
       seasons: formattedSeasons,
     } as SeasonsAPIResponse)
   } catch (error) {
-    console.error('Error fetching seasons:', error)
+    console.error('Erro ao buscar temporadas:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch seasons' },
+      { success: false, error: 'Falha ao buscar temporadas' },
       { status: 500 }
     )
   }

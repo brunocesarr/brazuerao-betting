@@ -26,7 +26,7 @@ export async function DELETE(
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const { groupId } = await params
@@ -50,9 +50,9 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error deleting group:', error)
+    console.error('Erro ao deletar grupo:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to delete group' },
+      { success: false, error: 'Falha ao deletar grupo' },
       { status: 500 }
     )
   }
@@ -67,14 +67,14 @@ export async function POST(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
+        { success: false, message: 'Não autorizado' },
         { status: 401 }
       )
     }
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const { groupId } = await params
@@ -82,9 +82,9 @@ export async function POST(
 
     return NextResponse.json(userGroup)
   } catch (error) {
-    console.error('Error joining group:', error)
+    console.error('Erro ao entrar no grupo:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to join group' },
+      { success: false, error: 'Falha ao entrar no grupo' },
       { status: 500 }
     )
   }

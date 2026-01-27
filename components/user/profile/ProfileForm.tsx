@@ -69,7 +69,7 @@ export function ProfileForm({ user, onSubmit, isUpdating }: ProfileFormProps) {
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
           error={errors.name}
-          placeholder="Enter your full name"
+          placeholder="Digite seu nome completo"
           disabled={isUpdating}
           helperText="Este nome será exibido nas classificacoes e apostas"
         />
@@ -79,7 +79,7 @@ export function ProfileForm({ user, onSubmit, isUpdating }: ProfileFormProps) {
           type="email"
           value={user.email}
           disabled
-          helperText="Email nao pode ser alterado"
+          helperText="Email não pode ser alterado"
         />
       </div>
 
@@ -91,7 +91,7 @@ export function ProfileForm({ user, onSubmit, isUpdating }: ProfileFormProps) {
             isLoading={isUpdating}
             className="flex-1"
           >
-            Save Changes
+            Salvar Mudanças
           </Button>
           <Button
             type="button"
@@ -99,7 +99,7 @@ export function ProfileForm({ user, onSubmit, isUpdating }: ProfileFormProps) {
             onClick={handleCancel}
             disabled={isUpdating}
           >
-            Cancel
+            Cancelar
           </Button>
         </div>
       )}

@@ -8,9 +8,9 @@ export async function GET(request: Request) {
       roles,
     })
   } catch (error) {
-    console.error('Error fetching roles:', error)
+    console.error('Erro ao buscar funções:', error)
     return NextResponse.json(
-      { error: 'Falha ao buscar roles' },
+      { error: 'Falha ao buscar funções' },
       { status: 500 }
     )
   }

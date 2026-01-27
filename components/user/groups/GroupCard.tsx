@@ -6,7 +6,7 @@ import { Globe, Lock, Send } from 'lucide-react'
 interface GroupCardProps {
   group: UserBetGroup
   variant: 'my-group' | 'available'
-  isSelected: boolean
+  isSelected?: boolean
   onSelectGroup?: (groupId: string) => void
   onJoinRequest?: (groupId: string) => void
   onDeleteGroup?: (groupId: string) => void
@@ -100,7 +100,7 @@ export default function GroupCard({
             }
           }}
         >
-          {isAdmin ? 'Apagar' : isPending ? 'Cancelar solicitacao' : 'Sair'}
+          {isAdmin ? 'Apagar' : isPending ? 'Cancelar solicitação' : 'Sair'}
         </Button>
       )}
     </div>

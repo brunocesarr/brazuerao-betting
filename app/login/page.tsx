@@ -14,11 +14,11 @@ export default function LoginPage() {
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
     try {
+      e.preventDefault()
+      setLoading(true)
+      setError('')
+
       const result = await signIn('credentials', {
         email,
         password,
@@ -28,7 +28,7 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Email ou senha inválidos')
       } else {
-        router.push('/betting')
+        router.push('/user/profile')
       }
     } catch (error) {
       setError('Ocorreu um erro. Tente novamente.')
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 className="input-field"
-                placeholder="your@email.com"
+                placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

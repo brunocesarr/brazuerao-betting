@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
     if (year > new Date().getFullYear())
       return NextResponse.json(
-        { message: 'Invalid parameter: year' },
+        { message: 'Parâmetro inválido: ano' },
         { status: 400 }
       )
 
@@ -19,12 +19,12 @@ export async function GET(request: NextRequest) {
       return Response.json(data)
     } else {
       return NextResponse.json(
-        { message: 'Data for the requested year is not available' },
+        { message: 'Dados para o ano solicitado não estão disponíveis' },
         { status: 404 }
       )
     }
   } catch (error) {
-    console.error('Error fetching leaderboard:', error)
+    console.error('Erro ao buscar classificação:', error)
     return NextResponse.json(
       { error: 'Falha ao buscar classificação' },
       { status: 500 }

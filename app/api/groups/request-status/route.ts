@@ -8,9 +8,9 @@ export async function GET(request: Request) {
       requestStatus,
     })
   } catch (error) {
-    console.error('Error fetching request status:', error)
+    console.error('Erro ao buscar status da solicitação:', error)
     return NextResponse.json(
-      { error: 'Falha ao buscar request status' },
+      { error: 'Falha ao buscar status da solicitação' },
       { status: 500 }
     )
   }

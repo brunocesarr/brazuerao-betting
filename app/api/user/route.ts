@@ -16,7 +16,7 @@ export async function GET() {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
+        { success: false, message: 'Não autorizado' },
         { status: 401 }
       )
     }
@@ -27,16 +27,16 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, message: 'User not found' },
+        { success: false, message: 'Usuário não encontrado' },
         { status: 404 }
       )
     }
 
     return NextResponse.json(user)
   } catch (error) {
-    console.error('Error fetching user profile:', error)
+    console.error('Erro ao buscar perfil do usuário:', error)
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { success: false, message: 'Erro interno do servidor' },
       { status: 500 }
     )
   }
@@ -52,7 +52,7 @@ export async function PATCH(request: Request) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
+        { success: false, message: 'Não autorizado' },
         { status: 401 }
       )
     }
@@ -65,7 +65,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Validation error',
+          message: 'Erro de validação',
           errors: validation.error.format(),
         },
         { status: 400 }
@@ -92,9 +92,9 @@ export async function PATCH(request: Request) {
       user: updatedUser,
     })
   } catch (error) {
-    console.error('Error updating user profile:', error)
+    console.error('Erro ao atualizar perfil do usuário:', error)
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { success: false, message: 'Erro interno do servidor' },
       { status: 500 }
     )
   }

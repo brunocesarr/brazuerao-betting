@@ -18,14 +18,14 @@ export async function GET(request: Request) {
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     return Response.json({
       groups: allGroups,
     })
   } catch (error) {
-    console.error('Error fetching user groups:', error)
+    console.error('Erro ao buscar grupos do usuário:', error)
     return NextResponse.json(
       { error: 'Falha ao buscar grupos do usuário' },
       { status: 500 }

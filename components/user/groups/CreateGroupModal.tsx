@@ -188,7 +188,7 @@ export default function CreateGroupModal({
           {/* Modal Footer */}
           <div className="flex gap-3 mt-6">
             <Button className="flex-1" variant="danger" onClick={handleClose}>
-              Cancel
+              Cancelar
             </Button>
             <Button className="flex-1" type="submit" variant="primary">
               Criar grupo

@@ -20,7 +20,7 @@ export async function GET(
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const { groupId } = await params
@@ -31,7 +31,7 @@ export async function GET(
       requests: currentRequests,
     })
   } catch (error) {
-    console.error('Error fetching user groups:', error)
+    console.error('Erro ao buscar grupos do usuário:', error)
     return NextResponse.json(
       { error: 'Falha ao buscar grupos do usuário' },
       { status: 500 }
@@ -48,14 +48,14 @@ export async function PATCH(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
+        { success: false, message: 'Não autorizado' },
         { status: 401 }
       )
     }
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const { groupId } = await params
@@ -71,9 +71,9 @@ export async function PATCH(
       request: userGroup,
     })
   } catch (error) {
-    console.error('Error update user get group:', error)
+    console.error('Erro ao atualizar grupo de aposta do usuário:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to update bet group' },
+      { success: false, error: 'Falha ao atualizar grupo de aposta' },
       { status: 500 }
     )
   }

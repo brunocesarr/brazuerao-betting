@@ -1,5 +1,6 @@
 'use client'
 
+import { Group } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -138,6 +139,17 @@ export default function Navbar() {
                             />
                           </svg>
                           Perfil
+                        </Link>
+
+                        {/* Menu Items */}
+                        <Link
+                          href="/user/groups"
+                          className={`block flex flex-row items-center px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200 ${
+                            isActive('/user/groups') ? 'bg-gray-200' : ''
+                          }`}
+                        >
+                          <Group className="mr-2 h-4 w-4" />
+                          Grupos
                         </Link>
 
                         <div className="my-0 border-t border-gray-200"></div>

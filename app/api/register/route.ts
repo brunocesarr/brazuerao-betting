@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const user = await createUser(name, email, password)
     return NextResponse.json({ user })
   } catch (error) {
-    console.error('Registration error:', error)
+    console.error('Erro no registro:', error)
     return NextResponse.json({ error: 'Falha no registro' }, { status: 500 })
   }
 }

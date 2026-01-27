@@ -9,7 +9,7 @@ interface SearchBarProps {
 export default function SearchBar({
   value,
   onChange,
-  placeholder = 'Search...',
+  placeholder = 'Pesquisar...',
 }: SearchBarProps) {
   return (
     <div className="relative">

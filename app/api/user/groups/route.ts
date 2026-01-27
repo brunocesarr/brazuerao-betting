@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const userGroups = await getUserGroups(session.user.id)
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       groups: userGroups,
     })
   } catch (error) {
-    console.error('Error fetching user groups:', error)
+    console.error('Erro ao buscar grupos do usuário:', error)
     return NextResponse.json(
       { error: 'Falha ao buscar grupos do usuário' },
       { status: 500 }
@@ -38,14 +38,14 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
+        { success: false, message: 'Não autorizado' },
         { status: 401 }
       )
     }
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
-      throw new Error('User not found')
+      throw new Error('Usuário não encontrado')
     }
 
     const { name, challenge, isPrivate, allowPublicViewing, rules } =
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     )
     return NextResponse.json(newUserGroup)
   } catch (error) {
-    console.error('Registration error:', error)
+    console.error('Erro no registro:', error)
     return NextResponse.json({ error: 'Falha no registro' }, { status: 500 })
   }
 }

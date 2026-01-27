@@ -23,9 +23,9 @@ export default function FindGroupsTab({
   const handleJoinGroup = async (groupId: string) => {
     const result = await confirm({
       title: `Grupo: ${groups.find((group) => group.groupId === groupId)?.name}`,
-      message: 'Deseja enviar uma solicitacao para entrar?',
+      message: 'Deseja enviar uma solicitação para entrar?',
       confirmText: 'Sim',
-      cancelText: 'Nao',
+      cancelText: 'Não',
       variant: 'info',
     })
 
