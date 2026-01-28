@@ -3,6 +3,7 @@
  * Organized by domain and data flow direction
  */
 
+import { RuleTypeEnum } from '@/helpers/constants'
 import { CurrentRequestBetGroup } from '@/types/domain'
 
 // ============================================================================
@@ -82,7 +83,7 @@ export type CurrentRequestBetGroupAPIResponse = CurrentRequestBetGroup & {}
  */
 export interface RulesAPIResponse {
   id: string
-  ruleType: 'EXACT_CHAMPION' | 'EXACT_POSITION' | 'ZONE_MATCH'
+  ruleType: RuleTypeEnum
   description: string
   points: number
   priority: number
@@ -90,6 +91,7 @@ export interface RulesAPIResponse {
     rangeStart: number
     rangeEnd: number
   }[]
+  isDefault: boolean
   isActive: boolean
   createdAt: Date
 }

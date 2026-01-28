@@ -33,6 +33,7 @@ interface AuthContextType {
     name: string,
     challenge: string | null | undefined,
     isPrivate: boolean,
+    deadlineAt: Date,
     allowPublicViewing: boolean,
     rules: string[]
   ) => Promise<boolean>
@@ -148,6 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     name: string,
     challenge: string | null | undefined,
     isPrivate: boolean,
+    deadlineAt: Date,
     allowPublicViewing: boolean,
     rules: string[]
   ): Promise<boolean> => {
@@ -158,6 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name,
         challenge,
         isPrivate,
+        deadlineAt,
         allowPublicViewing,
         rules
       )

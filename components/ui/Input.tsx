@@ -1,45 +1,22 @@
-import { clsx } from 'clsx'
-import { InputHTMLAttributes, forwardRef } from 'react'
+import * as React from 'react'
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
-  helperText?: string
-}
+import { cn } from '@/lib/utils'
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, helperText, id, ...props }, ref) => {
-    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-')
-
+const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
+  ({ className, type, ...props }, ref) => {
     return (
-      <div className="w-full">
-        {label && (
-          <label
-            htmlFor={inputId}
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            {label}
-          </label>
+      <input
+        type={type}
+        className={cn(
+          'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+          className
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={clsx(
-            'w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 transition-colors',
-            'focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-0',
-            'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
-            error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
-            className
-          )}
-          {...props}
-        />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        {helperText && !error && (
-          <p className="mt-1 text-sm text-gray-500">{helperText}</p>
-        )}
-      </div>
+        ref={ref}
+        {...props}
+      />
     )
   }
 )
-
 Input.displayName = 'Input'
+
+export { Input }

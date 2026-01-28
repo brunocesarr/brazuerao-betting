@@ -1,6 +1,6 @@
 'use client'
 
-import { ToastContainer } from '@/components/ui/Toast'
+import { ToastContainer } from '@/components/shared/Toast'
 import { createContext, useCallback, useContext, useState } from 'react'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'

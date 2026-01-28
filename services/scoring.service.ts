@@ -1,3 +1,4 @@
+import { RuleTypeEnum } from '@/helpers/constants'
 import { TeamPositionAPIResponse, UserScoreAPIResponse } from '@/types/api'
 import { BetRuleDBModel } from '@/types/entities'
 
@@ -21,13 +22,13 @@ function scoreByRule(
   const scoredTeams: string[] = []
 
   switch (rule.ruleType) {
-    case 'EXACT_CHAMPION':
+    case RuleTypeEnum.champion:
       if (table.find((team) => team.position === 1)?.name === predictions[0]) {
         scoredTeams.push(predictions[0])
       }
       break
 
-    case 'EXACT_POSITION':
+    case RuleTypeEnum.position:
       if (rule.ranges) {
         rule.ranges.forEach((range) => {
           const teamsInRange = table.filter(
@@ -50,7 +51,7 @@ function scoreByRule(
       }
       break
 
-    case 'ZONE_MATCH':
+    case RuleTypeEnum.zone:
       rule.ranges?.forEach((range) => {
         const teamsInRange = table.filter(
           (team) =>

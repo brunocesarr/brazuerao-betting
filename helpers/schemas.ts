@@ -1,3 +1,4 @@
+import { RuleTypeEnum } from '@/helpers/constants'
 import { z } from 'zod'
 
 /**
@@ -7,9 +8,9 @@ import { z } from 'zod'
 export const predictionSchema = z.array(z.string()).min(1)
 
 export const scoringRuleTypeSchema = z.enum([
-  'EXACT_CHAMPION',
-  'EXACT_POSITION',
-  'ZONE_MATCH',
+  RuleTypeEnum.champion,
+  RuleTypeEnum.position,
+  RuleTypeEnum.zone,
 ])
 
 export const rangeSchema = z.object({

@@ -1,5 +1,6 @@
 'use client'
 
+import { RuleTypeEnum } from '@/helpers/constants'
 import { getAllBetRules } from '@/services/brazuerao.service'
 import { RulesAPIResponse } from '@/types'
 import { useEffect, useState } from 'react'
@@ -74,11 +75,11 @@ export default function RegrasSimples() {
 
           <SecaoRegra titulo="3. Classificação">
             <ul className="list-inside list-disc space-y-2">
-              {rules.some((rule) => rule.ruleType === 'EXACT_CHAMPION') && (
-                <li>Posição 1: Campeão</li>
-              )}
+              {rules.some(
+                (rule) => rule.ruleType === RuleTypeEnum.champion
+              ) && <li>Posição 1: Campeão</li>}
               {rules
-                .filter((rule) => rule.ruleType === 'ZONE_MATCH')
+                .filter((rule) => rule.ruleType === RuleTypeEnum.zone)
                 .map((rule) => (
                   <li key={rule.id}>
                     Zonas de classificação:

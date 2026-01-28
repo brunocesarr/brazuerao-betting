@@ -11,6 +11,7 @@ declare module 'next-auth' {
 export type {
   BetData,
   LeaderboardEntry,
+  RuleBet,
   ScoreEntry,
   Season,
   TeamPrediction,

@@ -1,6 +1,6 @@
 'use client'
 
-import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { createContext, useContext, useState } from 'react'
 
 interface ConfirmOptions {

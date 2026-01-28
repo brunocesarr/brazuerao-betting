@@ -1,3 +1,4 @@
+import { RuleTypeEnum } from '@/helpers/constants'
 import { authOptions } from '@/lib/auth'
 import {
   existsUser,
@@ -62,7 +63,7 @@ const calculateScore = (
   const scoresByRule = rules.map((rule) => {
     let scoredTeams: string[] = []
     switch (rule.ruleType) {
-      case 'EXACT_CHAMPION':
+      case RuleTypeEnum.champion:
         if (
           table.find((teamPositionInfo) => teamPositionInfo.position === 1)
             ?.name === predictions[0]
@@ -70,7 +71,7 @@ const calculateScore = (
           scoredTeams = [predictions[0]]
         }
         break
-      case 'EXACT_POSITION':
+      case RuleTypeEnum.position:
         if (rule.ranges) {
           rule.ranges.forEach((range) => {
             let teamsInRange = table.filter(
@@ -91,7 +92,7 @@ const calculateScore = (
             .map((team) => team.name)
         }
         break
-      case 'ZONE_MATCH':
+      case RuleTypeEnum.zone:
         rule.ranges?.forEach((range) => {
           let teamsInRange = table.filter(
             (team) =>

@@ -80,6 +80,7 @@ export interface UserBetGroup {
   name: string
   challenge?: string | null
   isPrivate: boolean
+  deadlineAt: Date
   allowPublicViewing: boolean
   userId?: string
   roleGroupId?: string

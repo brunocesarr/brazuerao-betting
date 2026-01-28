@@ -6,6 +6,20 @@ datasource db {
   provider = "sqlite" // or "mysql" or "sqlite"
 }
 
+model RoleGroup {
+  id            String         @id @default(cuid())
+  name          String         @unique // ADMIN, USER, ROOT
+
+  userBetGroups UserBetGroup[]
+}
+
+model RequestStatus {
+  id            String         @id @default(cuid())
+  status        String         @unique // PENDING, APPROVED, REJECTED
+
+  userBetGroups UserBetGroup[]
+}
+
 model User {
   id            String         @id @default(cuid())
   email         String         @unique
@@ -13,21 +27,25 @@ model User {
   password      String
   photoUrl      String?
   createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt @default(now())
 
   bets          Bet[]
   userBetGroups UserBetGroup[]
 }
 
 model Bet {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  groupId     String?
   predictions Json // Array of {teamId: number, position: number}
   season      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt @default(now())
 
-  @@unique([userId, season])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  group       BetGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, season, groupId])
 }
 
 model ScoringRule {
@@ -37,10 +55,11 @@ model ScoringRule {
   description String
   points      Int
   // Optional: additional conditions
-  priority    Int @default(0)
+  priority    Int      @default(0)
   ranges      Json? // Array of {rangeStart: number, rangeEnd: number}
 
-  isActive    Boolean @default(true)
+  isDefault   Boolean  @default(true)
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
   scoringRuleBetGroups ScoringRuleBetGroup[]
@@ -52,22 +71,13 @@ model BetGroup {
   challenge           String?         
   isPrivate           Boolean        @default(true)
   allowPublicViewing  Boolean        @default(false)
+  deadlineAt          DateTime       @default(now())
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt @default(now())
 
   userBetGroups UserBetGroup[]
   scoringRuleBetGroups ScoringRuleBetGroup[]
-}
-
-model RoleGroup {
-  id            String         @id @default(cuid())
-  name          String         @unique
-
-  userBetGroups UserBetGroup[]
-}
-
-model RequestStatus {
-  id            String         @id @default(cuid())
-  status        String         @unique // PENDING, APPROVED, REJECTED
-  userBetGroups UserBetGroup[]
+  bets Bet[]
 }
 
 model UserBetGroup {
@@ -75,7 +85,8 @@ model UserBetGroup {
   userId          String
   requestStatusId String
   roleGroupId     String   
-  createdAt       DateTime @default(now())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt @default(now())
 
   group         BetGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -88,10 +99,10 @@ model UserBetGroup {
 model ScoringRuleBetGroup {
   groupId         String
   ruleId          String
-  createdAt       DateTime @default(now())
+  createdAt       DateTime    @default(now())
 
-  group         BetGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  scoringRule   ScoringRule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  group           BetGroup    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  scoringRule     ScoringRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, ruleId])
 }

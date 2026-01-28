@@ -147,14 +147,16 @@ const getAllBetRules = async (): Promise<BetRuleDBModel[]> => {
 // MARK: - Bets
 const getUserBet = async (
   userId: string,
+  groupId: string = '',
   season: number = new Date().getFullYear()
 ): Promise<UserBetDBModel | null> => {
   try {
     const bet = await prisma.bet.findUnique({
       where: {
-        userId_season: {
+        userId_season_groupId: {
           userId,
-          season,
+          season: season,
+          groupId: groupId,
         },
       },
     })
@@ -176,6 +178,7 @@ const getUserBet = async (
 const createUserBet = async (
   userId: string,
   predictions: string[],
+  groupId: string,
   season: number = new Date().getFullYear()
 ): Promise<UserBetDBModel> => {
   try {
@@ -187,9 +190,10 @@ const createUserBet = async (
 
     const bet = await prisma.bet.upsert({
       where: {
-        userId_season: {
+        userId_season_groupId: {
           userId,
           season: validatedData.season,
+          groupId: groupId,
         },
       },
       update: {
@@ -218,15 +222,16 @@ const getUserScore = async (
   userId: string
 ): Promise<UserScoreAPIResponse[]> => {
   try {
-    const [brazilianLeague, rules, userBet] = await Promise.all([
-      getBrazilianLeague(),
-      getAllBetRules(),
-      getUserBet(userId),
-    ])
+    const userBet = await getUserBet(userId)
 
     if (!userBet) {
-      throw new Error('User bet not found')
+      return []
     }
+
+    const [brazilianLeague, rules] = await Promise.all([
+      getBrazilianLeague(),
+      getAllBetRules(),
+    ])
 
     const predictions = predictionSchema.parse(userBet.predictions)
     return calculateScore(predictions, rules, brazilianLeague)
@@ -247,6 +252,7 @@ const getAllGroups = async (): Promise<UserBetGroup[]> => {
         name: group.name,
         challenge: group.challenge,
         isPrivate: group.isPrivate,
+        deadlineAt: group.deadlineAt,
         allowPublicViewing: group.allowPublicViewing,
       }
     })
@@ -280,6 +286,7 @@ const getUserGroups = async (userId: string): Promise<UserBetGroup[]> => {
           name: group.name,
           challenge: group.challenge,
           isPrivate: group.isPrivate,
+          deadlineAt: group.deadlineAt,
           allowPublicViewing: group.allowPublicViewing,
           userId: relation.userId,
           roleGroupId: relation.roleGroupId,
@@ -298,6 +305,7 @@ const createNewBetGroup = async (
   name: string,
   challenge: string | undefined,
   isPrivate: boolean,
+  deadlineAt: Date,
   allowPublicViewing: boolean,
   rules: string[]
 ) => {
@@ -308,6 +316,7 @@ const createNewBetGroup = async (
           name,
           challenge,
           isPrivate,
+          deadlineAt,
           allowPublicViewing,
         },
       }),
@@ -343,6 +352,7 @@ const createNewBetGroup = async (
       name: newGroup.name,
       challenge: newGroup.challenge,
       isPrivate: newGroup.isPrivate,
+      deadlineAt: newGroup.deadlineAt,
       allowPublicViewing: newGroup.allowPublicViewing,
       userId: userBetGroup.userId,
       roleGroupId: userBetGroup.roleGroupId,

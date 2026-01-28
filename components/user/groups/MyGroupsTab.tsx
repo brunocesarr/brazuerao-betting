@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/shared/Button'
 import { DefaultValues } from '@/helpers/constants'
 import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { UserBetGroup } from '@/types/domain'

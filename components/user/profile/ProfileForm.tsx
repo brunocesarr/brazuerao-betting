@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/shared/Button'
+import { Input } from '@/components/shared/Input'
 import { updateProfileSchema } from '@/helpers/schemas'
 import { UserProfile as User } from '@/types'
 import { FormEvent, useState } from 'react'

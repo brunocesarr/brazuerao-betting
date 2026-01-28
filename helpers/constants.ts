@@ -23,3 +23,9 @@ export enum RequestStatusEnum {
   rejected = 'REJECTED',
   pending = 'PENDING',
 }
+
+export enum RuleTypeEnum {
+  champion = 'EXACT_CHAMPION',
+  position = 'EXACT_POSITION',
+  zone = 'ZONE_MATCH',
+}

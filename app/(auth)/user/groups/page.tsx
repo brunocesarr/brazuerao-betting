@@ -110,6 +110,7 @@ export default function GroupManagementPage() {
       groupData.name,
       groupData.challenge,
       groupData.isPrivate,
+      groupData.deadlineAt,
       groupData.allowPublicViewing,
       rules
     )

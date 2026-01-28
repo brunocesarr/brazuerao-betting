@@ -2,7 +2,7 @@
 
 'use client'
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/shared/Button'
 import { ProfileForm } from '@/components/user/profile/ProfileForm'
 import { ProfileHeader } from '@/components/user/profile/ProfileHeader'
 import { ProfileSkeleton } from '@/components/user/profile/ProfileSkeleton'

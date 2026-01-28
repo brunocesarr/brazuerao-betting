@@ -48,14 +48,21 @@ export async function POST(request: NextRequest) {
       throw new Error('Usuário não encontrado')
     }
 
-    const { name, challenge, isPrivate, allowPublicViewing, rules } =
-      await request.json()
+    const {
+      name,
+      challenge,
+      isPrivate,
+      deadlineAt,
+      allowPublicViewing,
+      rules,
+    } = await request.json()
 
     const newUserGroup = await createNewBetGroup(
       session.user.id,
       name,
       challenge,
       isPrivate,
+      deadlineAt,
       allowPublicViewing,
       rules
     )

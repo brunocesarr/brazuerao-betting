@@ -1,8 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
-import Checkbox from '@/components/ui/Checkbox'
-import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/shared/Button'
+import Checkbox from '@/components/shared/Checkbox'
+import DatePickerButton from '@/components/shared/DatePickerButton'
+import { Input } from '@/components/shared/Input'
 import { RuleBet, UserBetGroup } from '@/types/domain'
 import { Globe, Lock, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -30,8 +31,11 @@ export default function CreateGroupModal({
     name: '',
     challenge: '',
     isPrivate: false,
+    deadlineAt: new Date(),
     allowPublicViewing: true,
-    selectedRules: rules.map((rule) => rule.id),
+    selectedRules: rules
+      .filter((rule) => rule.isDefault)
+      .map((rule) => rule.id),
   })
 
   useEffect(() => {
@@ -52,8 +56,11 @@ export default function CreateGroupModal({
       name: '',
       challenge: '',
       isPrivate: false,
+      deadlineAt: new Date(),
       allowPublicViewing: true,
-      selectedRules: rules.map((rule) => rule.id),
+      selectedRules: rules
+        .filter((rule) => rule.isDefault)
+        .map((rule) => rule.id),
     })
     onClose()
   }
@@ -103,6 +110,18 @@ export default function CreateGroupModal({
               }
               placeholder="Descreva a prenda / desafio que deve ser paga pelos perdedores"
             />
+
+            <div className="w-full">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Data de encerramento das apostas*
+              </label>
+              <DatePickerButton
+                value={formData.deadlineAt}
+                onChange={(date) =>
+                  setFormData({ ...formData, deadlineAt: date ?? new Date() })
+                }
+              />
+            </div>
 
             {/* Privacy Toggle */}
             <div className="flex items-center justify-between p-4 mt-6 bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg">

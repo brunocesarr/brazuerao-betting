@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/shared/Button'
 import { DefaultValues, RequestStatusEnum } from '@/helpers/constants'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useConfirmDialog } from '@/lib/contexts/DialogContext'

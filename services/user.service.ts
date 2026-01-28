@@ -43,6 +43,7 @@ async function createNewBetGroup(
   name: string,
   challenge: string | null | undefined,
   isPrivate: boolean,
+  deadlineAt: Date,
   allowPublicViewing: boolean,
   rules: string[]
 ) {
@@ -51,6 +52,7 @@ async function createNewBetGroup(
       name,
       challenge,
       isPrivate,
+      deadlineAt,
       allowPublicViewing,
       rules,
     })

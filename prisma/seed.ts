@@ -13,7 +13,7 @@ const initialRequestStatuses = [
   { status: 'REJECTED' },
 ]
 
-const roleGroups = [{ name: 'ADMIN' }, { name: 'USER' }]
+const roleGroups = [{ name: 'ADMIN' }, { name: 'USER' }, { name: 'ROOT' }]
 
 const betRules = [
   {
