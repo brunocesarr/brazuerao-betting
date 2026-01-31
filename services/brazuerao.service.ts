@@ -1,7 +1,11 @@
 import { DefaultValues, RequestStatusEnum } from '@/helpers/constants'
 import { withAPIErrorHandling } from '@/lib/api-error'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
-import { TeamPositionAPIResponse, UserScoreAPIResponse } from '@/types/api'
+import {
+  TeamPositionAPIResponse,
+  UserBetAPIResponse,
+  UserScoreAPIResponse,
+} from '@/types/api'
 import { GroupRole, RequestStatus, RuleBet, UserBetGroup } from '@/types/domain'
 
 const API_SOURCE = 'Brazuerao API'
@@ -59,20 +63,21 @@ async function getAllBetRules(): Promise<RuleBet[]> {
 async function getBetByUserId() {
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.get('/bets')
-    return data?.bet
+    return data?.bets as UserBetAPIResponse[]
   }, `${API_SOURCE}/bets`)
 }
 
 /**
  * Saves user's predictions to the Brazuerão API
  */
-async function saveUserBet(predictions: string[]) {
+async function saveUserBet(predictions: string[], groupId: string | null) {
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.post('/bets', {
+      groupId,
       predictions,
       season: new Date().getFullYear(),
     })
-    return data?.bet
+    return data?.bet as UserBetAPIResponse
   }, `${API_SOURCE}/bets`)
 }
 

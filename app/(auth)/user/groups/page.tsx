@@ -7,6 +7,7 @@ import MyGroupRequestCards from '@/components/user/groups/MyGroupRequests'
 import MyGroupsTab from '@/components/user/groups/MyGroupsTab'
 import TabNavigation from '@/components/user/groups/TabNavigation'
 import { useAuth } from '@/lib/contexts/AuthContext'
+import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { useToast } from '@/lib/contexts/ToastContext'
 import {
   getAllBetGroups,
@@ -23,11 +24,13 @@ export default function GroupManagementPage() {
   const {
     userGroups: myGroups,
     createNewGroup,
+    updateGroupInfo,
     deleteGroup,
     joinGroup,
     isLoading: isLoadingAuth,
   } = useAuth()
   const { showToast } = useToast()
+  const { confirm } = useConfirmDialog()
 
   const searchParams = useSearchParams()
   const activeTabParam: GroupTabType =
@@ -106,7 +109,17 @@ export default function GroupManagementPage() {
     >,
     rules: string[]
   ) => {
-    await createNewGroup(
+    const result = await confirm({
+      title: 'Atencão',
+      message: `Prosseguir com a criacão do novo Grupo ${groupData.name}?`,
+      confirmText: 'Confirmar',
+      cancelText: 'Cancelar',
+      variant: 'info',
+    })
+
+    if (!result) return
+
+    const newGroup = await createNewGroup(
       groupData.name,
       groupData.challenge,
       groupData.isPrivate,
@@ -114,6 +127,38 @@ export default function GroupManagementPage() {
       groupData.allowPublicViewing,
       rules
     )
+    if (!newGroup) return
+    setSelectedGroup(newGroup)
+  }
+
+  const handleUpdateGroupInfo = async (
+    groupData: Omit<
+      UserBetGroup,
+      'groupId' | 'userId' | 'roleGroupId' | 'requestStatusId'
+    >,
+    rules: string[]
+  ) => {
+    const result = await confirm({
+      title: 'Atencão',
+      message: `Prosseguir com a atualizacao das informacões do Grupo ${groupData.name}?`,
+      confirmText: 'Confirmar',
+      cancelText: 'Cancelar',
+      variant: 'info',
+    })
+
+    if (!result) return
+
+    if (!selectedGroup) return
+    const updatedGroup = await updateGroupInfo(
+      selectedGroup.groupId,
+      groupData.name,
+      groupData.challenge,
+      groupData.deadlineAt,
+      groupData.isPrivate,
+      groupData.allowPublicViewing
+    )
+    if (!updatedGroup) return
+    setSelectedGroup(updatedGroup)
   }
 
   const handleJoinRequest = async (groupId: string) => {
@@ -191,14 +236,18 @@ export default function GroupManagementPage() {
           <CreateGroupModal
             rules={rules}
             isOpen={showCreateModal}
+            mode="create"
             onClose={() => setShowCreateModal(false)}
-            onCreateGroup={handleCreateGroup}
+            onSubmit={handleCreateGroup}
           />
         </div>
 
         {selectedGroup && (
           <div className="mt-8 bg-white rounded-lg p-6">
-            <MyGroupRequestCards userBetGroup={selectedGroup} />
+            <MyGroupRequestCards
+              userBetGroup={selectedGroup}
+              onUpdateGroupInfo={handleUpdateGroupInfo}
+            />
           </div>
         )}
       </div>

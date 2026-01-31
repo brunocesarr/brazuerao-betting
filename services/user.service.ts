@@ -80,6 +80,29 @@ async function joinBetGroup(groupId: string) {
 }
 
 /**
+ * Join group from the Brazuerão API
+ */
+async function updateBetGroup(
+  groupId: string,
+  name: string,
+  challenge: string | null | undefined,
+  deadlineAt: Date,
+  isPrivate: boolean,
+  allowPublicViewing: boolean
+) {
+  return withAPIErrorHandling(async () => {
+    const { data } = await appBrazuerao.patch(`/user/groups/${groupId}`, {
+      name,
+      challenge,
+      deadlineAt,
+      isPrivate,
+      allowPublicViewing,
+    })
+    return data as UserBetGroup
+  }, `${API_SOURCE}/user/groups/${groupId}`)
+}
+
+/**
  * Fetch current requests for group from the Brazuerão API
  */
 async function getCurrentRequestByBetGroup(groupId: string) {
@@ -116,6 +139,7 @@ export {
   getCurrentRequestByBetGroup,
   getUserInfo,
   joinBetGroup,
+  updateBetGroup,
   updateUserBetGroup,
   updateUserInfo,
 }

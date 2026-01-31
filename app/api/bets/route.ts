@@ -2,7 +2,7 @@ import { authOptions } from '@/lib/auth'
 import {
   createUserBet,
   existsUser,
-  getUserBet,
+  getUserBets,
 } from '@/repositories/brazuerao.repository'
 import { UserBetAPIResponse } from '@/types/api'
 import { getServerSession } from 'next-auth'
@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
       throw new Error('Usuário não encontrado')
     }
 
-    const bet = await getUserBet(session.user.id, season)
-    return NextResponse.json({ bet: bet as UserBetAPIResponse })
+    const bets = await getUserBets(session.user.id, '', season)
+    return NextResponse.json({ bets: bets as UserBetAPIResponse[] })
   } catch (error) {
     console.error('Erro ao obter aposta:', error)
     return NextResponse.json(
@@ -48,14 +48,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { predictions, season } = body
+    const { predictions, season, groupId } = body
 
     const existingUser = await existsUser({ id: session.user.id })
     if (!existingUser) {
       throw new Error('Usuário não encontrado')
     }
 
-    const bet = await createUserBet(session.user.id, predictions, season)
+    const bet = await createUserBet(
+      session.user.id,
+      predictions,
+      groupId,
+      season
+    )
     return NextResponse.json({ bet })
   } catch (error) {
     console.error('Erro ao salvar aposta:', error)

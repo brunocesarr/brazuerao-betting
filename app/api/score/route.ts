@@ -15,11 +15,8 @@ export async function GET(request: NextRequest) {
       throw new Error('Usuário não encontrado')
     }
 
-    const score = await getUserScore(session.user.id)
-    return NextResponse.json({
-      score: score.reduce((total, item) => total + item.score, 0),
-      scoreByRule: score,
-    })
+    const scores = await getUserScore(session.user.id)
+    return NextResponse.json(scores)
   } catch (error) {
     console.error('Erro ao buscar classificação:', error)
     return NextResponse.json(

@@ -1,18 +1,25 @@
 'use client'
 
 import { useToast } from '@/lib/contexts/ToastContext'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function RegisterPage() {
+  const { status } = useSession()
+  const { showToast } = useToast()
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const { showToast } = useToast()
+
+  useEffect(() => {
+    if (status === 'authenticated') router.push('/user/profile')
+  }, [status])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

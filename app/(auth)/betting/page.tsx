@@ -1,13 +1,16 @@
 'use client'
 
+import { BetGroupSelectSimple } from '@/components/betting/BetGroupSelect'
 import SortableTableRow from '@/components/betting/SortableTableRow'
+import Checkbox from '@/components/shared/Checkbox'
+import { LoadingState } from '@/components/shared/LoadingState'
+import EmptyState from '@/components/user/groups/EmptyState'
+import { useAuth } from '@/lib/contexts/AuthContext'
+import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { useToast } from '@/lib/contexts/ToastContext'
-import {
-  getBetByUserId,
-  getBrazilianLeague,
-  saveUserBet,
-} from '@/services/brazuerao.service'
-import { TeamPrediction } from '@/types'
+import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
+import { getBrazilianLeague } from '@/services/brazuerao.service'
+import { TeamPrediction, UserBetAPIResponse } from '@/types'
 import {
   closestCenter,
   DndContext,
@@ -23,24 +26,27 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { DoorClosedLockedIcon } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export default function BettingPage() {
-  const { status } = useSession()
-  const router = useRouter()
+  const { userBets, userGroups, isLoading: authLoading, saveMyBet } = useAuth()
+  const { showToast } = useToast()
+  const { confirm } = useConfirmDialog()
+
   const [savedPredictions, setSavedPredictions] = useState<TeamPrediction[]>([])
   const [predictions, setPredictions] = useState<TeamPrediction[]>([])
-  const [hasChanges, setHasChanges] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const { showToast } = useToast()
+  const [selectedGroupId, setSelectedGroupId] = useState<string>('')
+  const [saveForAll, setSaveForAll] = useState<boolean>(true)
+  const [isLoadingBet, setIsLoadingBet] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
 
-  // Configure drag sensors
+  const { isExpired, deadline } = useBetDeadline(selectedGroupId, userGroups)
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Require 8px of movement before drag starts
+        distance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -48,151 +54,216 @@ export default function BettingPage() {
     })
   )
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login')
-    }
-  }, [status, router])
+  const hasChanges = useMemo(() => {
+    if (isExpired) return false
+    if (savedPredictions.length === 0 && predictions.length > 0) return true
+    return JSON.stringify(predictions) !== JSON.stringify(savedPredictions)
+  }, [predictions, savedPredictions, isExpired])
 
   useEffect(() => {
-    const checkForChanges = () => {
-      if (!savedPredictions) {
-        setHasChanges(false)
-        return
+    if (!authLoading && userBets.length > 0) {
+      initializeBettingData()
+    }
+  }, [userBets, userGroups, authLoading])
+
+  useEffect(() => {
+    if (!authLoading) {
+      loadPredictions(selectedGroupId)
+    }
+  }, [selectedGroupId, authLoading])
+
+  const initializeBettingData = useCallback(() => {
+    const mostRecentBet = getMostRecentBet(userBets)
+    const initialGroupId = mostRecentBet?.groupId ?? ''
+
+    setSelectedGroupId(initialGroupId)
+    setSaveForAll(!initialGroupId)
+  }, [userBets])
+
+  const getMostRecentBet = (
+    bets: UserBetAPIResponse[]
+  ): UserBetAPIResponse | null => {
+    if (bets.length === 0) return null
+
+    return [...bets].sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )[0]
+  }
+
+  const loadPredictions = useCallback(
+    async (groupId: string) => {
+      try {
+        setIsLoadingBet(true)
+
+        const brazilianTable = await getBrazilianLeague()
+        const userBet = findUserBet(userBets, groupId)
+
+        const predictions = createPredictions(brazilianTable, userBet)
+
+        // Only show predictions if not expired OR if user already has a bet OR if saving for all
+        const shouldShowPredictions =
+          !isExpired || !!userBet || saveForAll || (!saveForAll && !groupId)
+
+        setPredictions(shouldShowPredictions ? predictions : [])
+        setSavedPredictions(userBet ? predictions : [])
+      } catch (error) {
+        console.error('Failed to load predictions:', error)
+        showToast({
+          message: 'Erro ao carregar previsões',
+          type: 'error',
+        })
+        setPredictions([])
+        setSavedPredictions([])
+      } finally {
+        setIsLoadingBet(false)
       }
-      setHasChanges(
-        JSON.stringify(predictions) !== JSON.stringify(savedPredictions)
-      )
-    }
+    },
+    [userBets, isExpired, saveForAll, showToast]
+  )
 
-    checkForChanges()
-  }, [predictions, savedPredictions])
-
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetchSavedBet()
-    }
-  }, [])
-
-  const fetchSavedBet = async () => {
-    try {
-      setLoading(true)
-      const [bet, table] = await Promise.all([
-        getBetByUserId(),
-        getBrazilianLeague(),
-      ])
-
-      const initialPredictions: TeamPrediction[] = table.map(
-        (team: any, index: number) => {
-          let position = team.position
-          if (bet && bet.predictions) {
-            const savedTeam = bet.predictions.find(
-              (pred: TeamPrediction) => pred.teamName === team.name
-            )
-            if (savedTeam) {
-              position = savedTeam.position
-            }
-          }
-
-          return {
-            teamId: String(index),
-            teamName: team.name,
-            position: position,
-            shieldUrl: team.shield,
-          }
-        }
-      )
-
-      setPredictions(initialPredictions)
-      setSavedPredictions(bet ? initialPredictions : [])
-    } catch (error) {
-      console.error('Failed to fetch saved bet:', error)
-      setSavedPredictions([])
-      setPredictions([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (!over || active.id === over.id) {
-      return
-    }
-
-    setPredictions((items) => {
-      const oldIndex = items.findIndex((item) => item.teamId === active.id)
-      const newIndex = items.findIndex((item) => item.teamId === over.id)
-
-      const newItems = arrayMove(items, oldIndex, newIndex)
-
-      newItems.forEach((pred, idx) => {
-        pred.position = idx + 1
-      })
-
-      return newItems
-    })
-  }
-
-  const moveTeam = (index: number, direction: 'up' | 'down') => {
-    const newPredictions = [...predictions]
-    const targetIndex = direction === 'up' ? index - 1 : index + 1
-
-    if (targetIndex < 0 || targetIndex >= newPredictions.length) return
-    ;[newPredictions[index], newPredictions[targetIndex]] = [
-      newPredictions[targetIndex],
-      newPredictions[index],
-    ]
-
-    newPredictions.forEach((pred, idx) => {
-      pred.position = idx + 1
-    })
-
-    setPredictions(newPredictions)
-  }
-
-  const handleSubmit = async () => {
-    try {
-      setLoading(true)
-
-      saveUserBet(predictions.map((p) => p.teamName))
-      setSavedPredictions(predictions)
-
-      showToast({
-        message: 'Sua previsão foi salva com sucesso!',
-        type: 'success',
-      })
-    } catch (error) {
-      showToast({
-        message: 'Falha ao salvar sua previsão. Tente novamente.',
-        type: 'error',
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (status === 'loading' || loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="border-primary-600 mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-b-2"></div>
-          <p className="text-gray-600">Carregando...</p>
-        </div>
-      </div>
+  const findUserBet = (bets: UserBetAPIResponse[], groupId: string) => {
+    return bets.find((bet) =>
+      groupId ? bet.groupId === groupId : bet.groupId === null
     )
   }
 
-  const getPositionColor = (position: number) => {
-    if (position <= 4) return 'bg-blue-50/10 border-blue-200/50'
-    if (position <= 16) return 'bg-green-50/10 border-green-200/50'
-    return 'bg-red-50/10 border-red-200/50'
+  const createPredictions = (
+    brazilianTable: any[],
+    userBet?: UserBetAPIResponse
+  ): TeamPrediction[] => {
+    return brazilianTable
+      .map((team: any, index: number) => {
+        let position = team.position
+
+        if (userBet) {
+          const predIndex = userBet.predictions.findIndex(
+            (prediction) => prediction === team.name
+          )
+          if (predIndex !== -1) {
+            position = predIndex + 1
+          }
+        }
+
+        return {
+          teamId: String(index),
+          teamName: team.name,
+          position,
+          shieldUrl: team.shield,
+        }
+      })
+      .sort((a, b) => a.position - b.position)
+  }
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      if (isExpired) return
+
+      const { active, over } = event
+      if (!over || active.id === over.id) return
+
+      setPredictions((items) => {
+        const oldIndex = items.findIndex((item) => item.teamId === active.id)
+        const newIndex = items.findIndex((item) => item.teamId === over.id)
+        const newItems = arrayMove(items, oldIndex, newIndex)
+
+        return newItems.map((pred, idx) => ({
+          ...pred,
+          position: idx + 1,
+        }))
+      })
+    },
+    [isExpired]
+  )
+
+  const moveTeam = useCallback(
+    (index: number, direction: 'up' | 'down') => {
+      if (isExpired) return
+
+      const targetIndex = direction === 'up' ? index - 1 : index + 1
+      if (targetIndex < 0 || targetIndex >= predictions.length) return
+
+      setPredictions((items) => {
+        const newItems = [...items]
+        ;[newItems[index], newItems[targetIndex]] = [
+          newItems[targetIndex],
+          newItems[index],
+        ]
+
+        return newItems.map((pred, idx) => ({
+          ...pred,
+          position: idx + 1,
+        }))
+      })
+    },
+    [predictions.length, isExpired]
+  )
+
+  const handleSubmit = async () => {
+    if (!saveForAll && !selectedGroupId) {
+      showToast({
+        message: 'Por favor, selecione um grupo.',
+        type: 'error',
+      })
+      return
+    }
+    const result = await confirm({
+      title: saveForAll
+        ? 'Atencão'
+        : `Previsão: ${userGroups.find((userGroup) => userGroup.groupId === selectedGroupId)?.name}`,
+      message: `Prosseguir com o salvamento da previsão? ${saveForAll ? '(Somente atualizará aqueles grupos em que está dentro do prazo de apostar)' : ''}`,
+      confirmText: 'Confirmar',
+      cancelText: 'Cancelar',
+      variant: 'info',
+    })
+
+    if (!result) return
+
+    try {
+      setIsSaving(true)
+
+      const success = await saveMyBet(
+        predictions.map((p) => p.teamName),
+        saveForAll ? '' : selectedGroupId
+      )
+
+      if (success) {
+        setSavedPredictions([...predictions])
+        showToast({
+          message: 'Aposta salva com sucesso!',
+          type: 'success',
+        })
+      }
+    } catch (error) {
+      console.error('Failed to save bet:', error)
+      showToast({
+        message: 'Erro ao salvar aposta',
+        type: 'error',
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleSelectGroupId = useCallback((groupId: string) => {
+    setSelectedGroupId(groupId)
+    setSaveForAll(groupId.length === 0)
+  }, [])
+
+  const handleSelectSaveForAll = useCallback((save: boolean) => {
+    setSaveForAll(save)
+    if (save) {
+      setSelectedGroupId('')
+    }
+  }, [])
+
+  if (authLoading) {
+    return <LoadingState message="Carregando..." />
   }
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] py-8">
-      <div className="container mx-auto max-w-5xl px-4">
+      <div className="container mx-auto max-w-5xl px-4 space-y-8">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="mb-3 text-4xl font-bold text-gray-50">
@@ -203,114 +274,160 @@ export default function BettingPage() {
           </p>
         </div>
 
-        {/* Drag Instructions */}
-        <div className="mb-4 rounded-lg from-primary-600 to-primary-700 bg-gradient-to-r p-4 text-center">
-          <p className="text-sm text-white">
-            💡 <strong>Dica:</strong> Clique e arraste o ícone de linhas (☰)
-            para reordenar os times ou use os botões de setas
-          </p>
-        </div>
-
-        {/* Standings Table with Drag & Drop */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="card mb-6 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="from-primary-600 to-primary-700 bg-gradient-to-r text-white">
-                  <tr>
-                    <th className="px-3 py-4 text-center text-sm font-semibold">
-                      <svg
-                        className="mx-auto h-5 w-5"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M9 2h6v2H9V2zm0 4h6v2H9V6zm0 4h6v2H9v-2zm0 4h6v2H9v-2zm0 4h6v2H9v-2z" />
-                      </svg>
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold">
-                      Posição
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold">
-                      Time
-                    </th>
-                    <th className="px-6 py-4 text-right text-sm font-semibold">
-                      Mover
-                    </th>
-                  </tr>
-                </thead>
-                <SortableContext
-                  items={predictions.map((p) => p.teamId)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <tbody className="divide-y divide-gray-200">
-                    {predictions.map((pred, index) => (
-                      <SortableTableRow
-                        key={pred.teamId}
-                        pred={pred}
-                        index={index}
-                        getPositionColor={getPositionColor}
-                        moveTeam={moveTeam}
-                        predictionsLength={predictions.length}
-                      />
-                    ))}
-                  </tbody>
-                </SortableContext>
-              </table>
-            </div>
+        {/* Group Selection */}
+        {userGroups.length > 0 && (
+          <div className="w-full from-primary-700 to-white bg-gradient-to-b p-4 rounded-lg space-y-4">
+            <BetGroupSelectSimple
+              groups={userGroups}
+              onValueChange={handleSelectGroupId}
+              value={selectedGroupId}
+              disabled={saveForAll || isLoadingBet}
+            />
+            <Checkbox
+              id="allow-checkbox"
+              label="Quero salvar minha aposta para todos os grupos que participo. (Somente atualizará aqueles grupos em que está dentro do prazo de apostar)"
+              checked={saveForAll}
+              onChange={handleSelectSaveForAll}
+              disabled={isLoadingBet}
+            />
           </div>
-        </DndContext>
+        )}
 
-        {/* Save Button */}
-        <div className="text-center">
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !hasChanges}
-            className="btn-primary relative px-12 py-4 text-lg"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Salvando...
-              </span>
-            ) : (
-              <>
-                Salvar
-                {!hasChanges && (
-                  <span className="ml-2 text-sm opacity-75">
-                    (Sem alterações)
+        {/* Empty State - Deadline Expired */}
+        {!isLoadingBet && predictions.length === 0 && (
+          <div className="from-primary-700 to-white bg-gradient-to-br p-4 rounded-xl text-white mb-8">
+            <EmptyState
+              icon={DoorClosedLockedIcon}
+              title="Chegou tarde demais ein..."
+              description="Esse grupo não está aceitando mais apostas."
+            />
+          </div>
+        )}
+
+        {/* Loading State */}
+        {isLoadingBet && <LoadingState message="Carregando aposta..." />}
+
+        {/* Predictions Table */}
+        {!isLoadingBet && predictions.length > 0 && (
+          <div className="space-y-8">
+            {/* Instructions */}
+            <div className="my-4 rounded-lg from-primary-600 to-primary-700 bg-gradient-to-r p-4 text-center">
+              <p className="text-sm text-white">
+                💡 <strong>Dica:</strong> Clique e arraste o ícone de linhas
+                (☰) para reordenar os times ou use os botões de setas
+              </p>
+            </div>
+
+            {/* Drag & Drop Table */}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="card mb-6 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="from-primary-600 to-primary-700 bg-gradient-to-r text-white">
+                      <tr>
+                        <th className="px-3 py-4 text-center text-sm font-semibold">
+                          <svg
+                            className="mx-auto h-5 w-5"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M9 2h6v2H9V2zm0 4h6v2H9V6zm0 4h6v2H9v-2zm0 4h6v2H9v-2zm0 4h6v2H9v-2z" />
+                          </svg>
+                        </th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                          Posição
+                        </th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                          Time
+                        </th>
+                        <th className="px-6 py-4 text-right text-sm font-semibold">
+                          Mover
+                        </th>
+                      </tr>
+                    </thead>
+                    <SortableContext
+                      items={predictions.map((p) => p.teamId)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <tbody className="divide-y divide-gray-200">
+                        {predictions.map((pred, index) => (
+                          <SortableTableRow
+                            key={pred.teamId}
+                            pred={pred}
+                            index={index}
+                            disabled={isExpired}
+                            getPositionColor={() => ''}
+                            moveTeam={moveTeam}
+                            predictionsLength={predictions.length}
+                          />
+                        ))}
+                      </tbody>
+                    </SortableContext>
+                  </table>
+                </div>
+              </div>
+            </DndContext>
+
+            {/* Submit Button */}
+            <div className="text-center">
+              <button
+                onClick={handleSubmit}
+                disabled={!hasChanges || isSaving || isExpired}
+                className="btn-primary relative px-12 py-4 text-lg hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSaving ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Salvando...
+                  </span>
+                ) : (
+                  <span>
+                    {isExpired ? 'Apostas Encerradas' : 'Salvar Previsão'}
                   </span>
                 )}
-              </>
-            )}
-          </button>
-          <p className="mt-4 text-sm text-gray-200/90">
-            Você pode editar sua previsão a qualquer momento antes do início da
-            temporada
-          </p>
-        </div>
+              </button>
+
+              {/* Deadline Info */}
+              <p className="mt-4 text-sm text-gray-200/90">
+                {deadline
+                  ? `Você pode editar sua previsão até ${deadline.toLocaleDateString(
+                      'pt-BR',
+                      {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      }
+                    )}`
+                  : 'Você pode editar sua previsão a qualquer momento durante a temporada'}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

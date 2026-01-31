@@ -44,6 +44,14 @@ export interface ScoreEntry {
 }
 
 /**
+ * Score info for a bet group
+ */
+export interface ScoryGroupEntry {
+  groupId: string
+  scores: ScoreEntry[]
+}
+
+/**
  * Leaderboard entry with user info and scores
  */
 export interface LeaderboardEntry {

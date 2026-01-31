@@ -3,7 +3,7 @@ import { authOptions } from '@/lib/auth'
 import {
   existsUser,
   getAllBetRules,
-  getUserBet,
+  getUserBets,
 } from '@/repositories/brazuerao.repository'
 import { getBrazilianLeague } from '@/services/brazuerao.service'
 import { TeamPositionAPIResponse } from '@/types/api'
@@ -32,18 +32,14 @@ export async function GET(request: NextRequest) {
     const [brazilianLeague, rules, userBet] = await Promise.all([
       getBrazilianLeague(),
       getAllBetRules(),
-      getUserBet(session.user.id),
+      getUserBets(session.user.id),
     ])
 
     if (!userBet) {
       throw new Error('Aposta do usuário não encontrada')
     }
 
-    const leaderboard = calculateScore(
-      userBet.predictions,
-      rules,
-      brazilianLeague
-    )
+    const leaderboard = calculateScore([], rules, brazilianLeague)
 
     return NextResponse.json({ leaderboard })
   } catch (error) {

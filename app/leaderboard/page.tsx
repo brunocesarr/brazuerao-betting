@@ -28,7 +28,7 @@ export default function LeaderboardPage() {
   const stats = useScoreCalculations(leaderboard, getRuleTypeByRuleId)
 
   if (loading && leaderboard.length === 0) {
-    return <LoadingState />
+    return <LoadingState message="Carregando scores..." />
   }
 
   return (

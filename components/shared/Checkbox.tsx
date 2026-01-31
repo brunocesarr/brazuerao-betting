@@ -23,7 +23,7 @@ export default function Checkbox({
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
-        className="w-4 h-4 accent-primary-600 text-primary-600 bg-primary-100 border-primary-300 rounded focus:ring-primary-500 focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-4 h-4 accent-primary-600 text-primary-600 bg-primary-100 border-primary-300 rounded focus:ring-primary-500 focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
       />
       <label
         htmlFor={id}

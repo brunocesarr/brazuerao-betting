@@ -6,20 +6,30 @@ import { useAuth } from '@/lib/contexts/AuthContext'
 import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 import { useEffect, useState } from 'react'
+import CreateGroupModal from './CreateGroupModal'
 
 interface MyGroupRequestTableProps {
   userBetGroup: UserBetGroup
+  onUpdateGroupInfo: (
+    group: Omit<
+      UserBetGroup,
+      'groupId' | 'userId' | 'roleGroupId' | 'requestStatusId'
+    >,
+    rules: string[]
+  ) => void
 }
 
 export default function MyGroupRequestTable({
   userBetGroup,
+  onUpdateGroupInfo,
 }: MyGroupRequestTableProps) {
   const { confirm } = useConfirmDialog()
-  const { getCurrentRequests, handleCurrentRequest } = useAuth()
+  const { getCurrentRequests, handleCurrentRequest, updateGroupInfo } =
+    useAuth()
 
   const [requests, setRequests] = useState<CurrentRequestBetGroup[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false)
 
   useEffect(() => {
     setRequests([])
@@ -231,10 +241,47 @@ export default function MyGroupRequestTable({
 
   return (
     <div className="space-y-6">
+      <CreateGroupModal
+        rules={[]}
+        isOpen={isOpenEditModal}
+        mode="edit"
+        onClose={() => setIsOpenEditModal(false)}
+        existingGroup={userBetGroup}
+        onSubmit={onUpdateGroupInfo}
+      />
+
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">
-          Grupo: {userBetGroup.name}
-        </h2>
+        <div className="flex flex-col md:flex-row justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Grupo: {userBetGroup.name.toUpperCase()}
+            </h2>
+            <h2 className="text-xs font-thin text-gray-900">
+              {new Date(userBetGroup.deadlineAt).getTime() <=
+              new Date().getTime()
+                ? 'Apostas encerradas!'
+                : 'Aceitando apostas até ' +
+                  new Date(userBetGroup.deadlineAt).toLocaleDateString(
+                    'pt-BR',
+                    {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    }
+                  )}
+            </h2>
+          </div>
+          <Button
+            className="text-xs font-medium"
+            type="button"
+            variant="primary"
+            onClick={() => setIsOpenEditModal(true)}
+          >
+            Editar
+          </Button>
+        </div>
         <p className="font-thin text-sm text-gray-600 mt-1">
           Aceite ou rejeite participantes para o seu grupo. Você pode também
           remover, caso precise.
@@ -318,9 +365,9 @@ export default function MyGroupRequestTable({
                           type="button"
                           variant="primary"
                           onClick={() => handleApprove(request)}
-                          disabled={loadingId === request.userId}
+                          disabled={isLoading}
                         >
-                          {loadingId === request.userId ? (
+                          {isLoading ? (
                             <svg
                               className="animate-spin h-4 w-4"
                               xmlns="http://www.w3.org/2000/svg"
@@ -365,9 +412,9 @@ export default function MyGroupRequestTable({
                           type="button"
                           variant="danger"
                           onClick={() => handleReject(request)}
-                          disabled={loadingId === request.userId}
+                          disabled={isLoading}
                         >
-                          {loadingId === request.userId ? (
+                          {isLoading ? (
                             <svg
                               className="animate-spin h-4 w-4"
                               xmlns="http://www.w3.org/2000/svg"

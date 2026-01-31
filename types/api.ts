@@ -63,6 +63,7 @@ export interface BetBrazueraoAPIRequest {
 export interface UserBetAPIResponse {
   id: string
   userId: string
+  groupId: string | null
   predictions: string[]
   season: number
   createdAt: Date

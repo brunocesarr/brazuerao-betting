@@ -9,12 +9,14 @@ import { useState } from 'react'
 export default function SortableTableRow({
   pred,
   index,
+  disabled,
   getPositionColor,
   moveTeam,
   predictionsLength,
 }: {
   pred: TeamPrediction
   index: number
+  disabled: boolean
   getPositionColor: (position: number) => string
   moveTeam: (index: number, direction: 'up' | 'down') => void
   predictionsLength: number
@@ -101,7 +103,7 @@ export default function SortableTableRow({
         <div className="flex justify-end gap-2">
           <button
             onClick={() => moveTeam(index, 'up')}
-            disabled={index === 0}
+            disabled={index === 0 || disabled}
             className="bg-primary-600 hover:bg-primary-700 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
             title="Mover para cima"
           >
@@ -115,7 +117,7 @@ export default function SortableTableRow({
           </button>
           <button
             onClick={() => moveTeam(index, 'down')}
-            disabled={index === predictionsLength - 1}
+            disabled={index === predictionsLength - 1 || disabled}
             className="bg-primary-600 hover:bg-primary-700 rounded-lg p-2 text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30"
             title="Mover para baixo"
           >

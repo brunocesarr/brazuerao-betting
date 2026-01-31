@@ -7,6 +7,7 @@ import {
   joinBetGroup,
   unfollowBetGroup,
 } from '@/repositories/brazuerao.repository'
+import { updateBetGroup } from '@/repositories/user-bet-group.repository'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -87,5 +88,44 @@ export async function POST(
       { success: false, error: 'Falha ao entrar no grupo' },
       { status: 500 }
     )
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ groupId: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, message: 'Não autorizado' },
+        { status: 401 }
+      )
+    }
+
+    const existingUser = await existsUser({ id: session.user.id })
+    if (!existingUser) {
+      throw new Error('Usuário não encontrado')
+    }
+
+    const { groupId } = await params
+    const { name, challenge, isPrivate, deadlineAt, allowPublicViewing } =
+      await request.json()
+
+    const newUserGroup = await updateBetGroup(
+      session.user.id,
+      groupId,
+      name,
+      challenge,
+      isPrivate,
+      deadlineAt,
+      allowPublicViewing
+    )
+    return NextResponse.json(newUserGroup)
+  } catch (error) {
+    console.error('Update error:', error)
+    return NextResponse.json({ error: 'Falha na atualizacão' }, { status: 500 })
   }
 }

@@ -37,7 +37,25 @@ export default function Home() {
               compita!
             </p>
 
-            <CountdownTimer targetDate={new Date(Dates.EXPIRATION_DATE_BET)} />
+            {new Date(Dates.EXPIRATION_DATE_BET) <= new Date() ? (
+              <div className="mb-12 flex flex-col items-center justify-center gap-6 rounded-xl bg-slate-950/10 p-8 backdrop-blur-sm">
+                <p className="text-lg text-gray-400">
+                  Contagem regressiva para o começo do Brasileirão{' '}
+                  {new Date().getFullYear()} encerrou...
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-center md:flex">
+                  <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm">
+                    <div className="text-2xl font-bold text-white">
+                      Está aberta a temporada {new Date().getFullYear()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <CountdownTimer
+                targetDate={new Date(Dates.EXPIRATION_DATE_BET)}
+              />
+            )}
 
             <div className="mb-16 flex flex-col justify-center gap-4 sm:flex-row">
               {status === 'authenticated' ? (

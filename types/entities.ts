@@ -17,6 +17,7 @@ import { Prisma } from '@prisma/client'
 export interface UserBetDBModel {
   id: string
   userId: string
+  groupId: string | null
   predictions: Prisma.JsonValue
   season: number
   createdAt: Date

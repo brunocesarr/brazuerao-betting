@@ -2,6 +2,7 @@
 
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useSessionRefresh } from '@/lib/hooks/useSessionRefresh'
+import { getBetByUserId, saveUserBet } from '@/services/brazuerao.service'
 import {
   createNewBetGroup,
   deleteBetGroup,
@@ -9,10 +10,11 @@ import {
   getCurrentRequestByBetGroup,
   getUserInfo,
   joinBetGroup,
+  updateBetGroup,
   updateUserBetGroup,
   updateUserInfo,
 } from '@/services/user.service'
-import { UserProfile as User } from '@/types'
+import { UserProfile as User, UserBetAPIResponse } from '@/types'
 import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -27,6 +29,7 @@ import {
 interface AuthContextType {
   user: User | null
   userGroups: UserBetGroup[]
+  userBets: UserBetAPIResponse[]
   isLoading: boolean
   updateProfile: (name: string) => Promise<boolean>
   createNewGroup: (
@@ -36,7 +39,15 @@ interface AuthContextType {
     deadlineAt: Date,
     allowPublicViewing: boolean,
     rules: string[]
-  ) => Promise<boolean>
+  ) => Promise<UserBetGroup | null>
+  updateGroupInfo: (
+    groupId: string,
+    name: string,
+    challenge: string | null | undefined,
+    deadlineAt: Date,
+    isPrivate: boolean,
+    allowPublicViewing: boolean
+  ) => Promise<UserBetGroup | null>
   deleteGroup: (groupId: string) => Promise<boolean>
   joinGroup: (groupId: string) => Promise<boolean>
   getCurrentRequests: (groupId: string) => Promise<CurrentRequestBetGroup[]>
@@ -45,6 +56,7 @@ interface AuthContextType {
     groupId: string,
     statusId: string
   ) => Promise<CurrentRequestBetGroup | null>
+  saveMyBet: (predictions: string[], groupId: string | null) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -57,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [user, setUser] = useState<User | null>(null)
   const [userGroups, setUserGroups] = useState<UserBetGroup[]>([])
+  const [userBets, setUserBets] = useState<UserBetAPIResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -69,20 +82,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [status, router])
 
   useEffect(() => {
-    const fetchUserGroups = async () => {
+    const fetchUserInfos = async () => {
       try {
         setIsLoading(true)
         if (!user) {
           setUserGroups([])
+          setUserBets([])
           return
         }
-        const groups = await getBetGroupsByUserId()
+        const [groups, bets] = await Promise.all([
+          getBetGroupsByUserId(),
+          getBetByUserId(),
+        ])
+
         setUserGroups(groups)
+        setUserBets(bets)
       } catch (err) {
         const errorMessage =
           err instanceof Error
             ? err.message
-            : 'Falha ao obter os grupos do usuário.'
+            : 'Falha ao obter os dados do usuário.'
         showToast({
           type: 'error',
           message: errorMessage,
@@ -92,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    fetchUserGroups()
+    fetchUserInfos()
   }, [user])
 
   const fetchProfile = useCallback(async () => {
@@ -152,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     deadlineAt: Date,
     allowPublicViewing: boolean,
     rules: string[]
-  ): Promise<boolean> => {
+  ): Promise<UserBetGroup | null> => {
     try {
       setIsLoading(true)
 
@@ -170,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         message: 'Novo grupo criado com sucesso.',
       })
 
-      return true
+      return newGroup
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Falha ao criar novo grupo.'
@@ -178,7 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         type: 'error',
         message: errorMessage,
       })
-      return false
+      return null
     } finally {
       setIsLoading(false)
     }
@@ -236,6 +255,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const updateGroupInfo = async (
+    groupId: string,
+    name: string,
+    challenge: string | null | undefined,
+    deadlineAt: Date,
+    isPrivate: boolean,
+    allowPublicViewing: boolean
+  ): Promise<UserBetGroup | null> => {
+    try {
+      setIsLoading(true)
+
+      const updatedGroup = await updateBetGroup(
+        groupId,
+        name,
+        challenge,
+        deadlineAt,
+        isPrivate,
+        allowPublicViewing
+      )
+      setUserGroups([
+        ...userGroups.filter((userGroup) => userGroup.groupId !== groupId),
+        updatedGroup,
+      ])
+      showToast({
+        type: 'success',
+        message: 'Atualizacão feita com sucesso.',
+      })
+
+      return updatedGroup
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Falha ao atualizar as informacões do grupo.'
+      showToast({
+        type: 'error',
+        message: errorMessage,
+      })
+      return null
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleCurrentRequest = async (
     userId: string,
     groupId: string,
@@ -277,18 +340,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const saveMyBet = async (
+    predictions: string[],
+    groupId: string | null
+  ): Promise<boolean> => {
+    try {
+      setIsLoading(true)
+
+      const savedUserBet = await saveUserBet(predictions, groupId)
+      if (savedUserBet) {
+        const newUserBets = [
+          ...userBets.filter((userBet) => userBet.id === savedUserBet.id),
+          savedUserBet,
+        ]
+        setUserBets(newUserBets)
+        showToast({
+          type: 'success',
+          message: 'Aposta salva com sucesso.',
+        })
+      }
+
+      return true
+    } catch (err) {
+      showToast({
+        type: 'error',
+        message: 'Falha ao salvar a aposta.',
+      })
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
         user,
         userGroups,
+        userBets,
         isLoading,
         updateProfile,
         createNewGroup,
+        updateGroupInfo,
         deleteGroup,
         joinGroup,
         getCurrentRequests,
         handleCurrentRequest,
+        saveMyBet,
       }}
     >
       {children}
