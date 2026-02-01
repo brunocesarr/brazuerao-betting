@@ -7,16 +7,16 @@ import {
   type DayPickerProps,
   labelNext,
   labelPrevious,
-  useNavigation,
+  useDayPicker,
 } from 'react-day-picker'
 
 export type CalendarProps = DayPickerProps
 
 function CustomNav() {
-  const { previousMonth, nextMonth, goToMonth } = useNavigation()
+  const { previousMonth, nextMonth, goToMonth } = useDayPicker()
 
   return (
-    <nav className="flex items-center justify-between absolute inset-x-0 z-10">
+    <nav className="flex items-center justify-between absolute inset-l-5 z-10">
       <Button
         variant="outline"
         size="icon"
@@ -84,7 +84,6 @@ function Calendar({
       components={{
         Nav: CustomNav,
       }}
-      hideNavigation
       {...props}
     />
   )

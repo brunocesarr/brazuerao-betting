@@ -248,6 +248,11 @@ export default function CreateEditGroupModal({
                 onChange={(date) =>
                   setFormData({ ...formData, deadlineAt: date })
                 }
+                placeholder="Selecione a data"
+                minDate={
+                  mode === 'create' ? new Date() : new Date(formData.deadlineAt)
+                }
+                maxDate={new Date(`${new Date().getFullYear()}-12-31`)}
               />
               {errors.deadlineAt && (
                 <p className="mt-1 text-sm text-red-600">{errors.deadlineAt}</p>

@@ -745,3 +745,28 @@
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+/* ==========================================================================
+ CALENDAR
+ ========================================================================== */
+
+/* Garante que a navegação apareça */
+.rdp {
+  --rdp-cell-size: 36px;
+  --rdp-accent-color: hsl(var(--primary));
+  --rdp-background-color: hsl(var(--primary) / 0.1);
+}
+
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: hsl(var(--accent));
+}
+
+.rdp-day_selected {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.rdp-nav_button {
+  width: 28px;
+  height: 28px;
+}

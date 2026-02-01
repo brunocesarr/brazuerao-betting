@@ -1,8 +1,9 @@
 'use client'
 
 import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
-import * as React from 'react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -14,100 +15,175 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const HOURS = Array.from({ length: 24 }, (_, i) => i)
+const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5)
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+interface DatePickerButtonProps {
+  value: Date
+  onChange: (date: Date) => void
+  placeholder?: string
+  minDate?: Date
+  maxDate?: Date
+  disabled?: boolean
+}
+
 export default function DatePickerButton({
   value,
   onChange,
-}: {
-  value: Date
-  onChange: (date: Date) => void
-}) {
-  const [date, setDate] = React.useState<Date>(value)
-  const [isOpen, setIsOpen] = React.useState(false)
+  placeholder = 'Selecione data e hora',
+  minDate,
+  maxDate,
+  disabled = false,
+}: DatePickerButtonProps) {
+  const [isOpen, setIsOpen] = useState(false)
 
-  const hours = Array.from({ length: 24 }, (_, i) => i)
+  // Temporary date while picker is open
+  const [tempDate, setTempDate] = useState<Date>(value)
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  /**
+   * Handle date selection from calendar
+   * Only updates temp date, doesn't close popover
+   */
   const handleDateSelect = (selectedDate: Date | undefined) => {
-    setIsOpen(false)
     if (selectedDate) {
-      setDate(selectedDate)
-      onChange(selectedDate)
+      // Preserve current time when selecting a new date
+      const newDate = new Date(selectedDate)
+      newDate.setHours(tempDate.getHours())
+      newDate.setMinutes(tempDate.getMinutes())
+      newDate.setSeconds(0)
+      newDate.setMilliseconds(0)
+
+      setTempDate(newDate)
     }
   }
 
-  const handleTimeChange = (type: 'hour' | 'minute', value: string) => {
-    if (date) {
-      const newDate = new Date(date)
-      if (type === 'hour') {
-        newDate.setHours(parseInt(value))
-      } else if (type === 'minute') {
-        newDate.setMinutes(parseInt(value))
-      }
-      setDate(newDate)
+  /**
+   * Handle time change (hours or minutes)
+   */
+  const handleTimeChange = (type: 'hour' | 'minute', value: number) => {
+    const newDate = new Date(tempDate)
+
+    if (type === 'hour') {
+      newDate.setHours(value)
+    } else {
+      newDate.setMinutes(value)
     }
+
+    setTempDate(newDate)
   }
+
+  /**
+   * Confirm and apply the selected date
+   */
+  const handleConfirm = () => {
+    onChange(tempDate)
+    setIsOpen(false)
+  }
+
+  /**
+   * Cancel and close picker
+   */
+  const handleCancel = () => {
+    setTempDate(value) // Reset to original value
+    setIsOpen(false)
+  }
+
+  /**
+   * When popover opens, sync temp date with current value
+   */
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setTempDate(value)
+    }
+    setIsOpen(open)
+  }
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
+          disabled={disabled}
           className={cn(
-            'w-fit justify-between text-left font-normal h-10 px-4 hover:cursor-pointer',
-            !date && 'text-muted-foreground'
+            'h-10 w-fit justify-start px-4 text-left font-normal',
+            !value && 'text-muted-foreground'
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? (
-            format(date, 'dd/MM/yyyy HH:mm')
-          ) : (
-            <span>MM/DD/YYYY hh:mm</span>
-          )}
+          {value
+            ? format(value, 'dd/MM/yyyy HH:mm', { locale: ptBR })
+            : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-auto p-0"
-        onFocusOutside={() => handleDateSelect(date)}
-      >
-        <div className="flex flex-col items-center">
-          <div className="sm:flex">
+
+      <PopoverContent className="w-auto p-0" align="start">
+        <div className="flex flex-col">
+          {/* Calendar and Time Selectors */}
+          <div className="flex flex-col sm:flex-row">
+            {/* Calendar */}
             <Calendar
               mode="single"
-              selected={date}
+              selected={tempDate}
               onSelect={handleDateSelect}
+              disabled={(date) => {
+                if (minDate && date < minDate) return true
+                if (maxDate && date > maxDate) return true
+                return false
+              }}
+              locale={ptBR}
+              initialFocus
             />
-            <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
-              <ScrollArea className="w-64 sm:w-auto">
-                <div className="flex sm:flex-col p-2">
-                  {hours.reverse().map((hour) => (
+
+            {/* Time Selectors */}
+            <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
+              {/* Hours */}
+              <ScrollArea className="w-full sm:w-auto">
+                <div className="flex p-2 sm:flex-col">
+                  {HOURS.map((hour) => (
                     <Button
                       key={hour}
                       size="icon"
                       variant={
-                        date && date.getHours() === hour ? 'default' : 'ghost'
+                        tempDate.getHours() === hour ? 'default' : 'ghost'
                       }
-                      className="sm:w-full shrink-0 aspect-square"
-                      onClick={() => handleTimeChange('hour', hour.toString())}
+                      className="aspect-square shrink-0 sm:w-full"
+                      onClick={() => handleTimeChange('hour', hour)}
                     >
-                      {hour}
+                      {hour.toString().padStart(2, '0')}
                     </Button>
                   ))}
                 </div>
                 <ScrollBar orientation="horizontal" className="sm:hidden" />
               </ScrollArea>
-              <ScrollArea className="w-64 sm:w-auto">
-                <div className="flex sm:flex-col p-2">
-                  {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
+
+              {/* Minutes */}
+              <ScrollArea className="w-full sm:w-auto">
+                <div className="flex p-2 sm:flex-col">
+                  {MINUTES.map((minute) => (
                     <Button
                       key={minute}
                       size="icon"
                       variant={
-                        date && date.getMinutes() === minute
-                          ? 'default'
-                          : 'ghost'
+                        tempDate.getMinutes() === minute ? 'default' : 'ghost'
                       }
-                      className="sm:w-full shrink-0 aspect-square"
-                      onClick={() =>
-                        handleTimeChange('minute', minute.toString())
-                      }
+                      className="aspect-square shrink-0 sm:w-full"
+                      onClick={() => handleTimeChange('minute', minute)}
                     >
                       {minute.toString().padStart(2, '0')}
                     </Button>
@@ -117,16 +193,20 @@ export default function DatePickerButton({
               </ScrollArea>
             </div>
           </div>
-          <Button
-            onClick={(e) => handleDateSelect(date)}
-            variant="default"
-            className={cn(
-              'w-full justify-center text-center font-normal h-10 px-4 hover:cursor-pointer',
-              !date && 'text-muted-foreground'
-            )}
-          >
-            Confirmar
-          </Button>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 border-t p-3">
+            <Button variant="outline" className="flex-1" onClick={handleCancel}>
+              Cancelar
+            </Button>
+            <Button
+              variant="default"
+              className="flex-1"
+              onClick={handleConfirm}
+            >
+              Confirmar
+            </Button>
+          </div>
         </div>
       </PopoverContent>
     </Popover>
