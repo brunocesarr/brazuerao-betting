@@ -1,4 +1,4 @@
-import { DefaultValues, RequestStatusEnum } from '@/helpers/constants'
+import { DefaultValues, RequestStatusEnum } from '@/constants/constants'
 import { withAPIErrorHandling } from '@/lib/api-error'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
 import {

@@ -1,4 +1,4 @@
-import { RuleTypeEnum } from '@/helpers/constants'
+import { RuleTypeEnum } from '@/constants/constants'
 import { z } from 'zod'
 
 /**

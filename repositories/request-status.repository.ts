@@ -1,4 +1,4 @@
-import { DefaultValues, RequestStatusEnum } from '@/helpers/constants'
+import { DefaultValues, RequestStatusEnum } from '@/constants/constants'
 import { prisma } from '@/lib/prisma'
 import { unfollowBetGroup } from '@/repositories/user-bet-group.repository'
 import { getUserById } from '@/repositories/user.repository'

@@ -1,6 +1,6 @@
 'use client'
 
-import { RuleTypeEnum } from '@/helpers/constants'
+import { RuleTypeEnum } from '@/constants/constants'
 import { getAllBetRules } from '@/services/brazuerao.service'
 import { RulesAPIResponse } from '@/types'
 import { useEffect, useState } from 'react'
@@ -57,7 +57,7 @@ export default function RegrasSimples() {
             </p>
           </SecaoRegra>
 
-          <SecaoRegra titulo="2. Sistema de Pontuação">
+          <SecaoRegra titulo="2. Sistema de Pontuação (Padrão)">
             <ul className="list-inside list-disc space-y-2">
               {rules &&
                 rules
@@ -74,7 +74,7 @@ export default function RegrasSimples() {
             </ul>
           </SecaoRegra>
 
-          <SecaoRegra titulo="3. Classificação">
+          <SecaoRegra titulo="3. Classificação (Padrão)">
             <ul className="list-inside list-disc space-y-2">
               {rules.some(
                 (rule) => rule.ruleType === RuleTypeEnum.champion

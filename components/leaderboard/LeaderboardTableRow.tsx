@@ -1,4 +1,4 @@
-import { RuleTypeEnum } from '@/helpers/constants'
+import { RuleTypeEnum } from '@/constants/constants'
 import { LeaderboardRowProps } from '@/types/leaderboard.types'
 import { ChevronDown, ChevronUp, Edit2, Eye } from 'lucide-react'
 import Link from 'next/link'

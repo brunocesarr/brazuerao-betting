@@ -1,4 +1,4 @@
-import { DefaultValues } from '@/helpers/constants'
+import { DefaultValues } from '@/constants/constants'
 import { prisma } from '@/lib/prisma'
 
 // MARK: - Group Role

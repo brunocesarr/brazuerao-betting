@@ -1,5 +1,5 @@
 import { StatCard } from '@/components/leaderboard/StatCard'
-import { RuleTypeEnum } from '@/helpers/constants'
+import { RuleTypeEnum } from '@/constants/constants'
 import { RuleBet, ScoreEntry } from '@/types'
 import { Award, Target, Trophy } from 'lucide-react'
 

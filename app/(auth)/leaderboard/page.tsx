@@ -2,12 +2,15 @@
 
 import { BetGroupSelectSimple } from '@/components/betting/BetGroupSelect'
 import { EmptyState } from '@/components/leaderboard/EmptyState'
+import ExportGroupPDFDropdown from '@/components/leaderboard/ExportGroupPDFButton'
 import { InfoCard } from '@/components/leaderboard/InfoCard'
 import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable'
 import { PageHeader } from '@/components/leaderboard/PageHeader'
 import { SummaryCards } from '@/components/leaderboard/SummaryCards'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { useLeaderboard } from '@/lib/contexts/LeaderboardContext'
+import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
+import { RuleBet } from '@/types'
 import { useState } from 'react'
 
 export default function LeaderboardPage() {
@@ -23,6 +26,7 @@ export default function LeaderboardPage() {
     getRuleByRuleId,
   } = useLeaderboard()
 
+  const { deadline, isExpired } = useBetDeadline(selectedGroup, groups)
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
   const toggleRow = (userId: string) => {
@@ -35,6 +39,17 @@ export default function LeaderboardPage() {
     setExpandedRows(newExpanded)
   }
 
+  const getRules = (): RuleBet[] => {
+    if (!username) return rules.filter((rule) => rule.isDefault)
+    const groupRules =
+      leaderboard
+        .find((details) => details.groupId === selectedGroup)
+        ?.score.map((ruleScore) => ruleScore.ruleId) ?? []
+    return rules.filter((rule) =>
+      groupRules.some((groupRule) => groupRule === rule.id)
+    )
+  }
+
   if (loading && leaderboard.length === 0) {
     return <LoadingState message="Carregando scores..." />
   }
@@ -42,12 +57,16 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
       <div className="container mx-auto max-w-7xl px-4 py-8">
-        <PageHeader
-          title="Minha Pontuação"
-          description="Acompanhe seu desempenho e veja como está se saindo no grupo"
-        />
+        {username && (
+          <>
+            <PageHeader
+              title="Minha Pontuação"
+              description="Acompanhe seu desempenho e veja como está se saindo no grupo"
+            />
 
-        <SummaryCards stats={myUserScore} rules={rules} />
+            <SummaryCards stats={myUserScore} rules={rules} />
+          </>
+        )}
 
         {leaderboard.length > 0 ? (
           <div className="space-y-4">
@@ -74,12 +93,30 @@ export default function LeaderboardPage() {
               onToggleRow={toggleRow}
               getRuleByRuleId={getRuleByRuleId}
             />
+
+            <div className="flex flex-col items-end justify-end space-y-2">
+              <ExportGroupPDFDropdown
+                groupName={
+                  groups.find((group) => group.groupId === selectedGroup)
+                    ?.name ?? ''
+                }
+                deadline={deadline ? new Date(deadline) : new Date()}
+                leaderboard={leaderboard}
+                getRuleByRuleId={getRuleByRuleId}
+                disabled={!isExpired}
+              />
+              {isExpired && (
+                <p className="text-xs text-gray-400/80">
+                  Funcão estará disponível após encerramento das apostas
+                </p>
+              )}
+            </div>
+
+            <InfoCard rules={getRules()} />
           </div>
         ) : (
           <EmptyState />
         )}
-
-        <InfoCard rules={rules} />
       </div>
     </div>
   )

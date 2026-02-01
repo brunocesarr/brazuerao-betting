@@ -3,7 +3,7 @@
  * Matches the Prisma schema structure
  */
 
-import { RequestStatusEnum } from '@/helpers/constants'
+import { RequestStatusEnum } from '@/constants/constants'
 import { Prisma } from '@prisma/client'
 
 // ============================================================================

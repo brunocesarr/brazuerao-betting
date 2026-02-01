@@ -1,7 +1,7 @@
 'use client'
 
 import CountdownTimer from '@/components/home/CountdownTimer'
-import { Dates } from '@/helpers/constants'
+import { Dates } from '@/constants/constants'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -43,7 +43,7 @@ export default function Home() {
                   Contagem regressiva para o começo do Brasileirão{' '}
                   {new Date().getFullYear()} encerrou...
                 </p>
-                <div className="grid grid-cols-2 gap-4 text-center md:flex">
+                <div className="flex justify-center min-w-full gap-4 text-center md:flex">
                   <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm">
                     <div className="text-2xl font-bold text-white">
                       Está aberta a temporada {new Date().getFullYear()}

@@ -1,6 +1,6 @@
 'use client'
 
-import { DefaultValues } from '@/helpers/constants'
+import { DefaultValues } from '@/constants/constants'
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useSessionRefresh } from '@/lib/hooks/useSessionRefresh'
 import {
@@ -80,7 +80,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (status === 'unauthenticated') {
       setUser(null)
-      router.push('/login')
     } else if (status === 'authenticated') {
       fetchProfile()
     }

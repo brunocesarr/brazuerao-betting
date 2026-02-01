@@ -1,5 +1,5 @@
 import { Button } from '@/components/shared/Button'
-import { DefaultValues } from '@/helpers/constants'
+import { DefaultValues } from '@/constants/constants'
 import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { UserBetGroup } from '@/types/domain'
 import { Plus, Users } from 'lucide-react'

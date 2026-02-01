@@ -3,7 +3,7 @@
  * Represents entities used within the application layers
  */
 
-import { RequestStatusEnum } from '@/helpers/constants'
+import { RequestStatusEnum } from '@/constants/constants'
 import { RulesAPIResponse } from '@/types/api'
 import { RequestStatusDBModel, RoleGroupDBModel } from '@/types/entities'
 
@@ -58,6 +58,7 @@ export interface LeaderboardEntry {
   userId: string
   groupId: string
   username: string
+  predictions: string[]
   totalScore: number
   score: ScoreEntry[]
 }

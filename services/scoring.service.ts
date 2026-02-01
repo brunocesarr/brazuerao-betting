@@ -1,5 +1,5 @@
-import { RuleTypeEnum } from '@/helpers/constants'
-import { TeamPositionAPIResponse, UserScoreAPIResponse } from '@/types/api'
+import { RuleTypeEnum } from '@/constants/constants'
+import { ScoreEntryAPIResponse, TeamPositionAPIResponse } from '@/types/api'
 import { BetRuleDBModel } from '@/types/entities'
 
 /**
@@ -84,7 +84,7 @@ export function calculateScore(
   predictions: string[],
   rules: BetRuleDBModel[],
   table: TeamPositionAPIResponse[]
-): UserScoreAPIResponse[] {
+): ScoreEntryAPIResponse[] {
   // Score each rule
   const scoresByRule = rules.map((rule) =>
     scoreByRule(rule, predictions, table)

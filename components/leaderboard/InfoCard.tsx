@@ -1,5 +1,4 @@
 import { RuleBet } from '@/types'
-import Link from 'next/link'
 
 export const InfoCard = ({ rules }: { rules: RuleBet[] }) => (
   <div className="mt-8 rounded-lg border border-green-500/30 bg-green-500/10 p-6">
@@ -18,11 +17,7 @@ export const InfoCard = ({ rules }: { rules: RuleBet[] }) => (
           ))}
         </ul>
         <p className="mt-3 text-sm text-gray-300">
-          Veja mais detalhes nas{' '}
-          <Link href="/rules" className="text-green-400 hover:underline">
-            regras completas
-          </Link>
-          .
+          Entre em contato com o lider do grupo para mais detalhes ou dúvidas.
         </p>
       </div>
     </div>

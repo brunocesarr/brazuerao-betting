@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/shared/Button'
-import { DefaultValues, RequestStatusEnum } from '@/helpers/constants'
+import { DefaultValues, RequestStatusEnum } from '@/constants/constants'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'

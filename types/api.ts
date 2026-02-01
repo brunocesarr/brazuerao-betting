@@ -3,7 +3,7 @@
  * Organized by domain and data flow direction
  */
 
-import { RuleTypeEnum } from '@/helpers/constants'
+import { RuleTypeEnum } from '@/constants/constants'
 import { CurrentRequestBetGroup } from '@/types/domain'
 
 // ============================================================================

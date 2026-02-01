@@ -30,12 +30,12 @@ import {
 } from '@/repositories/user.repository'
 import { getBrazilianLeague } from '@/services/brazuerao.service'
 import { calculateScore } from '@/services/scoring.service'
-import { UserScoreAPIResponse } from '@/types/api'
+import { ScoreEntryAPIResponse } from '@/types/api'
 
 // MARK: - Score
 const getUserScore = async (
   userId: string
-): Promise<{ groupId: string | null; score: UserScoreAPIResponse[] }[]> => {
+): Promise<{ groupId: string | null; score: ScoreEntryAPIResponse[] }[]> => {
   try {
     const userBets = await getUserBets(userId)
 
@@ -87,6 +87,7 @@ const getLeaderboard = async (groupId: string, season: number) => {
           userId: userInfo.id,
           username: userInfo?.name,
           groupId: userBet.groupId,
+          predictions,
           totalScore: score.reduce((total, item) => total + item.score, 0),
           score,
         }
