@@ -2,6 +2,7 @@
 
 import { DefaultValues } from '@/constants/constants'
 import { useToast } from '@/lib/contexts/ToastContext'
+import { useRequireAuth } from '@/lib/hooks/useRequireAuth'
 import { useSessionRefresh } from '@/lib/hooks/useSessionRefresh'
 import {
   getBetByUserId,
@@ -22,7 +23,6 @@ import {
 import { UserBetAPIResponse, UserProfile } from '@/types'
 import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import {
   createContext,
   useCallback,
@@ -42,6 +42,7 @@ interface AuthContextType {
   userGroups: UserBetGroup[]
   userBets: UserBetAPIResponse[]
   isLoading: boolean
+  isAuthenticated: boolean
 
   // User Actions
   updateProfile: (name: string) => Promise<boolean>
@@ -121,10 +122,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 // ============================================================================
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
   const { status } = useSession()
   const { showToast } = useToast()
   const { refreshSession } = useSessionRefresh()
+  const { isAuthenticated } = useRequireAuth()
 
   // State
   const [user, setUser] = useState<UserProfile | null>(null)
@@ -138,24 +139,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * Handle authentication status changes
-   * Redirects unauthenticated users to home page
+   * No redirect - let individual pages handle their own protection
    */
   useEffect(() => {
-    if (status === 'loading') return
+    // Wait for session to be determined
+    if (status === 'loading') {
+      setIsLoading(true)
+      return
+    }
 
     if (status === 'unauthenticated') {
-      // Clear state
+      // Clear state but don't redirect
       setUser(null)
       setUserGroups([])
       setUserBets([])
       setIsLoading(false)
-
-      // Redirect to home
-      router.push('/')
     } else if (status === 'authenticated') {
       fetchProfile()
     }
-  }, [status, router])
+  }, [status])
 
   /**
    * Fetch user groups and bets when user changes
@@ -305,7 +307,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false)
       }
     },
-    [userBets]
+    [userBets, showToast]
   )
 
   /**
@@ -353,58 +355,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false)
       }
     },
-    []
+    [showToast]
   )
 
   /**
    * Delete a bet group
    */
-  const deleteGroup = useCallback(async (groupId: string): Promise<boolean> => {
-    try {
-      setIsLoading(true)
+  const deleteGroup = useCallback(
+    async (groupId: string): Promise<boolean> => {
+      try {
+        setIsLoading(true)
 
-      await deleteBetGroup(groupId)
+        await deleteBetGroup(groupId)
 
-      setUserGroups((prev) => prev.filter((group) => group.groupId !== groupId))
+        setUserGroups((prev) =>
+          prev.filter((group) => group.groupId !== groupId)
+        )
 
-      showToast({
-        type: 'success',
-        message: SUCCESS_MESSAGES.DELETE_GROUP,
-      })
+        showToast({
+          type: 'success',
+          message: SUCCESS_MESSAGES.DELETE_GROUP,
+        })
 
-      return true
-    } catch (err) {
-      handleError(err, ERROR_MESSAGES.DELETE_GROUP)
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+        return true
+      } catch (err) {
+        handleError(err, ERROR_MESSAGES.DELETE_GROUP)
+        return false
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [showToast]
+  )
 
   /**
    * Join an existing bet group
    */
-  const joinGroup = useCallback(async (groupId: string): Promise<boolean> => {
-    try {
-      setIsLoading(true)
+  const joinGroup = useCallback(
+    async (groupId: string): Promise<boolean> => {
+      try {
+        setIsLoading(true)
 
-      const newGroup = await joinBetGroup(groupId)
+        const newGroup = await joinBetGroup(groupId)
 
-      setUserGroups((prev) => [...prev, newGroup])
+        setUserGroups((prev) => [...prev, newGroup])
 
-      showToast({
-        type: 'success',
-        message: SUCCESS_MESSAGES.JOIN_GROUP,
-      })
+        showToast({
+          type: 'success',
+          message: SUCCESS_MESSAGES.JOIN_GROUP,
+        })
 
-      return true
-    } catch (err) {
-      handleError(err, ERROR_MESSAGES.JOIN_GROUP)
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+        return true
+      } catch (err) {
+        handleError(err, ERROR_MESSAGES.JOIN_GROUP)
+        return false
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [showToast]
+  )
 
   // ============================================================================
   // REQUEST MANAGEMENT
@@ -453,7 +463,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null
       }
     },
-    [userBets]
+    [userBets, showToast]
   )
 
   // ============================================================================
@@ -501,7 +511,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false)
       }
     },
-    []
+    [showToast]
   )
 
   // ============================================================================
@@ -553,6 +563,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       userGroups,
       userBets,
       isLoading,
+      isAuthenticated,
       updateProfile,
       createNewGroup,
       updateGroupInfo,
@@ -567,6 +578,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       userGroups,
       userBets,
       isLoading,
+      isAuthenticated,
       updateProfile,
       createNewGroup,
       updateGroupInfo,
@@ -579,7 +591,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {isAuthenticated ? children : null}
+    </AuthContext.Provider>
   )
 }
 

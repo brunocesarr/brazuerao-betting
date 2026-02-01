@@ -9,8 +9,12 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development', // Debug em desenvolvimento
   pages: {
     signIn: '/login',
+    signOut: '/',
+    error: '/login',
   },
   providers: [
     CredentialsProvider({
@@ -50,27 +54,12 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
-        token.email = user.email
-        token.name = user.name
-      }
-
-      if (trigger === 'update' && session) {
-        token.name = session.name
-        return {
-          ...token,
-          ...session,
-        }
-      }
-
-      if (token.id) {
-        const dbUser = await getUserById(token.id as string)
-        if (dbUser) {
-          token.name = dbUser.name
-          token.email = dbUser.email
-        }
+        const dbUser = await getUserById(user.id as string)
+        token.id = dbUser.id
+        token.email = dbUser.email
+        token.name = dbUser.name
       }
 
       return token
