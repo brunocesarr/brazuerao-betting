@@ -1,11 +1,15 @@
 import { predictionSchema } from '@/helpers/schemas'
+import { prisma } from '@/lib/prisma'
 import {
   getAllRequestStatus,
   getCurrentRequestsByGroupId,
   updateRequestStatus,
 } from '@/repositories/request-status.repository'
 import { getAllGroupRoles } from '@/repositories/roles-repository'
-import { getAllBetRules } from '@/repositories/rules.repository'
+import {
+  getAllBetRules,
+  getAllBetRulesByGroupId,
+} from '@/repositories/rules.repository'
 import {
   createNewBetGroup,
   deleteBetGroup,
@@ -14,7 +18,11 @@ import {
   joinBetGroup,
   unfollowBetGroup,
 } from '@/repositories/user-bet-group.repository'
-import { createUserBet, getUserBets } from '@/repositories/user-bet.repository'
+import {
+  createUserBet,
+  getUserBets,
+  getUserBetsByGroupId,
+} from '@/repositories/user-bet.repository'
 import {
   createUser,
   existsUser,
@@ -53,6 +61,43 @@ const getUserScore = async (
   }
 }
 
+const getLeaderboard = async (groupId: string, season: number) => {
+  try {
+    const userBets = await getUserBetsByGroupId(groupId, season)
+
+    if (userBets.length === 0) {
+      return []
+    }
+
+    const [brazilianLeague, rules, userInfos] = await Promise.all([
+      getBrazilianLeague(),
+      getAllBetRulesByGroupId(groupId),
+      prisma.user.findMany({
+        where: { id: { in: userBets.map((userBet) => userBet.userId) } },
+      }),
+    ])
+
+    return userBets
+      .map((userBet) => {
+        const predictions = predictionSchema.parse(userBet.predictions)
+        const score = calculateScore(predictions, rules, brazilianLeague)
+        const userInfo = userInfos.find((info) => info.id === userBet.userId)
+        if (!userInfo) return null
+        return {
+          userId: userInfo.id,
+          username: userInfo?.name,
+          groupId: userBet.groupId,
+          totalScore: score.reduce((total, item) => total + item.score, 0),
+          score,
+        }
+      })
+      .filter((userBet) => userBet)
+  } catch (error) {
+    console.error('Get group score error:', error)
+    throw error
+  }
+}
+
 export {
   createNewBetGroup,
   createUser,
@@ -64,6 +109,7 @@ export {
   getAllGroups,
   getAllRequestStatus,
   getCurrentRequestsByGroupId,
+  getLeaderboard,
   getUserBets,
   getUserById,
   getUserGroups,

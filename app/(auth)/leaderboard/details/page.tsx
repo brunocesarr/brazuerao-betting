@@ -1,63 +1,43 @@
 'use client'
 
+import { Button } from '@/components/shared/Button'
+import { useLeaderboard } from '@/lib/contexts/LeaderboardContext'
+import { LeaderboardEntry } from '@/types'
 import { ArrowLeft, Award, Target, TrendingUp, Trophy } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-interface ScoreDetail {
-  ruleId: string
-  ruleType: string
-  ruleDescription: string
-  teams: string[]
-  points: number
-}
-
 export default function LeaderboardDetailsPage() {
+  const { leaderboard, getRuleByRuleId, username, groups } = useLeaderboard()
+
   const searchParams = useSearchParams()
   const router = useRouter()
   const userId = searchParams.get('userId')
   const groupId = searchParams.get('groupId')
 
   const [loading, setLoading] = useState(true)
-  const [scoreDetails, setScoreDetails] = useState<ScoreDetail[]>([])
+  const [scoreDetails, setScoreDetails] = useState<LeaderboardEntry>()
 
   useEffect(() => {
     if (userId && groupId) {
       loadScoreDetails()
+    } else {
+      router.replace('/leaderboard')
     }
   }, [userId, groupId])
 
   const loadScoreDetails = async () => {
     try {
       setLoading(true)
-      // Fetch detailed score data
-      // const data = await getDetailedScore(userId, groupId)
-
-      // Mock data for demonstration
-      setScoreDetails([
-        {
-          ruleId: '1',
-          ruleType: 'EXACT_CHAMPION',
-          ruleDescription: 'Acertar o Campeão',
-          teams: ['Palmeiras'],
-          points: 10,
-        },
-        {
-          ruleId: '2',
-          ruleType: 'EXACT_POSITION',
-          ruleDescription: 'Times na Posição Exata',
-          teams: ['Flamengo', 'Atlético-MG', 'Fortaleza'],
-          points: 9,
-        },
-        {
-          ruleId: '3',
-          ruleType: 'ZONE_MATCH',
-          ruleDescription: 'Times na Zona Correta',
-          teams: ['São Paulo', 'Internacional', 'Corinthians', 'Bahia'],
-          points: 4,
-        },
-      ])
+      const score = leaderboard.find(
+        (scoreUser) =>
+          scoreUser.userId === userId && scoreUser.groupId === groupId
+      )
+      if (!score) {
+        router.replace('/leaderboard')
+      }
+      setScoreDetails(score)
     } catch (error) {
       console.error('Failed to load score details:', error)
     } finally {
@@ -65,12 +45,7 @@ export default function LeaderboardDetailsPage() {
     }
   }
 
-  const totalPoints = scoreDetails.reduce(
-    (sum, detail) => sum + detail.points,
-    0
-  )
-
-  const getRuleIcon = (ruleType: string) => {
+  const getRuleIcon = (ruleType?: string) => {
     switch (ruleType) {
       case 'EXACT_CHAMPION':
         return <Trophy className="w-6 h-6 text-yellow-500" />
@@ -83,7 +58,7 @@ export default function LeaderboardDetailsPage() {
     }
   }
 
-  const getRuleBgColor = (ruleType: string) => {
+  const getRuleBgColor = (ruleType?: string) => {
     switch (ruleType) {
       case 'EXACT_CHAMPION':
         return 'from-yellow-500/20 to-yellow-600/20 border-yellow-500/30'
@@ -94,6 +69,12 @@ export default function LeaderboardDetailsPage() {
       default:
         return 'from-gray-500/20 to-gray-600/20 border-gray-500/30'
     }
+  }
+
+  const isDeadlineExpired = (): boolean => {
+    const group = groups.find((group) => group.groupId === groupId)
+    if (!group) return true
+    return new Date(group.deadlineAt).getTime() < new Date().getTime()
   }
 
   if (loading) {
@@ -134,9 +115,16 @@ export default function LeaderboardDetailsPage() {
               <p className="text-white/80 text-sm font-medium mb-1">
                 Pontuação Total
               </p>
-              <p className="text-5xl font-bold text-white">{totalPoints}</p>
+              <p className="text-5xl font-bold text-white">
+                {scoreDetails?.totalScore}
+              </p>
               <p className="text-white/70 text-sm mt-2">
-                {scoreDetails.length} regras pontuadas
+                {
+                  scoreDetails?.score.filter(
+                    (scoreEntry) => scoreEntry.score > 0
+                  ).length
+                }{' '}
+                regras pontuadas
               </p>
             </div>
             <div className="p-4 bg-white/20 rounded-full">
@@ -151,19 +139,19 @@ export default function LeaderboardDetailsPage() {
             Detalhamento por Regra
           </h2>
 
-          {scoreDetails.map((detail) => (
+          {scoreDetails?.score.map((detail) => (
             <div
               key={detail.ruleId}
-              className={`bg-gradient-to-r ${getRuleBgColor(detail.ruleType)} border rounded-lg p-6`}
+              className={`bg-gradient-to-r ${getRuleBgColor(getRuleByRuleId(detail.ruleId)?.ruleType)} border rounded-lg p-6`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-[#1a1a1a] rounded-lg">
-                    {getRuleIcon(detail.ruleType)}
+                    {getRuleIcon(getRuleByRuleId(detail.ruleId)?.ruleType)}
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-1">
-                      {detail.ruleDescription}
+                      {getRuleByRuleId(detail.ruleId)?.description}
                     </h3>
                     <p className="text-sm text-gray-400">
                       {detail.teams.length} time(s) pontuado(s)
@@ -172,7 +160,7 @@ export default function LeaderboardDetailsPage() {
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-white">
-                    {detail.points}
+                    {detail.score}
                   </div>
                   <div className="text-xs text-gray-400">pontos</div>
                 </div>
@@ -194,20 +182,17 @@ export default function LeaderboardDetailsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex gap-4">
-          <Link
-            href="/predictions"
-            className="flex-1 inline-flex justify-center items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+        {username && (
+          <Button
+            className="flex-1 mt-8 flex gap-4 w-full h-14"
+            type="button"
+            variant="primary"
+            onClick={() => router.push(`/betting?groupId=${groupId}`)}
+            disabled={isDeadlineExpired()}
           >
             Editar Previsões
-          </Link>
-          <Link
-            href="/rules"
-            className="flex-1 inline-flex justify-center items-center gap-2 px-6 py-3 bg-[#2a2a2a] hover:bg-[#333333] text-white font-semibold rounded-lg border border-gray-700 transition-colors"
-          >
-            Ver Regras
-          </Link>
-        </div>
+          </Button>
+        )}
       </div>
     </div>
   )

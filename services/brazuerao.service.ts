@@ -6,7 +6,13 @@ import {
   UserBetAPIResponse,
   UserScoreAPIResponse,
 } from '@/types/api'
-import { GroupRole, RequestStatus, RuleBet, UserBetGroup } from '@/types/domain'
+import {
+  GroupRole,
+  LeaderboardEntry,
+  RequestStatus,
+  RuleBet,
+  UserBetGroup,
+} from '@/types/domain'
 
 const API_SOURCE = 'Brazuerao API'
 
@@ -30,7 +36,7 @@ function mapTeamPositionData(
 async function getIndividualUserScore(): Promise<UserScoreAPIResponse[]> {
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.get('/score')
-    return (data?.scoreByRule ?? []) as UserScoreAPIResponse[]
+    return data
   }, `${API_SOURCE}/score`)
 }
 
@@ -75,6 +81,19 @@ async function saveUserBet(predictions: string[], groupId: string | null) {
     const { data } = await appBrazuerao.post('/bets', {
       groupId,
       predictions,
+      season: new Date().getFullYear(),
+    })
+    return data?.bet as UserBetAPIResponse
+  }, `${API_SOURCE}/bets`)
+}
+
+/**
+ * Update groupId for default user's predictions to the Brazuerão API
+ */
+async function updateGroupIdForUserBet(groupId: string | null) {
+  return withAPIErrorHandling(async () => {
+    const { data } = await appBrazuerao.patch('/bets', {
+      groupId,
       season: new Date().getFullYear(),
     })
     return data?.bet as UserBetAPIResponse
@@ -137,6 +156,28 @@ async function getAllRequestStatus(): Promise<RequestStatus[]> {
   }, `${API_SOURCE}/groups/request-status`)
 }
 
+/**
+ * Fetches current groups for leaderboard from the Brazuerão API
+ */
+async function getLeaderboardGroups(): Promise<UserBetGroup[]> {
+  return withAPIErrorHandling(async () => {
+    const { data } = await appBrazuerao.get('/leaderboard')
+    return data.groups
+  }, `${API_SOURCE}/groups`)
+}
+
+/**
+ * Fetches current groups for leaderboard from the Brazuerão API
+ */
+async function getScoreForLeaderboardGroup(
+  groupId: string
+): Promise<LeaderboardEntry[]> {
+  return withAPIErrorHandling(async () => {
+    const { data } = await appBrazuerao.get(`/leaderboard/${groupId}`)
+    return data
+  }, `${API_SOURCE}/leaderboard/${groupId}`)
+}
+
 export {
   getAllBetGroups,
   getAllBetRules,
@@ -145,5 +186,8 @@ export {
   getBetByUserId,
   getBrazilianLeague,
   getIndividualUserScore,
+  getLeaderboardGroups,
+  getScoreForLeaderboardGroup,
   saveUserBet,
+  updateGroupIdForUserBet,
 }

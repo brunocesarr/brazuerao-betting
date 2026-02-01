@@ -1,31 +1,39 @@
 'use client'
 
+import { BetGroupSelectSimple } from '@/components/betting/BetGroupSelect'
 import { EmptyState } from '@/components/leaderboard/EmptyState'
-import { GroupSelector } from '@/components/leaderboard/GroupSelector'
 import { InfoCard } from '@/components/leaderboard/InfoCard'
 import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable'
 import { PageHeader } from '@/components/leaderboard/PageHeader'
 import { SummaryCards } from '@/components/leaderboard/SummaryCards'
 import { LoadingState } from '@/components/shared/LoadingState'
-import { useLeaderboard } from '@/lib/hooks/useLeaderboard'
-import { useScoreCalculations } from '@/lib/hooks/useScoreCalculations'
+import { useLeaderboard } from '@/lib/contexts/LeaderboardContext'
+import { useState } from 'react'
 
 export default function LeaderboardPage() {
   const {
     myUserScore,
-    session,
+    username,
     groups,
     rules,
     leaderboard,
     selectedGroup,
     loading,
-    expandedRows,
-    setSelectedGroup,
-    toggleRow,
-    getRuleTypeByRuleId,
+    onChangeSelectedGroup,
+    getRuleByRuleId,
   } = useLeaderboard()
 
-  const stats = useScoreCalculations(leaderboard, getRuleTypeByRuleId)
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+
+  const toggleRow = (userId: string) => {
+    const newExpanded = new Set(expandedRows)
+    if (newExpanded.has(userId)) {
+      newExpanded.delete(userId)
+    } else {
+      newExpanded.add(userId)
+    }
+    setExpandedRows(newExpanded)
+  }
 
   if (loading && leaderboard.length === 0) {
     return <LoadingState message="Carregando scores..." />
@@ -42,23 +50,31 @@ export default function LeaderboardPage() {
         <SummaryCards stats={myUserScore} rules={rules} />
 
         {leaderboard.length > 0 ? (
-          <>
-            <GroupSelector
-              groups={groups}
-              selectedGroup={selectedGroup}
-              onChange={setSelectedGroup}
+          <div className="space-y-4">
+            <hr className="my-8 h-px border-0 bg-primary-700/50" />
+
+            {groups.length > 1 && (
+              <BetGroupSelectSimple
+                groups={groups}
+                onValueChange={onChangeSelectedGroup}
+                value={selectedGroup}
+              />
+            )}
+
+            <PageHeader
+              title={`Grupo: ${groups.find((group) => group.groupId === selectedGroup)?.name}`}
+              description="Acompanhe seu desempenho e dos demais integrantes"
             />
 
             <LeaderboardTable
               leaderboard={leaderboard}
-              stats={stats}
               expandedRows={expandedRows}
               selectedGroup={selectedGroup}
-              currentUsername={session?.user?.name}
+              currentUsername={username}
               onToggleRow={toggleRow}
-              getRuleTypeByRuleId={getRuleTypeByRuleId}
+              getRuleByRuleId={getRuleByRuleId}
             />
-          </>
+          </div>
         ) : (
           <EmptyState />
         )}

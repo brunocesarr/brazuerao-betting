@@ -1,8 +1,13 @@
 'use client'
 
+import { DefaultValues } from '@/helpers/constants'
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useSessionRefresh } from '@/lib/hooks/useSessionRefresh'
-import { getBetByUserId, saveUserBet } from '@/services/brazuerao.service'
+import {
+  getBetByUserId,
+  saveUserBet,
+  updateGroupIdForUserBet,
+} from '@/services/brazuerao.service'
 import {
   createNewBetGroup,
   deleteBetGroup,
@@ -184,6 +189,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         rules
       )
       setUserGroups([...userGroups, newGroup])
+
+      let defaultGroupId = userBets.find((userBet) => !userBet.groupId)?.id
+      if (defaultGroupId) {
+        const updatedBet = await updateGroupIdForUserBet(newGroup.groupId)
+        setUserBets([
+          ...userBets.filter((userBet) => userBet.id !== defaultGroupId),
+          updatedBet,
+        ])
+      }
+
       showToast({
         type: 'success',
         message: 'Novo grupo criado com sucesso.',
@@ -306,6 +321,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     try {
       const updatedInfo = await updateUserBetGroup(userId, groupId, statusId)
+
+      let defaultGroupId = userBets.find((userBet) => !userBet.groupId)?.id
+      if (
+        defaultGroupId &&
+        statusId === DefaultValues.approvedRequestStatus?.id
+      ) {
+        const updatedBet = await updateGroupIdForUserBet(groupId)
+        setUserBets([
+          ...userBets.filter((userBet) => userBet.id !== defaultGroupId),
+          updatedBet,
+        ])
+      }
+
       showToast({
         type: 'success',
         message: 'Ação realizada com sucesso.',

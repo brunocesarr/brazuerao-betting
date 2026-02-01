@@ -5,7 +5,6 @@ import { UserBetDBModel } from '@/types/entities'
 // MARK: - Bets
 export const getUserBets = async (
   userId: string,
-  groupId: string = '',
   season: number = new Date().getFullYear()
 ): Promise<UserBetDBModel[]> => {
   try {
@@ -13,9 +12,6 @@ export const getUserBets = async (
       where: {
         userId,
         season: season,
-      },
-      orderBy: {
-        updatedAt: 'desc',
       },
     })
 
@@ -31,6 +27,34 @@ export const getUserBets = async (
     })
   } catch (error) {
     console.error('Get user bets error:', error)
+    throw error
+  }
+}
+
+export const getUserBetsByGroupId = async (
+  groupId: string,
+  season: number = new Date().getFullYear()
+): Promise<UserBetDBModel[]> => {
+  try {
+    const bets = await prisma.bet.findMany({
+      where: {
+        season: season,
+        groupId,
+      },
+    })
+
+    if (!bets) {
+      return []
+    }
+
+    return bets.map((bet) => {
+      return {
+        ...bet,
+        predictions: predictionSchema.parse(bet.predictions),
+      }
+    })
+  } catch (error) {
+    console.error('Get user bets by groupId error:', error)
     throw error
   }
 }
@@ -58,6 +82,31 @@ export const createUserBet = async (
     return parseBetPredictions(updatedBets)
   } catch (error) {
     console.error('Create/update user bet error:', error)
+    throw error
+  }
+}
+
+export const updateGroupIdForDefaultUserBet = async (
+  userId: string,
+  groupId: string,
+  season: number = new Date().getFullYear()
+): Promise<UserBetDBModel[]> => {
+  try {
+    const existingBets = await fetchUserBets(userId, season)
+    const defaultUserBet = existingBets.find((bet) => !bet.groupId)
+
+    const updatedBet = await prisma.bet.update({
+      where: {
+        id: defaultUserBet?.id,
+      },
+      data: {
+        groupId,
+      },
+    })
+
+    return parseBetPredictions([updatedBet])
+  } catch (error) {
+    console.error('Update group id for user bet error:', error)
     throw error
   }
 }

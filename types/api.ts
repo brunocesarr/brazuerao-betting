@@ -101,6 +101,10 @@ export interface RulesAPIResponse {
  * User score result from scoring calculation
  */
 export interface UserScoreAPIResponse {
+  groupId: string
+  score: ScoreEntryAPIResponse[]
+}
+export interface ScoreEntryAPIResponse {
   ruleId: string
   score: number
   teams: string[]

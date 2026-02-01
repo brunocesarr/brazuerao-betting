@@ -11,6 +11,7 @@ import { useToast } from '@/lib/contexts/ToastContext'
 import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
 import { getBrazilianLeague } from '@/services/brazuerao.service'
 import { TeamPrediction, UserBetAPIResponse } from '@/types'
+import { UserBetGroup } from '@/types/domain'
 import {
   closestCenter,
   DndContext,
@@ -27,12 +28,14 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { DoorClosedLockedIcon } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export default function BettingPage() {
   const { userBets, userGroups, isLoading: authLoading, saveMyBet } = useAuth()
   const { showToast } = useToast()
   const { confirm } = useConfirmDialog()
+  const params = useSearchParams()
 
   const [savedPredictions, setSavedPredictions] = useState<TeamPrediction[]>([])
   const [predictions, setPredictions] = useState<TeamPrediction[]>([])
@@ -74,7 +77,10 @@ export default function BettingPage() {
 
   const initializeBettingData = useCallback(() => {
     const mostRecentBet = getMostRecentBet(userBets)
-    const initialGroupId = mostRecentBet?.groupId ?? ''
+    const mostRecentGroup = getMostRecentGroup()
+    const groupIdParam = params.get('groupId')
+    const initialGroupId =
+      groupIdParam ?? mostRecentBet?.groupId ?? mostRecentGroup?.groupId ?? ''
 
     setSelectedGroupId(initialGroupId)
     setSaveForAll(!initialGroupId)
@@ -88,6 +94,15 @@ export default function BettingPage() {
     return [...bets].sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )[0]
+  }
+
+  const getMostRecentGroup = (): UserBetGroup | null => {
+    if (userGroups.length === 0) return null
+
+    return [...userGroups].sort(
+      (a, b) =>
+        new Date(b.deadlineAt).getTime() - new Date(a.deadlineAt).getTime()
     )[0]
   }
 
@@ -257,6 +272,26 @@ export default function BettingPage() {
     }
   }, [])
 
+  const emptyStateByDeadlineExpired = () => {
+    return userGroups.length <= 1 ? (
+      <div className="from-primary-700 to-white bg-gradient-to-br p-4 rounded-xl text-white mb-8">
+        <EmptyState
+          icon={DoorClosedLockedIcon}
+          title="Eita! Parece que você esqueceu de apostar..."
+          description="Todos os grupos em que você está cadastrado já encerraram suas apostas."
+        />
+      </div>
+    ) : (
+      <div className="from-primary-700 to-white bg-gradient-to-br p-4 rounded-xl text-white mb-8">
+        <EmptyState
+          icon={DoorClosedLockedIcon}
+          title="Chegou tarde demais ein..."
+          description="Esse grupo não está aceitando mais apostas."
+        />
+      </div>
+    )
+  }
+
   if (authLoading) {
     return <LoadingState message="Carregando..." />
   }
@@ -265,17 +300,19 @@ export default function BettingPage() {
     <div className="min-h-screen bg-[#1a1a1a] py-8">
       <div className="container mx-auto max-w-5xl px-4 space-y-8">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="mb-3 text-4xl font-bold text-gray-50">
-            Sua previsão para o Brasileirão 2026
-          </h1>
-          <p className="text-lg text-gray-300">
-            Arraste os times para ordenar como você acha que vão terminar
-          </p>
-        </div>
+        <h1 className="mb-8 text-4xl font-bold text-gray-50 text-center">
+          Sua previsão para o Brasileirão 2026
+        </h1>
+
+        {/* Loading State */}
+        {isLoadingBet && <LoadingState message="Carregando aposta..." />}
+
+        {!isLoadingBet &&
+          predictions.length === 0 &&
+          emptyStateByDeadlineExpired()}
 
         {/* Group Selection */}
-        {userGroups.length > 0 && (
+        {userGroups.length > 1 && (
           <div className="w-full from-primary-700 to-white bg-gradient-to-b p-4 rounded-lg space-y-4">
             <BetGroupSelectSimple
               groups={userGroups}
@@ -293,23 +330,13 @@ export default function BettingPage() {
           </div>
         )}
 
-        {/* Empty State - Deadline Expired */}
-        {!isLoadingBet && predictions.length === 0 && (
-          <div className="from-primary-700 to-white bg-gradient-to-br p-4 rounded-xl text-white mb-8">
-            <EmptyState
-              icon={DoorClosedLockedIcon}
-              title="Chegou tarde demais ein..."
-              description="Esse grupo não está aceitando mais apostas."
-            />
-          </div>
-        )}
-
-        {/* Loading State */}
-        {isLoadingBet && <LoadingState message="Carregando aposta..." />}
-
         {/* Predictions Table */}
         {!isLoadingBet && predictions.length > 0 && (
           <div className="space-y-8">
+            <p className="text-lg text-gray-300">
+              Arraste os times para ordenar como você acha que vão terminar
+            </p>
+
             {/* Instructions */}
             <div className="my-4 rounded-lg from-primary-600 to-primary-700 bg-gradient-to-r p-4 text-center">
               <p className="text-sm text-white">

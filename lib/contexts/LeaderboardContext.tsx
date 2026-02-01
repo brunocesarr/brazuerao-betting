@@ -1,15 +1,41 @@
+'use client'
+
 import {
   getAllBetRules,
   getIndividualUserScore,
   getLeaderboardGroups,
   getScoreForLeaderboardGroup,
 } from '@/services/brazuerao.service'
-import { LeaderboardEntry, RuleBet } from '@/types'
-import { ScoreEntry, UserBetGroup } from '@/types/domain'
+import {
+  LeaderboardEntry,
+  RuleBet,
+  ScoreEntry,
+  UserBetGroup,
+} from '@/types/domain'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
-export const useLeaderboard = () => {
+interface LeaderboardContextType {
+  rules: RuleBet[]
+  groups: UserBetGroup[]
+  myUserScore: ScoreEntry[]
+  leaderboard: LeaderboardEntry[]
+  selectedGroup: string
+  username?: string | null
+  loading: boolean
+  onChangeSelectedGroup: (groupId: string) => void
+  getRuleByRuleId: (ruleId: string) => RuleBet | undefined
+}
+
+const LeaderboardContext = createContext<LeaderboardContextType | undefined>(
+  undefined
+)
+
+export function LeaderboardProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const { data: session, status } = useSession()
   const [myUserScore, setMyUserScore] = useState<ScoreEntry[]>([])
   const [rules, setRules] = useState<RuleBet[]>([])
@@ -73,30 +99,32 @@ export const useLeaderboard = () => {
   }
 
   const getRuleByRuleId = (ruleId: string): RuleBet | undefined => {
-    return rules.find((rule) => rule.id === ruleId)
+    return rules.find((rule: RuleBet) => rule.id === ruleId)
   }
 
-  const toggleRow = (userId: string) => {
-    const newExpanded = new Set(expandedRows)
-    if (newExpanded.has(userId)) {
-      newExpanded.delete(userId)
-    } else {
-      newExpanded.add(userId)
-    }
-    setExpandedRows(newExpanded)
-  }
+  return (
+    <LeaderboardContext.Provider
+      value={{
+        myUserScore,
+        rules,
+        groups,
+        leaderboard,
+        selectedGroup,
+        loading,
+        getRuleByRuleId,
+        username: session?.user.name,
+        onChangeSelectedGroup: setSelectedGroup,
+      }}
+    >
+      {children}
+    </LeaderboardContext.Provider>
+  )
+}
 
-  return {
-    session,
-    myUserScore,
-    rules,
-    groups,
-    leaderboard,
-    selectedGroup,
-    loading,
-    expandedRows,
-    setSelectedGroup,
-    toggleRow,
-    getRuleByRuleId,
+export function useLeaderboard() {
+  const context = useContext(LeaderboardContext)
+  if (!context) {
+    throw new Error('useLeaderboard must be used')
   }
+  return context
 }

@@ -18,7 +18,7 @@ export default function TabNavigation({
         <nav className="flex -mb-px">
           <button
             onClick={() => onTabChange('my-groups')}
-            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors hover:cursor-pointer ${
               activeTab === 'my-groups'
                 ? 'border-primary-500 text-primary-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -31,7 +31,7 @@ export default function TabNavigation({
           </button>
           <button
             onClick={() => onTabChange('find-groups')}
-            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors hover:cursor-pointer ${
               activeTab === 'find-groups'
                 ? 'border-primary-500 text-primary-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

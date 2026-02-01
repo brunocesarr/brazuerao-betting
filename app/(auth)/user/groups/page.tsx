@@ -242,7 +242,7 @@ export default function GroupManagementPage() {
           />
         </div>
 
-        {selectedGroup && (
+        {!(isLoading || isLoadingAuth) && selectedGroup && (
           <div className="mt-8 bg-white rounded-lg p-6">
             <MyGroupRequestCards
               userBetGroup={selectedGroup}

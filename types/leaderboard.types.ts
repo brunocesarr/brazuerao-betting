@@ -1,4 +1,4 @@
-import { LeaderboardEntry } from '@/types/domain'
+import { LeaderboardEntry, RuleBet } from '@/types/domain'
 
 export interface SummaryStats {
   totalScore: number
@@ -10,10 +10,9 @@ export interface SummaryStats {
 export interface LeaderboardRowProps {
   entry: LeaderboardEntry
   index: number
-  stats: SummaryStats
   isExpanded: boolean
   isCurrentUser: boolean
   selectedGroup: string
   onToggle: (userId: string) => void
-  getRuleTypeByRuleId: (ruleId: string) => string | undefined
+  getRuleByRuleId: (ruleId: string) => RuleBet | undefined
 }

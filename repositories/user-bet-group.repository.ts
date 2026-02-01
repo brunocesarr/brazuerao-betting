@@ -65,6 +65,34 @@ export const getUserGroups = async (
   }
 }
 
+export const getAllPublicUserGroups = async (): Promise<UserBetGroup[]> => {
+  try {
+    const groups = await prisma.betGroup.findMany({
+      where: {
+        isPrivate: false,
+        allowPublicViewing: true,
+      },
+    })
+
+    return groups.map((group) => {
+      return {
+        groupId: group.id,
+        name: group.name,
+        challenge: group.challenge,
+        isPrivate: group.isPrivate,
+        deadlineAt: group.deadlineAt,
+        allowPublicViewing: group.allowPublicViewing,
+        userId: '',
+        roleGroupId: '',
+        requestStatusId: '',
+      }
+    })
+  } catch (error) {
+    console.error('Get all public user groups error:', error)
+    throw error
+  }
+}
+
 export const updateBetGroup = async (
   userId: string,
   groupId: string,

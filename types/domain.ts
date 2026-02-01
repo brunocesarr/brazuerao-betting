@@ -56,7 +56,9 @@ export interface ScoryGroupEntry {
  */
 export interface LeaderboardEntry {
   userId: string
+  groupId: string
   username: string
+  totalScore: number
   score: ScoreEntry[]
 }
 

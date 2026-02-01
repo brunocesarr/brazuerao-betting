@@ -62,6 +62,7 @@ export default function RegrasSimples() {
               {rules &&
                 rules
                   .sort((a, b) => a.priority - b.priority)
+                  .filter((rule) => rule.isDefault)
                   .map((rule) => (
                     <li key={rule.id}>
                       {rule.description}:{' '}
