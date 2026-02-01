@@ -1,4 +1,9 @@
-import { withAPIErrorHandling } from '@/lib/api-error'
+import { safePost } from '@/lib/api/safe-axios'
+import {
+  getErrorMessage,
+  ValidationError,
+  withAPIErrorHandling,
+} from '@/lib/errors'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
 import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 
@@ -132,8 +137,36 @@ async function updateUserBetGroup(
   }, `${API_SOURCE}/user/groups/${groupId}/requests`)
 }
 
+/**
+ * Create new user from the Brazuerão API
+ */
+async function createNewUser(name: string, email: string, password: string) {
+  try {
+    const { data } = await safePost(appBrazuerao, '/register', {
+      name,
+      email,
+      password,
+    })
+    return { ok: true, data }
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      return {
+        ok: false,
+        error: error.message,
+        fieldErrors: error.fieldErrors,
+      }
+    }
+
+    return {
+      ok: false,
+      error: getErrorMessage(error),
+    }
+  }
+}
+
 export {
   createNewBetGroup,
+  createNewUser,
   deleteBetGroup,
   getBetGroupsByUserId,
   getCurrentRequestByBetGroup,

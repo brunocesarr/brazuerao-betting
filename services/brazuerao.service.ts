@@ -1,5 +1,5 @@
 import { DefaultValues, RequestStatusEnum } from '@/constants/constants'
-import { withAPIErrorHandling } from '@/lib/api-error'
+import { withAPIErrorHandling } from '@/lib/errors'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
 import {
   TeamPositionAPIResponse,

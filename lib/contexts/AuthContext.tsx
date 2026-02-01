@@ -1,5 +1,6 @@
 'use client'
 
+import { LoadingState } from '@/components/shared/LoadingState'
 import { DefaultValues } from '@/constants/constants'
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth'
@@ -589,6 +590,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       saveMyBet,
     ]
   )
+
+  if (isLoading) return <LoadingState message="Carregando..." />
 
   return (
     <AuthContext.Provider value={contextValue}>

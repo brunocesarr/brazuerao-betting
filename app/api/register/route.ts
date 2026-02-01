@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const existingUser = await existsUser({ email })
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Usuário já cadastrado' },
+        { error: 'E-mail já cadastrado' },
         { status: 400 }
       )
     }
