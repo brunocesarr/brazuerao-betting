@@ -20,16 +20,21 @@ export const LeaderboardTable = ({
   onToggleRow,
   getRuleByRuleId,
 }: LeaderboardTableProps) => {
+  const hasData = leaderboard.length > 0
+
   return (
-    <div className="overflow-hidden rounded-lg bg-[#2a2a2a] shadow-xl">
-      <LeaderboardTableHeader />
-      <div>
-        {leaderboard.length === 0 ? (
+    <div className="w-full overflow-hidden rounded-lg bg-[#2a2a2a] shadow-xl">
+      {/* Desktop Header - Hidden on mobile */}
+      {hasData && <LeaderboardTableHeader />}
+
+      {/* Table Body / Card List */}
+      <div className="divide-y divide-gray-700/50">
+        {!hasData ? (
           <EmptyState />
         ) : (
           leaderboard.map((entry, index) => (
             <LeaderboardTableRow
-              key={entry.userId}
+              key={`${entry.userId}-${entry.groupId}`}
               entry={entry}
               index={index}
               isExpanded={expandedRows.has(entry.userId)}

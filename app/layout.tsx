@@ -18,6 +18,7 @@ export default function RootLayout({
       suppressHydrationWarning
       data-lt-installed="true"
       data-scroll-behavior="smooth"
+      className="bg-primary-700"
     >
       <body cz-shortcut-listen="true">
         <Providers children={children} />

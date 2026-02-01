@@ -105,7 +105,7 @@ export default function LeaderboardPage() {
                 getRuleByRuleId={getRuleByRuleId}
                 disabled={!isExpired}
               />
-              {isExpired && (
+              {!isExpired && (
                 <p className="text-xs text-gray-400/80">
                   Funcão estará disponível após encerramento das apostas
                 </p>

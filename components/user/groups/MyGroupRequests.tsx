@@ -251,7 +251,7 @@ export default function MyGroupRequestTable({
       />
 
       <div>
-        <div className="flex flex-col md:flex-row justify-between">
+        <div className="flex flex-col md:flex-row justify-between space-y-2">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
               Grupo: {userBetGroup.name.toUpperCase()}
