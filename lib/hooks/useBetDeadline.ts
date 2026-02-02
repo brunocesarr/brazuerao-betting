@@ -18,7 +18,7 @@ export function useBetDeadline(
     }
 
     const deadline = new Date(group.deadlineAt)
-    const isExpired = deadline.getTime() <= Date.now()
+    const isExpired = deadline.getTime() <= new Date().getTime()
 
     return { isExpired, deadline }
   }, [selectedGroupId, userGroups])

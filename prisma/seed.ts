@@ -41,7 +41,7 @@ const betRules = [
 
 const requestStatusSeed = async () => {
   for (const requestStatus of initialRequestStatuses) {
-    let data = await prisma.requestStatus.findFirst({
+    const data = await prisma.requestStatus.findFirst({
       where: { status: requestStatus.status },
     })
 
@@ -60,7 +60,7 @@ const requestStatusSeed = async () => {
 
 const roleGroupSeed = async () => {
   for (const roleGroup of roleGroups) {
-    let data = await prisma.roleGroup.findFirst({
+    const data = await prisma.roleGroup.findFirst({
       where: { name: roleGroup.name },
     })
 
@@ -79,7 +79,7 @@ const roleGroupSeed = async () => {
 
 const betRulesSeed = async () => {
   for (const betRule of betRules) {
-    let data = await prisma.scoringRule.findFirst({
+    const data = await prisma.scoringRule.findFirst({
       where: { description: betRule.description },
     })
 

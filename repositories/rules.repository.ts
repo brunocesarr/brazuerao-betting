@@ -4,7 +4,7 @@ import { BetRuleDBModel } from '@/types/entities'
 // MARK: - Rules
 export const getAllBetRules = async (): Promise<BetRuleDBModel[]> => {
   try {
-    let rules = await prisma.scoringRule.findMany({
+    const rules = await prisma.scoringRule.findMany({
       where: {
         isActive: true,
       },
