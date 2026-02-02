@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
 
-import { Button } from '../ui/button'
+import { Button } from '@/components/shared/Button'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Popover,
@@ -158,9 +158,9 @@ export default function DatePickerButton({
                   {HOURS.map((hour) => (
                     <Button
                       key={hour}
-                      size="icon"
+                      size="sm"
                       variant={
-                        tempDate.getHours() === hour ? 'default' : 'ghost'
+                        tempDate.getHours() === hour ? 'primary' : 'ghost'
                       }
                       className="aspect-square shrink-0 sm:w-full"
                       onClick={() => handleTimeChange('hour', hour)}
@@ -178,9 +178,9 @@ export default function DatePickerButton({
                   {MINUTES.map((minute) => (
                     <Button
                       key={minute}
-                      size="icon"
+                      size="sm"
                       variant={
-                        tempDate.getMinutes() === minute ? 'default' : 'ghost'
+                        tempDate.getMinutes() === minute ? 'primary' : 'ghost'
                       }
                       className="aspect-square shrink-0 sm:w-full"
                       onClick={() => handleTimeChange('minute', minute)}
@@ -200,7 +200,7 @@ export default function DatePickerButton({
               Cancelar
             </Button>
             <Button
-              variant="default"
+              variant="primary"
               className="flex-1"
               onClick={handleConfirm}
             >

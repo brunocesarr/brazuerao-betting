@@ -1,5 +1,5 @@
 // components/ui/calendar.tsx
-import { Button, buttonVariants } from './button'
+import { Button } from '@/components/shared/Button'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import {
@@ -16,10 +16,10 @@ function CustomNav() {
   const { previousMonth, nextMonth, goToMonth } = useDayPicker()
 
   return (
-    <nav className="flex items-center justify-between absolute inset-l-5 z-10">
+    <nav className="flex items-center justify-between absolute inset-l-2 z-10">
       <Button
-        variant="outline"
-        size="icon"
+        variant="ghost"
+        size="sm"
         className={cn(
           'size-8 bg-transparent p-0 opacity-60 hover:opacity-100 border-0 hover:bg-slate-100 transition-all duration-200'
         )}
@@ -27,12 +27,12 @@ function CustomNav() {
         onClick={() => previousMonth && goToMonth(previousMonth)}
         aria-label={labelPrevious(previousMonth)}
       >
-        <ChevronLeft className="size-4" />
+        <ChevronLeft className="size-5 text-primary-700" />
       </Button>
 
       <Button
-        variant="outline"
-        size="icon"
+        variant="ghost"
+        size="sm"
         className={cn(
           'size-8 bg-transparent p-0 opacity-60 hover:opacity-100 border-0 hover:bg-slate-100 transition-all duration-200'
         )}
@@ -40,7 +40,7 @@ function CustomNav() {
         onClick={() => nextMonth && goToMonth(nextMonth)}
         aria-label={labelNext(nextMonth)}
       >
-        <ChevronRight className="size-4" />
+        <ChevronRight className="size- text-primary-700" />
       </Button>
     </nav>
   )
@@ -68,7 +68,6 @@ function Calendar({
           'text-slate-500 font-medium text-[0.75rem] tracking-wide text-center py-2',
         week: 'grid grid-cols-7 mt-0.5',
         day_button: cn(
-          buttonVariants({ variant: 'ghost' }),
           'size-9 p-0 font-normal hover:bg-slate-100 transition-all duration-200 rounded-lg mx-auto'
         ),
         day: 'text-center p-0 relative flex items-center justify-center',
