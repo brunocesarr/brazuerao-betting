@@ -16,7 +16,7 @@ function CustomNav() {
   const { previousMonth, nextMonth, goToMonth } = useDayPicker()
 
   return (
-    <nav className="flex items-center justify-between absolute inset-x-2 z-10">
+    <nav className="flex items-center justify-between absolute inset-x-12 z-10">
       <Button
         variant="ghost"
         size="sm"

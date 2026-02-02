@@ -7,12 +7,14 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { Input } from '@/components/ui/input'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 interface DatePickerButtonProps {
@@ -32,7 +34,6 @@ export default function DatePickerButton({
   maxDate,
   disabled = false,
 }: DatePickerButtonProps) {
-  const [isOpen, setIsOpen] = useState(false)
   const [tempDate, setTempDate] = useState<Date>(value)
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
@@ -85,20 +86,13 @@ export default function DatePickerButton({
 
   const handleConfirm = () => {
     onChange(tempDate)
-    setIsOpen(false)
-  }
-
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setTempDate(value)
-    }
-    setIsOpen(open)
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
+    <Dialog>
+      <DialogTrigger>
         <Button
+          type="button"
           variant="outline"
           disabled={disabled}
           className={cn(
@@ -107,17 +101,19 @@ export default function DatePickerButton({
             !value && 'text-muted-foreground'
           )}
         >
-          <CalendarIcon className="h-5 w-5 flex-shrink-0" />
+          <CalendarIcon className="h-5 w-5 flex-shrink-0 text-primary-700" />
           <span className="text-base">
             {value
               ? format(value, 'dd/MM/yyyy HH:mm', { locale: ptBR })
               : placeholder}
           </span>
         </Button>
-      </PopoverTrigger>
-
-      <PopoverContent className="w-auto p-0" align="center" side="bottom">
-        <div className="flex flex-col">
+      </DialogTrigger>
+      <DialogContent className="p-4 rounded-lg">
+        <DialogHeader className="flex items-center justify-center">
+          <DialogTitle className="text-lg font-bold">{placeholder}</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col no-scrollbar max-h-full overflow-y-auto">
           {/* Calendar Section */}
           <div className="border-b">
             <Calendar
@@ -130,13 +126,13 @@ export default function DatePickerButton({
                 return false
               }}
               locale={ptBR}
-              initialFocus
+              autoFocus
             />
           </div>
 
           {/* Time Picker Section */}
-          <div className="flex flex-col items-center justify-center gap-2">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col items-center justify-center">
+            <div className="flex items-center gap-4">
               {/* Hours Control */}
               <div className="flex flex-col items-center gap-1">
                 <Button
@@ -211,18 +207,33 @@ export default function DatePickerButton({
           </div>
 
           {/* Confirm Button */}
-          <div className="border-t p-3">
+          <div className="flex flex-col border-t p-2">
             <Button
               variant="default"
               type="button"
-              className="w-full bg-primary-700 py-6 text-base font-medium text-white hover:bg-gray-800"
+              className="w-full bg-primary-700 py-6 text-base font-medium text-white hover:bg-primary-800"
               onClick={handleConfirm}
+              disabled={
+                minDate ? tempDate.getTime() < minDate.getTime() : false
+              }
             >
               Confirmar
             </Button>
+            {minDate && tempDate.getTime() < minDate.getTime() && (
+              <p className="font-thin text-xs text-end mt-2">
+                Selecione uma data maior que{' '}
+                {minDate.toLocaleDateString('pt-BR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+            )}
           </div>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   )
 }
