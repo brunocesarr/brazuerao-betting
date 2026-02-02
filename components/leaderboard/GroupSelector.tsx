@@ -23,7 +23,7 @@ export const GroupSelector = ({
     <label className="block text-sm font-medium text-gray-300 mb-2">
       Selecione o Grupo
     </label>
-    <Select value={selectedGroup} onChange={(e) => onChange(e.target.value)}>
+    <Select value={selectedGroup} onValueChange={(e) => onChange(e)}>
       <SelectTrigger className="block w-full md:w-64 h-16 rounded-lg bg-[#2a2a2a] border border-gray-700 px-4 py-3 text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
         <SelectValue placeholder={'Selecione um grupo'} />
       </SelectTrigger>

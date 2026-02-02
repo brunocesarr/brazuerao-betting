@@ -119,14 +119,10 @@ export default function GroupManagementPage() {
 
     if (!result) return
 
-    const newGroup = await createNewGroup(
-      groupData.name,
-      groupData.challenge,
-      groupData.isPrivate,
-      groupData.deadlineAt,
-      groupData.allowPublicViewing,
-      rules
-    )
+    const newGroup = await createNewGroup({
+      ...groupData,
+      rules,
+    })
     if (!newGroup) return
     setSelectedGroup(newGroup)
   }
@@ -149,14 +145,10 @@ export default function GroupManagementPage() {
     if (!result) return
 
     if (!selectedGroup) return
-    const updatedGroup = await updateGroupInfo(
-      selectedGroup.groupId,
-      groupData.name,
-      groupData.challenge,
-      groupData.deadlineAt,
-      groupData.isPrivate,
-      groupData.allowPublicViewing
-    )
+    const updatedGroup = await updateGroupInfo({
+      ...groupData,
+      groupId: selectedGroup.groupId,
+    })
     if (!updatedGroup) return
     setSelectedGroup(updatedGroup)
   }
