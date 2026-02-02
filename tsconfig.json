@@ -23,34 +23,34 @@
       }
     ],
     "paths": {
-      "@/app/": [
+      "@/app/*": [
         "./app/*"
       ],
-      "@/components/": [
+      "@/components/*": [
         "./components/*"
       ],
-      "@/constants/": [
+      "@/constants/*": [
         "./constants/*"
       ],
-      "@/helpers/": [
+      "@/helpers/*": [
         "./helpers/*"
       ],
-      "@/lib/": [
+      "@/lib/*": [
         "./lib/*"
       ],
-      "@/prisma/": [
+      "@/prisma/*": [
         "./prisma/*"
       ],
-      "@/repositories/": [
+      "@/repositories/*": [
         "./repositories/*"
       ],
-      "@/services/": [
+      "@/services/*": [
         "./services/*"
       ],
-      "@/types/": [
+      "@/types/*": [
         "./types/*"
       ],
-      "@/utils/": [
+      "@/utils/*": [
         "./utils/*"
       ],
       "@/*": [
