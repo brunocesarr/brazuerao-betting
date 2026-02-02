@@ -48,7 +48,7 @@ export default function RegrasSimples() {
 
         {/* Rules Sections */}
         <div className="space-y-8">
-          <SecaoRegra titulo="1. Formato Geral">
+          <SecaoRegra titulo="Formato Geral">
             <p>
               O Brasileirão tem 20 equipes competem em formato de pontos
               corridos ida e volta (38 partidas por equipe). A pontuação será
@@ -57,46 +57,50 @@ export default function RegrasSimples() {
             </p>
           </SecaoRegra>
 
-          <SecaoRegra titulo="2. Sistema de Pontuação (Padrão)">
-            <ul className="list-inside list-disc space-y-2">
-              {rules &&
-                rules
-                  .sort((a, b) => a.priority - b.priority)
-                  .filter((rule) => rule.isDefault)
-                  .map((rule) => (
-                    <li key={rule.id}>
-                      {rule.description}:{' '}
-                      {rule.points > 1
-                        ? `${rule.points} pontos`
-                        : `${rule.points} ponto`}
-                    </li>
-                  ))}
-            </ul>
-          </SecaoRegra>
-
-          <SecaoRegra titulo="3. Classificação (Padrão)">
-            <ul className="list-inside list-disc space-y-2">
-              {rules.some(
-                (rule) => rule.ruleType === RuleTypeEnum.champion
-              ) && <li>Posição 1: Campeão</li>}
-              {rules
-                .filter((rule) => rule.ruleType === RuleTypeEnum.zone)
-                .map((rule) => (
-                  <li key={rule.id}>
-                    Zonas de classificação:
-                    <ul className="mt-1 ml-6 list-inside list-disc">
-                      {rule.ranges?.map((range: any, index: number) => (
-                        <li key={index}>
-                          Posições {range.rangeStart}º a {range.rangeEnd}º
+          {rules.length > 0 && (
+            <>
+              <SecaoRegra titulo="Sistema de Pontuação (Padrão)">
+                <ul className="list-inside list-disc space-y-2">
+                  {rules &&
+                    rules
+                      .sort((a, b) => a.priority - b.priority)
+                      .filter((rule) => rule.isDefault)
+                      .map((rule) => (
+                        <li key={rule.id}>
+                          {rule.description}:{' '}
+                          {rule.points > 1
+                            ? `${rule.points} pontos`
+                            : `${rule.points} ponto`}
                         </li>
                       ))}
-                    </ul>
-                  </li>
-                ))}
-            </ul>
-          </SecaoRegra>
+                </ul>
+              </SecaoRegra>
 
-          <SecaoRegra titulo="4. Critérios de Desempate">
+              <SecaoRegra titulo="Classificação (Padrão)">
+                <ul className="list-inside list-disc space-y-2">
+                  {rules.some(
+                    (rule) => rule.ruleType === RuleTypeEnum.champion
+                  ) && <li>Posição 1: Campeão</li>}
+                  {rules
+                    .filter((rule) => rule.ruleType === RuleTypeEnum.zone)
+                    .map((rule) => (
+                      <li key={rule.id}>
+                        Zonas de classificação:
+                        <ul className="mt-1 ml-6 list-inside list-disc">
+                          {rule.ranges?.map((range: any, index: number) => (
+                            <li key={index}>
+                              Posições {range.rangeStart}º a {range.rangeEnd}º
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                </ul>
+              </SecaoRegra>
+            </>
+          )}
+
+          <SecaoRegra titulo="Critérios de Desempate">
             <ol className="list-inside list-decimal space-y-2">
               <li>Número de pontos</li>
               {rules &&
@@ -106,7 +110,7 @@ export default function RegrasSimples() {
             </ol>
           </SecaoRegra>
 
-          <SecaoRegra titulo="5. Prendas">
+          <SecaoRegra titulo="Prendas">
             <ul className="list-inside list-disc space-y-2">
               <li>
                 <b>A prenda é prenda! Deve ser paga.</b>

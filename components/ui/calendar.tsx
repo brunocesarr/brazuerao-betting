@@ -16,31 +16,31 @@ function CustomNav() {
   const { previousMonth, nextMonth, goToMonth } = useDayPicker()
 
   return (
-    <nav className="flex items-center justify-between absolute inset-l-2 z-10">
+    <nav className="flex items-center justify-between absolute inset-x-2 z-10">
       <Button
         variant="ghost"
         size="sm"
         className={cn(
-          'size-8 bg-transparent p-0 opacity-60 hover:opacity-100 border-0 hover:bg-slate-100 transition-all duration-200'
+          'bg-transparent p-0 opacity-60 hover:opacity-100 border-0 hover:bg-slate-100 transition-all duration-200'
         )}
         disabled={!previousMonth}
         onClick={() => previousMonth && goToMonth(previousMonth)}
         aria-label={labelPrevious(previousMonth)}
       >
-        <ChevronLeft className="size-5 text-primary-700" />
+        <ChevronLeft className="size-4 text-primary-700" />
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
         className={cn(
-          'size-8 bg-transparent p-0 opacity-60 hover:opacity-100 border-0 hover:bg-slate-100 transition-all duration-200'
+          'bg-transparent p-0 opacity-60 hover:opacity-100 border-0 hover:bg-slate-100 transition-all duration-200'
         )}
         disabled={!nextMonth}
         onClick={() => nextMonth && goToMonth(nextMonth)}
         aria-label={labelNext(nextMonth)}
       >
-        <ChevronRight className="size- text-primary-700" />
+        <ChevronRight className="size-4 text-primary-700" />
       </Button>
     </nav>
   )
@@ -55,7 +55,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn('p-5', className)}
+      className={cn('p-2', className)}
       classNames={{
         months: 'flex flex-col sm:flex-row gap-4',
         month: 'space-y-4 w-full',
@@ -65,16 +65,16 @@ function Calendar({
         month_grid: 'w-full border-collapse mt-4',
         weekdays: 'grid grid-cols-7',
         weekday:
-          'text-slate-500 font-medium text-[0.75rem] tracking-wide text-center py-2',
-        week: 'grid grid-cols-7 mt-0.5',
+          'text-slate-900 font-medium text-[0.75rem] tracking-wide text-center py-2',
+        week: 'grid grid-cols-7 mt-0',
         day_button: cn(
-          'size-9 p-0 font-normal hover:bg-slate-100 transition-all duration-200 rounded-lg mx-auto'
+          'size-8 p-0 font-normal hover:bg-slate-100 transition-all duration-200 rounded-lg mx-auto'
         ),
         day: 'text-center p-0 relative flex items-center justify-center',
         selected:
-          'bg-slate-900 text-white hover:bg-slate-800 focus:bg-slate-800 font-medium shadow-sm',
+          'bg-slate-900 text-white hover:bg-slate-800 focus:bg-slate-800 font-medium shadow-sm rounded-lg',
         today:
-          'bg-slate-100 text-slate-900 font-semibold ring-2 ring-slate-300',
+          'bg-slate-50 text-slate-900 font-semibold ring-2 ring-slate-300 rounded-lg',
         outside: 'text-slate-400 opacity-50',
         disabled: 'text-slate-300 opacity-40',
         hidden: 'invisible',

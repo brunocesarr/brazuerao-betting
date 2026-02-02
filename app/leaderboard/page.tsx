@@ -57,7 +57,7 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
       <div className="container mx-auto max-w-7xl px-4 py-8">
-        {username && (
+        {username && myUserScore.length > 0 && (
           <>
             <PageHeader
               title="Minha Pontuação"

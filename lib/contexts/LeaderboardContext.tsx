@@ -68,7 +68,9 @@ export function LeaderboardProvider({
 
       if (status === 'authenticated') {
         const userScore = await getIndividualUserScore()
-        setMyUserScore(userScore[0].score)
+        if (userScore.length > 0) {
+          setMyUserScore(userScore[0].score)
+        }
       }
 
       setGroups(userGroups)

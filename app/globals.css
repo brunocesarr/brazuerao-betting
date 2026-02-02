@@ -770,3 +770,48 @@
   width: 28px;
   height: 28px;
 }
+
+/* ==========================================================================
+ INPUT
+ ========================================================================== */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* ==========================================================================
+ DATE PICKER
+ ========================================================================== */
+/* DatePicker Mobile Optimizations */
+@media (max-width: 768px) {
+  /* Prevent body scroll when dialog is open */
+  body:has([data-state='open'][role='dialog']) {
+    overflow: hidden;
+  }
+
+  /* Full screen dialog on mobile */
+  [role='dialog'] {
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  /* Larger touch targets */
+  [role='dialog'] button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Prevent iOS zoom on input focus */
+@media (max-width: 768px) {
+  input[type='number'] {
+    font-size: 16px !important;
+  }
+}

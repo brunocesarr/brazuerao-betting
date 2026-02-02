@@ -2,29 +2,18 @@
 
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 
-import { Button } from '@/components/shared/Button'
+import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { Input } from '@/components/ui/input'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const HOURS = Array.from({ length: 24 }, (_, i) => i)
-const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5)
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 interface DatePickerButtonProps {
   value: Date
@@ -44,75 +33,67 @@ export default function DatePickerButton({
   disabled = false,
 }: DatePickerButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
-
-  // Temporary date while picker is open
   const [tempDate, setTempDate] = useState<Date>(value)
 
-  // ============================================================================
-  // HANDLERS
-  // ============================================================================
-
-  /**
-   * Handle date selection from calendar
-   * Only updates temp date, doesn't close popover
-   */
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
-      // Preserve current time when selecting a new date
       const newDate = new Date(selectedDate)
       newDate.setHours(tempDate.getHours())
       newDate.setMinutes(tempDate.getMinutes())
       newDate.setSeconds(0)
       newDate.setMilliseconds(0)
-
       setTempDate(newDate)
     }
   }
 
-  /**
-   * Handle time change (hours or minutes)
-   */
-  const handleTimeChange = (type: 'hour' | 'minute', value: number) => {
+  const adjustTime = (type: 'hour' | 'minute', direction: 'up' | 'down') => {
     const newDate = new Date(tempDate)
 
     if (type === 'hour') {
-      newDate.setHours(value)
+      const currentHour = newDate.getHours()
+      const newHour =
+        direction === 'up'
+          ? (currentHour + 1) % 24
+          : (currentHour - 1 + 24) % 24
+      newDate.setHours(newHour)
     } else {
-      newDate.setMinutes(value)
+      const currentMinute = newDate.getMinutes()
+      const newMinute =
+        direction === 'up'
+          ? (currentMinute + 1) % 60
+          : (currentMinute - 1 + 60) % 60
+      newDate.setMinutes(newMinute)
     }
 
     setTempDate(newDate)
   }
 
-  /**
-   * Confirm and apply the selected date
-   */
+  const handleTimeInput = (type: 'hour' | 'minute', value: string) => {
+    const numValue = parseInt(value, 10)
+    if (isNaN(numValue)) return
+
+    const newDate = new Date(tempDate)
+
+    if (type === 'hour' && numValue >= 0 && numValue < 24) {
+      newDate.setHours(numValue)
+      setTempDate(newDate)
+    } else if (type === 'minute' && numValue >= 0 && numValue < 60) {
+      newDate.setMinutes(numValue)
+      setTempDate(newDate)
+    }
+  }
+
   const handleConfirm = () => {
     onChange(tempDate)
     setIsOpen(false)
   }
 
-  /**
-   * Cancel and close picker
-   */
-  const handleCancel = () => {
-    setTempDate(value) // Reset to original value
-    setIsOpen(false)
-  }
-
-  /**
-   * When popover opens, sync temp date with current value
-   */
   const handleOpenChange = (open: boolean) => {
     if (open) {
       setTempDate(value)
     }
     setIsOpen(open)
   }
-
-  // ============================================================================
-  // RENDER
-  // ============================================================================
 
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>
@@ -121,22 +102,24 @@ export default function DatePickerButton({
           variant="outline"
           disabled={disabled}
           className={cn(
-            'h-10 w-fit justify-start px-4 text-left font-normal',
+            'h-12 w-full justify-start gap-2 px-4 text-left font-normal',
+            'sm:w-auto',
             !value && 'text-muted-foreground'
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {value
-            ? format(value, 'dd/MM/yyyy HH:mm', { locale: ptBR })
-            : placeholder}
+          <CalendarIcon className="h-5 w-5 flex-shrink-0" />
+          <span className="text-base">
+            {value
+              ? format(value, 'dd/MM/yyyy HH:mm', { locale: ptBR })
+              : placeholder}
+          </span>
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0" align="center" side="bottom">
         <div className="flex flex-col">
-          {/* Calendar and Time Selectors */}
-          <div className="flex flex-col sm:flex-row">
-            {/* Calendar */}
+          {/* Calendar Section */}
+          <div className="border-b">
             <Calendar
               mode="single"
               selected={tempDate}
@@ -149,59 +132,90 @@ export default function DatePickerButton({
               locale={ptBR}
               initialFocus
             />
+          </div>
 
-            {/* Time Selectors */}
-            <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
-              {/* Hours */}
-              <ScrollArea className="w-full sm:w-auto">
-                <div className="flex p-2 sm:flex-col">
-                  {HOURS.map((hour) => (
-                    <Button
-                      key={hour}
-                      size="sm"
-                      variant={
-                        tempDate.getHours() === hour ? 'primary' : 'ghost'
-                      }
-                      className="aspect-square shrink-0 sm:w-full"
-                      onClick={() => handleTimeChange('hour', hour)}
-                    >
-                      {hour.toString().padStart(2, '0')}
-                    </Button>
-                  ))}
-                </div>
-                <ScrollBar orientation="horizontal" className="sm:hidden" />
-              </ScrollArea>
+          {/* Time Picker Section */}
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="flex items-center gap-3">
+              {/* Hours Control */}
+              <div className="flex flex-col items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-gray-100"
+                  onClick={() => adjustTime('hour', 'up')}
+                  aria-label="Incrementar hora"
+                >
+                  <ChevronUp className="h-5 w-5 text-gray-500" />
+                </Button>
 
-              {/* Minutes */}
-              <ScrollArea className="w-full sm:w-auto">
-                <div className="flex p-2 sm:flex-col">
-                  {MINUTES.map((minute) => (
-                    <Button
-                      key={minute}
-                      size="sm"
-                      variant={
-                        tempDate.getMinutes() === minute ? 'primary' : 'ghost'
-                      }
-                      className="aspect-square shrink-0 sm:w-full"
-                      onClick={() => handleTimeChange('minute', minute)}
-                    >
-                      {minute.toString().padStart(2, '0')}
-                    </Button>
-                  ))}
-                </div>
-                <ScrollBar orientation="horizontal" className="sm:hidden" />
-              </ScrollArea>
+                <Input
+                  type="number"
+                  min="0"
+                  max="23"
+                  value={tempDate.getHours().toString().padStart(2, '0')}
+                  onChange={(e) => handleTimeInput('hour', e.target.value)}
+                  className="h-12 w-12 border-0 bg-transparent text-center text-4xl font-bold focus-visible:ring-0"
+                />
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-gray-100"
+                  onClick={() => adjustTime('hour', 'down')}
+                  aria-label="Decrementar hora"
+                >
+                  <ChevronDown className="h-5 w-5 text-gray-500" />
+                </Button>
+              </div>
+
+              {/* Separator */}
+              <div className="text-2xl font-bold text-gray-400">:</div>
+
+              {/* Minutes Control */}
+              <div className="flex flex-col items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-gray-100"
+                  onClick={() => adjustTime('minute', 'up')}
+                  aria-label="Incrementar minuto"
+                >
+                  <ChevronUp className="h-5 w-5 text-gray-500" />
+                </Button>
+
+                <Input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={tempDate.getMinutes().toString().padStart(2, '0')}
+                  onChange={(e) => handleTimeInput('minute', e.target.value)}
+                  className="h-12 w-12 border-0 bg-transparent text-center text-4xl font-bold focus-visible:ring-0"
+                />
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-gray-100"
+                  onClick={() => adjustTime('minute', 'down')}
+                  aria-label="Decrementar minuto"
+                >
+                  <ChevronDown className="h-5 w-5 text-gray-500" />
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 border-t p-3">
-            <Button variant="outline" className="flex-1" onClick={handleCancel}>
-              Cancelar
-            </Button>
+          {/* Confirm Button */}
+          <div className="border-t p-3">
             <Button
-              variant="primary"
-              className="flex-1"
+              variant="default"
+              type="button"
+              className="w-full bg-primary-700 py-6 text-base font-medium text-white hover:bg-gray-800"
               onClick={handleConfirm}
             >
               Confirmar
