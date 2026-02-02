@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '../ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Popover,

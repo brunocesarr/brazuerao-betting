@@ -1,5 +1,5 @@
 // components/ui/calendar.tsx
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button, buttonVariants } from './button'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import {
