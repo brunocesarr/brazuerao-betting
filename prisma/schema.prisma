@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // or "mysql" or "sqlite"
+  provider = "postgresql" // or "mysql" or "sqlite"
 }
 
 model RoleGroup {
