@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,7 +23,39 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/app/": [
+        "./app/*"
+      ],
+      "@/components/": [
+        "./components/*"
+      ],
+      "@/constants/": [
+        "./constants/*"
+      ],
+      "@/helpers/": [
+        "./helpers/*"
+      ],
+      "@/lib/": [
+        "./lib/*"
+      ],
+      "@/prisma/": [
+        "./prisma/*"
+      ],
+      "@/repositories/": [
+        "./repositories/*"
+      ],
+      "@/services/": [
+        "./services/*"
+      ],
+      "@/types/": [
+        "./types/*"
+      ],
+      "@/utils/": [
+        "./utils/*"
+      ],
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -30,5 +66,7 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
