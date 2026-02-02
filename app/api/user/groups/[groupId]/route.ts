@@ -8,6 +8,7 @@ import {
   unfollowBetGroup,
 } from '@/repositories/brazuerao.repository'
 import { updateBetGroup } from '@/repositories/user-bet-group.repository'
+import { RoleGroupDBModel } from '@/types/entities'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -36,7 +37,9 @@ export async function DELETE(
       getAllGroupRoles(),
       getUserGroups(session.user.id),
     ])
-    const adminRole = roles.find((role) => role.name.toUpperCase() === 'ADMIN')
+    const adminRole = roles.find(
+      (role: RoleGroupDBModel) => role.name.toUpperCase() === 'ADMIN'
+    )
 
     if (
       groups.some(

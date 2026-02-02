@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['10.0.1.186'],
   reactStrictMode: true,
   images: {
     remotePatterns: [{ protocol: 'https', hostname: 'api.sofascore.com' }],
