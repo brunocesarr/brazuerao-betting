@@ -43,7 +43,6 @@ export function LeaderboardProvider({
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [selectedGroup, setSelectedGroup] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     loadInitialData()

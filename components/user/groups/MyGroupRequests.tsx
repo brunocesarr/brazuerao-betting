@@ -24,19 +24,11 @@ export default function MyGroupRequestTable({
   onUpdateGroupInfo,
 }: MyGroupRequestTableProps) {
   const { confirm } = useConfirmDialog()
-  const { getCurrentRequests, handleCurrentRequest, updateGroupInfo } =
-    useAuth()
+  const { getCurrentRequests, handleCurrentRequest } = useAuth()
 
   const [requests, setRequests] = useState<CurrentRequestBetGroup[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false)
-
-  useEffect(() => {
-    setRequests([])
-    if (userBetGroup) {
-      handleCurrentRequests()
-    }
-  }, [userBetGroup])
 
   const handleCurrentRequests = async () => {
     setIsLoading(true)
@@ -45,6 +37,13 @@ export default function MyGroupRequestTable({
     setRequests(requests)
     setIsLoading(false)
   }
+
+  useEffect(() => {
+    setRequests([])
+    if (userBetGroup) {
+      handleCurrentRequests()
+    }
+  }, [userBetGroup])
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('pt-BR', {

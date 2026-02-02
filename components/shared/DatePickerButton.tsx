@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -205,34 +207,36 @@ export default function DatePickerButton({
               </div>
             </div>
           </div>
-
-          {/* Confirm Button */}
-          <div className="flex flex-col border-t p-2">
-            <Button
-              variant="default"
-              type="button"
-              className="w-full bg-primary-700 py-6 text-base font-medium text-white hover:bg-primary-800"
-              onClick={handleConfirm}
-              disabled={
-                minDate ? tempDate.getTime() < minDate.getTime() : false
-              }
-            >
-              Confirmar
-            </Button>
-            {minDate && tempDate.getTime() < minDate.getTime() && (
-              <p className="font-thin text-xs text-end mt-2">
-                Selecione uma data maior que{' '}
-                {minDate.toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
-            )}
           </div>
+      <DialogFooter className="items-center">
+        <div className='flex flex-col items-center justiry-center w-full'>
+        <DialogClose className='min-w-full' disabled={minDate ? tempDate.getTime() < minDate.getTime() : false}>
+          <Button
+            variant="default"
+            type="button"
+            className="min-w-full bg-primary-700 py-6 text-base font-medium text-white hover:bg-primary-800"
+            onClick={handleConfirm}
+            disabled={
+              minDate ? tempDate.getTime() < minDate.getTime() : false
+            }
+          >
+            Confirmar
+          </Button>
+        </DialogClose> 
+        {minDate && tempDate.getTime() < minDate.getTime() && (
+          <p className="font-thin text-xs text-end mt-2 text-red-600">
+            Selecione uma data maior que{' '}
+            {minDate.toLocaleDateString('pt-BR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </p>
+        )}
         </div>
+      </DialogFooter>
       </DialogContent>
     </Dialog>
   )

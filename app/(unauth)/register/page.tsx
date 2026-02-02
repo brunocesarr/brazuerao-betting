@@ -64,8 +64,7 @@ export default function RegisterPage() {
   })
 
   const onSubmit = async (data: RegisterFormData) => {
-    // Remove confirmPassword before sending
-    const { confirmPassword, ...registerData } = data
+    const { ...registerData } = data
     await registerUser(registerData)
   }
 

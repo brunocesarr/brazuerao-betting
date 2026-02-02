@@ -20,8 +20,8 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className="bg-primary-700"
     >
-      <body cz-shortcut-listen="true">
-        <Providers children={children} />
+      <body>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

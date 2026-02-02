@@ -24,7 +24,7 @@ const ChampionBadge = ({ team }: { team: string }) => (
   </span>
 )
 
-const TeamBadge = ({ team, index }: { team: string; index: number }) => (
+const TeamBadge = ({ team }: { team: string; index: number }) => (
   <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/20 px-3 py-1.5 text-sm text-blue-400">
     {team}
   </span>

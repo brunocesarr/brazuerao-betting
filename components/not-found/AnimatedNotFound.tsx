@@ -7,7 +7,6 @@ import { SoccerNotFoundActions } from './NotFoundActions'
 export function AnimatedNotFound() {
   const [mounted, setMounted] = useState(false)
   const [score404, setScore404] = useState(0)
-  const [score0, setScore0] = useState(0)
   const [score100, setScore100] = useState(0)
 
   useEffect(() => {
@@ -119,7 +118,7 @@ export function AnimatedNotFound() {
             </div>
             <div className="animation-delay-800 group animate-fade-in-up rounded-lg bg-gray-800/50 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-gray-800/70">
               <div className="mb-1 text-3xl font-bold text-yellow-400 transition-all group-hover:scale-110">
-                {score0}%
+                {0}%
               </div>
               <div className="text-sm text-gray-400">Chance de Sucesso</div>
             </div>

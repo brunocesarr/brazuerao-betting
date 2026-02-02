@@ -37,12 +37,6 @@ export default function ConfirmDialog({
 
   if (!isOpen) return null
 
-  const variantStyles = {
-    danger: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
-    warning: 'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500',
-    info: 'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500',
-  }
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}

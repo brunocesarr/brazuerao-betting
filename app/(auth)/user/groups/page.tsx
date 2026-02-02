@@ -131,8 +131,7 @@ export default function GroupManagementPage() {
     groupData: Omit<
       UserBetGroup,
       'groupId' | 'userId' | 'roleGroupId' | 'requestStatusId'
-    >,
-    rules: string[]
+    >
   ) => {
     const result = await confirm({
       title: 'Atencão',

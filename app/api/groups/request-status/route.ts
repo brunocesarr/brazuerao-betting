@@ -1,7 +1,7 @@
 import { getAllRequestStatus } from '@/repositories/brazuerao.repository'
 import { NextResponse } from 'next/server'
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const requestStatus = await getAllRequestStatus()
     return Response.json({

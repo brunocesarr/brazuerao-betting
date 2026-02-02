@@ -31,6 +31,7 @@ export default function LoginPage() {
         router.push('/user/profile')
       }
     } catch (error) {
+      console.error('Submit login error. Error:', error)
       setError('Ocorreu um erro. Tente novamente.')
     } finally {
       setLoading(false)

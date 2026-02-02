@@ -90,7 +90,7 @@ export function generateGroupPredictionsPDF(data: GroupPDFData): void {
     margin: { left: 14, right: 14 },
   })
 
-  // @ts-ignore
+  // @ts-expect-error: Expected value
   yPosition = doc.lastAutoTable.finalY + 15
 
   // ============= FINAL STANDINGS PREDICTIONS TABLE =============
@@ -222,7 +222,7 @@ export function generateGroupPredictionsPDF(data: GroupPDFData): void {
       },
     })
 
-    // @ts-ignore
+    // @ts-expect-error: Expected value
     yPosition = doc.lastAutoTable.finalY + 10
 
     // Legend for colors
@@ -298,7 +298,7 @@ export function generateGroupPredictionsPDF(data: GroupPDFData): void {
         margin: { left: 20, right: 14 },
       })
 
-      // @ts-ignore
+      // @ts-expect-error: Expected value
       yPosition = doc.lastAutoTable.finalY + 10
     } else {
       doc.setFontSize(9)
