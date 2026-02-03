@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale'
 import { CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/shared/Button'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Dialog,
@@ -140,7 +140,7 @@ export default function DatePickerButton({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   className="hover:bg-gray-100"
                   onClick={() => adjustTime('hour', 'up')}
                   aria-label="Incrementar hora"
@@ -160,7 +160,7 @@ export default function DatePickerButton({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   className="hover:bg-gray-100"
                   onClick={() => adjustTime('hour', 'down')}
                   aria-label="Decrementar hora"
@@ -177,7 +177,7 @@ export default function DatePickerButton({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   className="hover:bg-gray-100"
                   onClick={() => adjustTime('minute', 'up')}
                   aria-label="Incrementar minuto"
@@ -197,7 +197,7 @@ export default function DatePickerButton({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   className="hover:bg-gray-100"
                   onClick={() => adjustTime('minute', 'down')}
                   aria-label="Decrementar minuto"
@@ -218,9 +218,9 @@ export default function DatePickerButton({
               asChild
             >
               <Button
-                variant="default"
+                variant="primary"
                 type="button"
-                className="min-w-full bg-primary-700 py-6 text-base font-medium text-white hover:bg-primary-800"
+                className="min-w-full bg-primary-700 text-base font-medium text-white hover:bg-primary-800"
                 onClick={handleConfirm}
                 disabled={
                   minDate ? tempDate.getTime() < minDate.getTime() : false
