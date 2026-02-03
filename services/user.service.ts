@@ -37,14 +37,14 @@ async function updateUserInfo(name: string) {
  * Fetches user's current groups from the Brazuerão API
  */
 async function getBetGroupsByUserId() {
-  const cacheBetGroups = localStorageService.getItem(
+  const cacheBetGroups = localStorageService.getItem<UserBetGroup[]>(
     LocalStorageKeysCache.GET_BET_GROUPS_BY_USER_ID
   )
   if (cacheBetGroups && cacheBetGroups.length > 0) return cacheBetGroups
 
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.get('/user/groups')
-    localStorageService.setItem(
+    localStorageService.setItem<UserBetGroup[]>(
       LocalStorageKeysCache.GET_USER_INFO,
       data.groups as UserBetGroup[]
     )

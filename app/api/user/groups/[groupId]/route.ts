@@ -8,6 +8,7 @@ import {
   unfollowBetGroup,
 } from '@/repositories/brazuerao.repository'
 import { updateBetGroup } from '@/repositories/user-bet-group.repository'
+import { UserBetGroup } from '@/types/domain'
 import { RoleGroupDBModel } from '@/types/entities'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
@@ -43,7 +44,7 @@ export async function DELETE(
 
     if (
       groups.some(
-        (group) =>
+        (group: UserBetGroup) =>
           group.groupId === groupId && group.roleGroupId === adminRole?.id
       )
     ) {
