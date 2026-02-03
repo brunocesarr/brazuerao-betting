@@ -18,7 +18,7 @@ export default function RootLayout({
       suppressHydrationWarning
       data-lt-installed="true"
       data-scroll-behavior="smooth"
-      className="bg-primary-700"
+      className="bg-white"
     >
       <body>
         <Providers>{children}</Providers>

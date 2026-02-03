@@ -23,7 +23,7 @@ import {
 } from '@/services/user.service'
 import { UserBetAPIResponse, UserProfile } from '@/types'
 import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import {
   createContext,
   useCallback,
@@ -187,6 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       handleError(err, ERROR_MESSAGES.FETCH_USER)
       setUser(null)
+      await signOut()
     } finally {
       setIsLoading(false)
     }
@@ -502,9 +503,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             type: 'success',
             message: SUCCESS_MESSAGES.SAVE_BET,
           })
+          return true
+        } else {
+          showToast({
+            type: 'error',
+            message: ERROR_MESSAGES.SAVE_BET,
+          })
         }
 
-        return true
+        return false
       } catch (err) {
         handleError(err, ERROR_MESSAGES.SAVE_BET)
         return false

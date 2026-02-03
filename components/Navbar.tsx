@@ -5,7 +5,11 @@ import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 interface NavLink {
   href: string
@@ -14,30 +18,120 @@ interface NavLink {
   show: boolean
 }
 
+interface UserMenuItem {
+  href: string
+  label: string
+  icon: React.ReactNode
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const USER_MENU_ITEMS: UserMenuItem[] = [
+  {
+    href: '/user/profile',
+    label: 'Perfil',
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    ),
+  },
+  {
+    href: '/user/groups',
+    label: 'Grupos',
+    icon: <Group className="h-4 w-4" />,
+  },
+]
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 export default function Navbar() {
   const { data: session } = useSession()
   const pathname = usePathname()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [, startTransition] = useTransition()
   const menuRef = useRef<HTMLDivElement>(null)
+  const prevPathnameRef = useRef(pathname)
 
-  // Close user menu when clicking outside
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+
+  /**
+   * Close user menu when clicking outside
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
       }
     }
+
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Close mobile menu on route change
   useEffect(() => {
-    setIsMobileMenuOpen(false)
+    // Only update if pathname actually changed
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname
+
+      // Defer to avoid sync updates
+      requestAnimationFrame(() => {
+        setIsMobileMenuOpen(false)
+        setIsUserMenuOpen(false)
+      })
+    }
   }, [pathname])
 
+  /**
+   * Close mobile menu on route change (non-blocking transition)
+   */
+  useEffect(() => {
+    startTransition(() => {
+      setIsMobileMenuOpen(false)
+      setIsUserMenuOpen(false)
+    })
+  }, [pathname])
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen((prev) => !prev)
+  }
+
+  const handleUserMenuToggle = () => {
+    setIsUserMenuOpen((prev) => !prev)
+  }
+
+  const handleMobileLinkClick = () => {
+    startTransition(() => {
+      setIsMobileMenuOpen(false)
+    })
+  }
+
   const isActive = (path: string) => pathname === path
+
+  // ============================================================================
+  // NAV LINKS
+  // ============================================================================
 
   const navLinks: NavLink[] = [
     {
@@ -54,32 +148,9 @@ export default function Navbar() {
     },
   ]
 
-  const userMenuItems = [
-    {
-      href: '/user/profile',
-      label: 'Perfil',
-      icon: (
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
-      ),
-    },
-    {
-      href: '/user/groups',
-      label: 'Grupos',
-      icon: <Group className="h-4 w-4" />,
-    },
-  ]
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
     <nav className="sticky top-0 z-50 border-b border-primary-50 bg-primary-700 shadow-lg">
@@ -133,8 +204,9 @@ export default function Navbar() {
               <div className="ml-4 flex items-center border-l-2 border-white/20 pl-4">
                 <div className="relative" ref={menuRef}>
                   <button
+                    type="button"
                     className="flex items-center space-x-2 transition-opacity hover:opacity-80"
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    onClick={handleUserMenuToggle}
                     aria-label="Menu do usuário"
                     aria-expanded={isUserMenuOpen}
                   >
@@ -170,7 +242,7 @@ export default function Navbar() {
                         </p>
                       </div>
 
-                      {userMenuItems.map((item) => (
+                      {USER_MENU_ITEMS.map((item) => (
                         <Link
                           key={item.href}
                           href={item.href}
@@ -184,9 +256,10 @@ export default function Navbar() {
                         </Link>
                       ))}
 
-                      <div className="border-t border-gray-200"></div>
+                      <div className="border-t border-gray-200" />
 
                       <button
+                        type="button"
                         onClick={() => signOut()}
                         className="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
                       >
@@ -212,7 +285,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="rounded-lg bg-primary-500/40 px-6 py-2 font-medium text-white transition-all duration-200 hover:bg-white/20"
+                className="rounded-lg bg-white/10 px-6 py-2 font-medium text-white transition-all duration-200 hover:bg-white/20"
               >
                 Login
               </Link>
@@ -221,8 +294,9 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
+            type="button"
             className="rounded-md p-2 text-white transition-colors hover:bg-white/10 lg:hidden"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={handleMobileMenuToggle}
             aria-label="Menu de navegação"
             aria-expanded={isMobileMenuOpen}
           >
@@ -245,6 +319,7 @@ export default function Navbar() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      onClick={handleMobileLinkClick}
                       className={`flex items-center gap-3 rounded-md px-4 py-3 font-medium text-white transition-all duration-200 ${
                         isActive(link.href)
                           ? 'bg-white/20'
@@ -260,7 +335,7 @@ export default function Navbar() {
               {session ? (
                 <>
                   {/* User Info */}
-                  <div className="my-2 border-t border-primary-50/20"></div>
+                  <div className="my-2 border-t border-primary-50/20" />
                   <div className="px-4 py-2">
                     <p className="text-sm font-medium text-white">
                       {session.user?.name}
@@ -271,10 +346,11 @@ export default function Navbar() {
                   </div>
 
                   {/* User Menu Items */}
-                  {userMenuItems.map((item) => (
+                  {USER_MENU_ITEMS.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
+                      onClick={handleMobileLinkClick}
                       className={`flex items-center gap-3 rounded-md px-4 py-3 text-white transition-all duration-200 ${
                         isActive(item.href)
                           ? 'bg-white/20'
@@ -288,6 +364,7 @@ export default function Navbar() {
 
                   {/* Logout Button */}
                   <button
+                    type="button"
                     onClick={() => signOut()}
                     className="flex items-center gap-3 rounded-md px-4 py-3 text-red-300 transition-all duration-200 hover:bg-red-500/20"
                   >

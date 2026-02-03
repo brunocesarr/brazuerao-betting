@@ -169,7 +169,7 @@ export default function GroupManagementPage() {
 
   const loadingComponent = () => {
     return (
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[500px]">
         <div className="text-center">
           <div className="border-primary-600 mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-b-2"></div>
           <p className="text-gray-600">Carregando...</p>

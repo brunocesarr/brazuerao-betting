@@ -21,7 +21,8 @@ export async function GET() {
       groups: [
         ...userGroups,
         ...publicGroups.filter(
-          (group) => !userGroups.some((userGroup) => userGroup.groupId === group.groupId)
+          (group) =>
+            !userGroups.some((userGroup) => userGroup.groupId === group.groupId)
         ),
       ],
     })

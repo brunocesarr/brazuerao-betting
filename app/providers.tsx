@@ -28,7 +28,7 @@ function ProvidersContent({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <ProvidersContent>{children}</ProvidersContent>
+      <ProvidersContent cz-shortcut-listen="true">{children}</ProvidersContent>
     </SessionProvider>
   )
 }

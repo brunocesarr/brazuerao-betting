@@ -31,7 +31,7 @@ export default function SimpleCountdown({ targetDate }: SimpleCountdownProps) {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [targetDate])
 
   return (
     <div className="mb-12 flex flex-col items-center justify-center gap-6 rounded-xl bg-slate-950/10 p-8 backdrop-blur-sm">

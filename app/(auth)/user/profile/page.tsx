@@ -15,7 +15,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-8">
+      <div className="min-h-screen mx-auto max-w-2xl px-4 py-8">
         <ProfileSkeleton />
       </div>
     )
@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-8">
+      <div className="min-h-screen mx-auto max-w-2xl px-4 py-8">
         <div className="rounded-lg bg-red-50 p-4 text-center">
           <p className="text-red-800">Falha ao carregar perfil</p>
         </div>

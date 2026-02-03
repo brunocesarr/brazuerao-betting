@@ -239,16 +239,12 @@ export default function BettingPage() {
 
       const success = await saveMyBet(
         predictions.map((p) => p.teamName),
-        saveForAll ? '' : selectedGroupId
+        saveForAll ? null : selectedGroupId
       )
 
       if (success) {
-        setSavedPredictions([...predictions])
-        showToast({
-          message: 'Aposta salva com sucesso!',
-          type: 'success',
-        })
-      }
+        setSavedPredictions(predictions)
+      } 
     } catch (error) {
       console.error('Failed to save bet:', error)
       showToast({

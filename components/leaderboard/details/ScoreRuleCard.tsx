@@ -1,4 +1,5 @@
-import { getRuleColors, getRuleIcon } from '@/utils/leaderboard.utils'
+import { ScoreRuleIcon } from '@/components/leaderboard/details/ScoreRuleIcon'
+import { getRuleColors } from '@/utils/leaderboard.utils'
 
 interface ScoreRuleCardProps {
   ruleType?: string
@@ -13,20 +14,22 @@ export const ScoreRuleCard = ({
   score,
   teams,
 }: ScoreRuleCardProps) => {
-  const Icon = getRuleIcon(ruleType)
   const colors = getRuleColors(ruleType)
 
   return (
     <div
-      className={`bg-gradient-to-r ${colors.gradient} border rounded-lg p-6`}
+      className={`rounded-lg border bg-gradient-to-r p-6 ${colors.gradient}`}
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="mb-4 flex items-start justify-between">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-[#1a1a1a] rounded-lg">
-            <Icon className={`w-6 h-6 ${colors.icon}`} />
+          <div className="rounded-lg bg-[#1a1a1a] p-3">
+            <ScoreRuleIcon
+              ruleType={ruleType}
+              className={`h-6 w-6 ${colors.icon}`}
+            />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white mb-1">
+            <h3 className="mb-1 text-lg font-semibold text-white">
               {description}
             </h3>
             <p className="text-sm text-gray-400">
@@ -40,16 +43,18 @@ export const ScoreRuleCard = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mt-4">
-        {teams.map((team, idx) => (
-          <span
-            key={`${team}-${idx}`}
-            className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#1a1a1a] text-white text-sm font-medium"
-          >
-            {team}
-          </span>
-        ))}
-      </div>
+      {teams.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {teams.map((team, idx) => (
+            <span
+              key={`${team}-${idx}`}
+              className="inline-flex items-center rounded-full bg-[#1a1a1a] px-3 py-1.5 text-sm font-medium text-white"
+            >
+              {team}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -13,7 +13,7 @@ export default function Footer() {
   if (hideFooter) return null
 
   return (
-    <footer className="from-primary-700 flex justify-center bg-gradient-to-b to-black px-4 py-6 text-white md:justify-end">
+    <footer className="relative bottom-0 w-full from-primary-700 flex justify-center bg-gradient-to-b to-black px-4 py-6 text-white md:justify-end">
       <div className="text-center text-sm text-white md:text-right">
         <p>
           © {currentYear}{' '}

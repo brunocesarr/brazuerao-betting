@@ -2,7 +2,7 @@ export function LoadingState(
   { message }: { message: string } = { message: 'Carregando...' }
 ) {
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-[#1a1a1a]">
+    <div className="flex flex-col min-h-screen items-center justify-center bg-[#1a1a1a] z-10">
       <svg
         className="animate-spin h-8 w-8 text-blue-600"
         xmlns="http://www.w3.org/2000/svg"

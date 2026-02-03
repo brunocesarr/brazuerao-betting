@@ -15,7 +15,7 @@ export default function RootLayout({
 
   useEffect(() => {
     if (status === 'authenticated') router.push('/user/profile')
-  }, [status])
+  }, [status, router])
 
   if (status !== 'unauthenticated')
     return <LoadingState message="Carregando..." />
