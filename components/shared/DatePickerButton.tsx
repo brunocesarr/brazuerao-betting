@@ -6,8 +6,8 @@ import { CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/shared/Button'
+import { Calendar } from '@/components/ui/calendar'
 import {
-  Calendar,
   Dialog,
   DialogClose,
   DialogContent,
@@ -15,8 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  Input,
-} from '@/components/ui'
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 interface DatePickerButtonProps {

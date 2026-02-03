@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/shared/Button'
 import DatePickerButton from '@/components/shared/DatePickerButton'
-import { Input } from '@/components/ui'
 import {
   Dialog,
   DialogContent,
@@ -20,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { UserBetGroup } from '@/types/domain'
