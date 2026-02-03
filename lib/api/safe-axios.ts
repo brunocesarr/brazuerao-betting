@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { handleAxiosError } from '@/lib/errors/axios-error-handler'
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 

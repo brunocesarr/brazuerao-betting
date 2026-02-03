@@ -59,7 +59,23 @@ export async function GET(
     )
 
     const standings = data.standings[0].rows.map(
-      (team: any, index: number) => ({
+      (
+        team: {
+          team: {
+            name: string
+            id: number
+            shortName: string
+          }
+          matches: number
+          wins: number
+          draws: number
+          losses: number
+          scoresFor: number
+          scoresAgainst: number
+          points: number
+        },
+        index: number
+      ) => ({
         position: index + 1,
         team: team.team.name,
         teamId: team.team.id,

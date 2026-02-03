@@ -87,11 +87,16 @@ export default function RegrasSimples() {
                       <li key={rule.id}>
                         Zonas de classificação:
                         <ul className="mt-1 ml-6 list-inside list-disc">
-                          {rule.ranges?.map((range: any, index: number) => (
-                            <li key={index}>
-                              Posições {range.rangeStart}º a {range.rangeEnd}º
-                            </li>
-                          ))}
+                          {rule.ranges?.map(
+                            (
+                              range: { rangeStart: number; rangeEnd: number },
+                              index: number
+                            ) => (
+                              <li key={index}>
+                                Posições {range.rangeStart}º a {range.rangeEnd}º
+                              </li>
+                            )
+                          )}
                         </ul>
                       </li>
                     ))}

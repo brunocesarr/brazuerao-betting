@@ -10,7 +10,11 @@ import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
 import { getBrazilianLeague } from '@/services/brazuerao.service'
-import { TeamPrediction, UserBetAPIResponse } from '@/types'
+import {
+  TeamPositionAPIResponse,
+  TeamPrediction,
+  UserBetAPIResponse,
+} from '@/types'
 import { UserBetGroup } from '@/types/domain'
 import {
   closestCenter,
@@ -144,11 +148,11 @@ export default function BettingPage() {
   }
 
   const createPredictions = (
-    brazilianTable: any[],
+    brazilianTable: TeamPositionAPIResponse[],
     userBet?: UserBetAPIResponse
   ): TeamPrediction[] => {
     return brazilianTable
-      .map((team: any, index: number) => {
+      .map((team: TeamPositionAPIResponse, index: number) => {
         let position = team.position
 
         if (userBet) {

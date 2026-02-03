@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint -c eslint.config.mjs",
+    "lint:fix": "eslint -c eslint.config.mjs --fix",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "seed": "prisma db seed"

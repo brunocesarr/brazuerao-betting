@@ -14,7 +14,7 @@ const eslintConfig = defineConfig([
   reactPlugin.configs.flat['jsx-runtime'],
   {
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
   // Override default ignores of eslint-config-next.
