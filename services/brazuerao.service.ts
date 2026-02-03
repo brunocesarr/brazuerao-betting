@@ -134,26 +134,31 @@ async function getAllGroupRoles(): Promise<GroupRole[]> {
   const cacheGroupRoles = localStorageService.getItem(
     LocalStorageKeysCache.GET_ALL_BET_GROUP_ROLES
   )
-  if (cacheGroupRoles && cacheGroupRoles.length > 0) return cacheGroupRoles
+  if (cacheGroupRoles && cacheGroupRoles.length > 0) {
+    updateDefaultRoleValues(cacheGroupRoles)
+    return cacheGroupRoles
+  }
 
   return withAPIErrorHandling(async () => {
     if (DefaultValues.groupRoles.length > 0) {
-      DefaultValues.adminGroupRule = DefaultValues.groupRoles.find(
-        (rule) => rule.name.toUpperCase() === 'ADMIN'
-      )
+      updateDefaultRoleValues(DefaultValues.groupRoles)
       return DefaultValues.groupRoles
     }
     const { data } = await appBrazuerao.get('/groups/roles')
-    DefaultValues.groupRoles = data.roles
-    DefaultValues.adminGroupRule = data.roles.find(
-      (rule: GroupRole) => rule.name.toUpperCase() === 'ADMIN'
-    )
+    updateDefaultRoleValues(data.roles)
     localStorageService.setItem(
       LocalStorageKeysCache.GET_ALL_BET_GROUP_ROLES,
       DefaultValues.groupRoles
     )
     return data.roles
   }, `${API_SOURCE}/groups/roles`)
+}
+
+function updateDefaultRoleValues(roles: GroupRole[]) {
+  DefaultValues.groupRoles = roles
+  DefaultValues.adminGroupRule = roles.find(
+    (rule: GroupRole) => rule.name.toUpperCase() === 'ADMIN'
+  )
 }
 
 /**
@@ -163,33 +168,34 @@ async function getAllRequestStatus(): Promise<RequestStatus[]> {
   const cacheRequestStatus = localStorageService.getItem(
     LocalStorageKeysCache.GET_ALL_REQUEST_STATUS
   )
-  if (cacheRequestStatus && cacheRequestStatus.length > 0)
+  if (cacheRequestStatus && cacheRequestStatus.length > 0) {
+    updateDefaultRequestStatus(cacheRequestStatus)
     return cacheRequestStatus
+  }
 
   return withAPIErrorHandling(async () => {
     if (DefaultValues.requestStatus.length > 0) {
-      DefaultValues.pendingRequestStatus = DefaultValues.requestStatus.find(
-        (status) => status.status === RequestStatusEnum.pending
-      )
-      DefaultValues.approvedRequestStatus = DefaultValues.requestStatus.find(
-        (status) => status.status === RequestStatusEnum.approved
-      )
+      updateDefaultRequestStatus(DefaultValues.requestStatus)
       return DefaultValues.requestStatus
     }
     const { data } = await appBrazuerao.get('/groups/request-status')
-    DefaultValues.requestStatus = data.requestStatus
-    DefaultValues.pendingRequestStatus = data.requestStatus.find(
-      (status: RequestStatus) => status.status === RequestStatusEnum.pending
-    )
-    DefaultValues.approvedRequestStatus = data.requestStatus.find(
-      (status: RequestStatus) => status.status === RequestStatusEnum.approved
-    )
+    updateDefaultRequestStatus(data.requestStatus)
     localStorageService.setItem(
       LocalStorageKeysCache.GET_ALL_REQUEST_STATUS,
       DefaultValues.requestStatus
     )
     return data.requestStatus
   }, `${API_SOURCE}/groups/request-status`)
+}
+
+function updateDefaultRequestStatus(requestStatus: RequestStatus[]) {
+  DefaultValues.requestStatus = requestStatus
+  DefaultValues.pendingRequestStatus = requestStatus.find(
+    (status: RequestStatus) => status.status === RequestStatusEnum.pending
+  )
+  DefaultValues.approvedRequestStatus = requestStatus.find(
+    (status: RequestStatus) => status.status === RequestStatusEnum.approved
+  )
 }
 
 /**
