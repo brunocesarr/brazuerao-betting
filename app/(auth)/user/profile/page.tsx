@@ -53,6 +53,17 @@ export default function ProfilePage() {
               onSubmit={updateProfile}
               isUpdating={isLoading}
             />
+
+            <div className="flex flex-col items-center md:items-end mt-4">
+              <Button
+                className="flex w-full md:w-fit"
+                type="button"
+                variant="outline"
+                onClick={() => router.push('/betting')}
+              >
+                Ir para minhas apostas
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-col rounded-lg bg-white p-6 shadow">

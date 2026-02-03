@@ -20,7 +20,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className="bg-white"
     >
-      <body>
+      <body suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -387,7 +387,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="mx-4 rounded-md bg-white/10 px-4 py-3 text-center font-medium text-white transition-all duration-200 hover:bg-white/20"
+                  className="rounded-md bg-white/10 px-4 py-3 text-center font-medium text-white transition-all duration-200 hover:bg-white/20"
                 >
                   Login
                 </Link>

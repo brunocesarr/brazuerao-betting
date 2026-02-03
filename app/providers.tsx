@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ConfirmDialogProvider } from '@/lib/contexts/DialogContext'
 import { ToastProvider } from '@/lib/contexts/ToastContext'
+import { Analytics } from '@vercel/analytics/next'
 import { SessionProvider, useSession } from 'next-auth/react'
 
 function ProvidersContent({ children }: { children: React.ReactNode }) {
@@ -31,8 +32,13 @@ function ProvidersContent({ children }: { children: React.ReactNode }) {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
-      <ProvidersContent cz-shortcut-listen="true">{children}</ProvidersContent>
-    </SessionProvider>
+    <>
+      <SessionProvider>
+        <ProvidersContent cz-shortcut-listen="true">
+          {children}
+        </ProvidersContent>
+      </SessionProvider>
+      <Analytics />
+    </>
   )
 }
