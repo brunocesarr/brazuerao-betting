@@ -1,6 +1,8 @@
 import { DefaultValues, RequestStatusEnum } from '@/constants/constants'
+import { LocalStorageKeysCache } from '@/constants/local-storage.constants'
 import { withAPIErrorHandling } from '@/lib/errors'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
+import localStorageService from '@/services/local-storage.service'
 import {
   TeamPositionAPIResponse,
   UserBetAPIResponse,
@@ -57,8 +59,17 @@ async function getBrazilianLeague(
  * Fetches all active scoring rules
  */
 async function getAllBetRules(): Promise<RuleBet[]> {
+  const cacheRules = localStorageService.getItem(
+    LocalStorageKeysCache.GET_ALL_RULES
+  )
+  if (cacheRules && cacheRules.length > 0) return cacheRules
+
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.get('/rules')
+    localStorageService.setItem(
+      LocalStorageKeysCache.GET_ALL_RULES,
+      data?.rules
+    )
     return (data?.rules ?? []) as RuleBet[]
   }, `${API_SOURCE}/rules`)
 }
@@ -104,8 +115,14 @@ async function updateGroupIdForUserBet(groupId: string | null) {
  * Fetches current groups from the Brazuerão API
  */
 async function getAllBetGroups(): Promise<UserBetGroup[]> {
+  const cacheBetGroups = localStorageService.getItem(
+    LocalStorageKeysCache.GET_ALL_BET_GROUPS
+  )
+  if (cacheBetGroups && cacheBetGroups.length > 0) return cacheBetGroups
+
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.get('/groups')
+    localStorageService.setItem(LocalStorageKeysCache.GET_ALL_BET_GROUPS, data)
     return data.groups
   }, `${API_SOURCE}/groups`)
 }
@@ -114,6 +131,11 @@ async function getAllBetGroups(): Promise<UserBetGroup[]> {
  * Fetches current group roles from the Brazuerão API
  */
 async function getAllGroupRoles(): Promise<GroupRole[]> {
+  const cacheGroupRoles = localStorageService.getItem(
+    LocalStorageKeysCache.GET_ALL_BET_GROUP_ROLES
+  )
+  if (cacheGroupRoles && cacheGroupRoles.length > 0) return cacheGroupRoles
+
   return withAPIErrorHandling(async () => {
     if (DefaultValues.groupRoles.length > 0) {
       DefaultValues.adminGroupRule = DefaultValues.groupRoles.find(
@@ -126,6 +148,10 @@ async function getAllGroupRoles(): Promise<GroupRole[]> {
     DefaultValues.adminGroupRule = data.roles.find(
       (rule: GroupRole) => rule.name.toUpperCase() === 'ADMIN'
     )
+    localStorageService.setItem(
+      LocalStorageKeysCache.GET_ALL_BET_GROUP_ROLES,
+      DefaultValues.groupRoles
+    )
     return data.roles
   }, `${API_SOURCE}/groups/roles`)
 }
@@ -134,6 +160,12 @@ async function getAllGroupRoles(): Promise<GroupRole[]> {
  * Fetches current request status from the Brazuerão API
  */
 async function getAllRequestStatus(): Promise<RequestStatus[]> {
+  const cacheRequestStatus = localStorageService.getItem(
+    LocalStorageKeysCache.GET_ALL_REQUEST_STATUS
+  )
+  if (cacheRequestStatus && cacheRequestStatus.length > 0)
+    return cacheRequestStatus
+
   return withAPIErrorHandling(async () => {
     if (DefaultValues.requestStatus.length > 0) {
       DefaultValues.pendingRequestStatus = DefaultValues.requestStatus.find(
@@ -151,6 +183,10 @@ async function getAllRequestStatus(): Promise<RequestStatus[]> {
     )
     DefaultValues.approvedRequestStatus = data.requestStatus.find(
       (status: RequestStatus) => status.status === RequestStatusEnum.approved
+    )
+    localStorageService.setItem(
+      LocalStorageKeysCache.GET_ALL_REQUEST_STATUS,
+      DefaultValues.requestStatus
     )
     return data.requestStatus
   }, `${API_SOURCE}/groups/request-status`)

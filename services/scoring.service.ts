@@ -86,9 +86,9 @@ export function calculateScore(
   table: TeamPositionAPIResponse[]
 ): ScoreEntryAPIResponse[] {
   // Score each rule
-  const scoresByRule = rules.map((rule) =>
-    scoreByRule(rule, predictions, table)
-  )
+  const scoresByRule = rules
+    .sort((a, b) => a.priority - b.priority)
+    .map((rule) => scoreByRule(rule, predictions, table))
 
   // Remove duplicates: teams can only score in their first matching rule
   return scoresByRule.map((score, index) => {

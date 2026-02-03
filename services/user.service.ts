@@ -1,3 +1,4 @@
+import { LocalStorageKeysCache } from '@/constants/local-storage.constants'
 import { safePost } from '@/lib/api/safe-axios'
 import {
   getErrorMessage,
@@ -5,6 +6,7 @@ import {
   withAPIErrorHandling,
 } from '@/lib/errors'
 import { appBrazuerao } from '@/repositories/apiBrazuerao'
+import localStorageService from '@/services/local-storage.service'
 import { CurrentRequestBetGroup, UserBetGroup } from '@/types/domain'
 
 const API_SOURCE = 'Brazuerao API'
@@ -35,8 +37,17 @@ async function updateUserInfo(name: string) {
  * Fetches user's current groups from the Brazuerão API
  */
 async function getBetGroupsByUserId() {
+  const cacheBetGroups = localStorageService.getItem(
+    LocalStorageKeysCache.GET_BET_GROUPS_BY_USER_ID
+  )
+  if (cacheBetGroups && cacheBetGroups.length > 0) return cacheBetGroups
+
   return withAPIErrorHandling(async () => {
     const { data } = await appBrazuerao.get('/user/groups')
+    localStorageService.setItem(
+      LocalStorageKeysCache.GET_USER_INFO,
+      data.groups as UserBetGroup[]
+    )
     return data.groups as UserBetGroup[]
   }, `${API_SOURCE}/user/groups`)
 }

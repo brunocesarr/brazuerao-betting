@@ -244,7 +244,7 @@ export default function BettingPage() {
 
       if (success) {
         setSavedPredictions(predictions)
-      } 
+      }
     } catch (error) {
       console.error('Failed to save bet:', error)
       showToast({
