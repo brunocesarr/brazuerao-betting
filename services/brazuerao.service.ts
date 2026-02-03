@@ -48,10 +48,20 @@ async function getIndividualUserScore(): Promise<UserScoreAPIResponse[]> {
 async function getBrazilianLeague(
   year?: number
 ): Promise<TeamPositionAPIResponse[]> {
+  const cacheRules = localStorageService.getItem<TeamPositionAPIResponse[]>(
+    `LocalStorageKeysCache.GET_STANDINGS_${year ?? new Date().getFullYear()}`
+  )
+  if (cacheRules && cacheRules.length > 0) return cacheRules
+
   return withAPIErrorHandling(async () => {
     const targetYear = year ?? new Date().getFullYear()
     const { data } = await appBrazuerao.get(`/standings/${targetYear}`)
-    return (data?.data ?? []).map(mapTeamPositionData)
+    const teams = (data?.data ?? []).map(mapTeamPositionData)
+    localStorageService.setItem<TeamPositionAPIResponse[]>(
+      `LocalStorageKeysCache.GET_STANDINGS_${year ?? new Date().getFullYear()}`,
+      teams
+    )
+    return teams
   }, `${API_SOURCE}/standings`)
 }
 

@@ -1,5 +1,6 @@
 import { predictionSchema, userBetPredictionsSchema } from '@/helpers/schemas'
 import { prisma } from '@/lib/prisma'
+import { getUserGroups } from '@/repositories/user-bet-group.repository'
 import { UserBetDBModel } from '@/types/entities'
 
 // MARK: - Bets
@@ -132,11 +133,12 @@ const handleBetCreationOrUpdate = async (
     return [await handleGroupBet(userId, groupId, validatedData, existingBets)]
   }
 
-  if (existingBets.length === 1 && !existingBets[0].groupId) {
-    return [await createBet(userId, groupId, validatedData)]
-  }
-
-  return updateNonExpiredBets(existingBets, validatedData.predictions)
+  return updateAndCreateNonExpiredBets(
+    userId,
+    validatedData.season,
+    existingBets,
+    validatedData.predictions
+  )
 }
 
 const createBet = async (
@@ -163,6 +165,11 @@ const handleGroupBet = async (
   await validateGroupDeadline(groupId)
 
   const existingBet = existingBets.find((bet) => bet.groupId === groupId)
+
+  const defaultBet = existingBets.find((bet) => !bet.groupId)
+  if (defaultBet) {
+    await prisma.bet.delete({ where: { id: defaultBet.id } })
+  }
 
   if (existingBet) {
     return updateBet(existingBet.id, validatedData.predictions)
@@ -192,31 +199,56 @@ const updateBet = async (betId: string, predictions: string[]) => {
   })
 }
 
-const updateNonExpiredBets = async (
+const updateAndCreateNonExpiredBets = async (
+  userId: string,
+  season: number,
   existingBets: UserBetDBModel[],
   predictions: string[]
 ): Promise<UserBetDBModel[]> => {
-  const betsWithGroups = existingBets.filter((bet) => bet.groupId)
-  const groupIds = betsWithGroups.map((bet) => bet.groupId as string)
+  const groups = await getUserGroups(userId)
 
-  const betGroups = await prisma.betGroup.findMany({
-    where: { id: { in: groupIds } },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
-
-  const nonExpiredGroupIds = betGroups
+  const nonExpiredGroupIds = groups
     .filter((group) => group.deadlineAt.getTime() > new Date().getTime())
-    .map((group) => group.id)
+    .map((group) => group.groupId)
 
-  return prisma.bet.updateManyAndReturn({
-    where: { id: { in: nonExpiredGroupIds } },
-    data: {
-      predictions,
-      updatedAt: new Date(),
-    },
-  })
+  if (nonExpiredGroupIds.length === 0) {
+    throw new Error('Deadline date expired.')
+  }
+
+  const defaultBet = existingBets.find((bet) => !bet.groupId)
+  if (defaultBet) {
+    await prisma.bet.delete({ where: { id: defaultBet.id } })
+  }
+
+  const groupsWithBet = existingBets
+    .filter((bet) => bet.groupId && nonExpiredGroupIds.includes(bet.groupId))
+    .map((bet) => bet.id)
+
+  const groupsWithoutBet = nonExpiredGroupIds.filter(
+    (groupId) => !groupsWithBet.includes(groupId)
+  )
+
+  const [updatedBets, createdBets] = await Promise.all([
+    prisma.bet.updateManyAndReturn({
+      where: { id: { in: groupsWithBet } },
+      data: {
+        predictions,
+        updatedAt: new Date(),
+      },
+    }),
+    prisma.bet.createManyAndReturn({
+      data: groupsWithoutBet.map((groupId) => {
+        return {
+          userId,
+          groupId,
+          season,
+          predictions,
+        }
+      }),
+    }),
+  ])
+
+  return [...updatedBets, ...createdBets]
 }
 
 const parseBetPredictions = (bets: UserBetDBModel[]): UserBetDBModel[] => {

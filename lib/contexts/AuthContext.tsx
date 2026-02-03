@@ -293,9 +293,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         setUserGroups((prev) => [...prev, newGroup])
 
-        // Assign default bet to new group
-        await assignDefaultBetToGroup(newGroup.groupId)
-
         showToast({
           type: 'success',
           message: SUCCESS_MESSAGES.CREATE_GROUP,
@@ -483,21 +480,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const savedUserBet = await saveUserBet(predictions, groupId)
 
         if (savedUserBet) {
-          setUserBets((prev) => {
-            const existingIndex = prev.findIndex(
-              (bet) => bet.id === savedUserBet.id
-            )
-
-            if (existingIndex >= 0) {
-              // Update existing bet
-              const updated = [...prev]
-              updated[existingIndex] = savedUserBet
-              return updated
-            } else {
-              // Add new bet
-              return [...prev, savedUserBet]
-            }
-          })
+          setUserBets([
+            ...userBets.filter(
+              (bet) => bet.groupId && bet.groupId !== savedUserBet.id
+            ),
+            savedUserBet,
+          ])
 
           showToast({
             type: 'success',

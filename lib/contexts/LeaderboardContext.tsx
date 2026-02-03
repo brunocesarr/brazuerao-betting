@@ -25,6 +25,7 @@ interface LeaderboardContextType {
   loading: boolean
   onChangeSelectedGroup: (groupId: string) => void
   getRuleByRuleId: (ruleId: string) => RuleBet | undefined
+  fetchLeaderboard: () => Promise<void>
 }
 
 const LeaderboardContext = createContext<LeaderboardContextType | undefined>(
@@ -122,6 +123,7 @@ export function LeaderboardProvider({
         getRuleByRuleId,
         username: session?.user.name,
         onChangeSelectedGroup: setSelectedGroup,
+        fetchLeaderboard,
       }}
     >
       {children}

@@ -43,7 +43,7 @@ export default function BettingPage() {
 
   const [savedPredictions, setSavedPredictions] = useState<TeamPrediction[]>([])
   const [predictions, setPredictions] = useState<TeamPrediction[]>([])
-  const [selectedGroupId, setSelectedGroupId] = useState<string>('')
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
   const [saveForAll, setSaveForAll] = useState<boolean>(true)
   const [isLoadingBet, setIsLoadingBet] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -68,13 +68,13 @@ export default function BettingPage() {
   }, [predictions, savedPredictions, isExpired])
 
   useEffect(() => {
-    if (!authLoading && userBets.length > 0) {
+    if (!authLoading && !isSaving) {
       initializeBettingData()
     }
   }, [userBets, userGroups, authLoading])
 
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading && !isSaving) {
       loadPredictions(selectedGroupId)
     }
   }, [selectedGroupId, authLoading])
@@ -84,7 +84,7 @@ export default function BettingPage() {
     const mostRecentGroup = getMostRecentGroup()
     const groupIdParam = params.get('groupId')
     const initialGroupId =
-      groupIdParam ?? mostRecentBet?.groupId ?? mostRecentGroup?.groupId ?? ''
+      groupIdParam ?? mostRecentBet?.groupId ?? mostRecentGroup?.groupId ?? null
 
     setSelectedGroupId(initialGroupId)
     setSaveForAll(!initialGroupId)
@@ -111,13 +111,12 @@ export default function BettingPage() {
   }
 
   const loadPredictions = useCallback(
-    async (groupId: string) => {
+    async (groupId: string | null) => {
       try {
         setIsLoadingBet(true)
 
         const brazilianTable = await getBrazilianLeague()
         const userBet = findUserBet(userBets, groupId)
-
         const predictions = createPredictions(brazilianTable, userBet)
 
         // Only show predictions if not expired OR if user already has a bet OR if saving for all
@@ -141,10 +140,8 @@ export default function BettingPage() {
     [userBets, isExpired, saveForAll, showToast]
   )
 
-  const findUserBet = (bets: UserBetAPIResponse[], groupId: string) => {
-    return bets.find((bet) =>
-      groupId ? bet.groupId === groupId : bet.groupId === null
-    )
+  const findUserBet = (bets: UserBetAPIResponse[], groupId: string | null) => {
+    return bets.find((bet) => bet.groupId === groupId)
   }
 
   const createPredictions = (
@@ -268,7 +265,7 @@ export default function BettingPage() {
   const handleSelectSaveForAll = useCallback((save: boolean) => {
     setSaveForAll(save)
     if (save) {
-      setSelectedGroupId('')
+      setSelectedGroupId(null)
     }
   }, [])
 
@@ -317,7 +314,7 @@ export default function BettingPage() {
             <BetGroupSelectSimple
               groups={userGroups}
               onValueChange={handleSelectGroupId}
-              value={selectedGroupId}
+              value={selectedGroupId ? selectedGroupId : undefined}
               disabled={saveForAll || isLoadingBet}
             />
             <Checkbox

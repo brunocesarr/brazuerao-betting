@@ -7,10 +7,13 @@ import { InfoCard } from '@/components/leaderboard/InfoCard'
 import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable'
 import { PageHeader } from '@/components/leaderboard/PageHeader'
 import { SummaryCards } from '@/components/leaderboard/SummaryCards'
+import { Button } from '@/components/shared/Button'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { useLeaderboard } from '@/lib/contexts/LeaderboardContext'
 import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
+import localStorageService from '@/services/local-storage.service'
 import { RuleBet } from '@/types'
+import { RefreshCcw } from 'lucide-react'
 import { useState } from 'react'
 
 export default function LeaderboardPage() {
@@ -24,6 +27,7 @@ export default function LeaderboardPage() {
     loading,
     onChangeSelectedGroup,
     getRuleByRuleId,
+    fetchLeaderboard,
   } = useLeaderboard()
 
   const { deadline, isExpired } = useBetDeadline(selectedGroup, groups)
@@ -48,6 +52,13 @@ export default function LeaderboardPage() {
     return rules.filter((rule) =>
       groupRules.some((groupRule) => groupRule === rule.id)
     )
+  }
+
+  const forceRefreshTable = async () => {
+    localStorageService.deleteItem(
+      `LocalStorageKeysCache.GET_STANDINGS_${new Date().getFullYear()}`
+    )
+    await fetchLeaderboard()
   }
 
   if (loading && leaderboard.length === 0) {
@@ -80,10 +91,23 @@ export default function LeaderboardPage() {
               />
             )}
 
-            <PageHeader
-              title={`Grupo: ${groups.find((group) => group.groupId === selectedGroup)?.name}`}
-              description="Acompanhe seu desempenho e dos demais integrantes"
-            />
+            <div className="flex flex-col md:flex-row items-end md:items-start justify-between space-y-2">
+              <PageHeader
+                title={`Grupo: ${groups.find((group) => group.groupId === selectedGroup)?.name}`}
+                description="Acompanhe seu desempenho e dos demais integrantes"
+              />
+
+              <div className="flex flex-col items-end justify-end space-y-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="bg-green-600"
+                  onClick={forceRefreshTable}
+                >
+                  <RefreshCcw className="w-4 h-4 mx-2" />
+                </Button>
+              </div>
+            </div>
 
             <LeaderboardTable
               leaderboard={leaderboard}
