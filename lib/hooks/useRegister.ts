@@ -1,13 +1,13 @@
 'use client'
 
 import { useToast } from '@/lib/contexts/ToastContext'
-import type { RegisterFormDataSimple } from '@/lib/validations/auth.schema'
+import type { RegisterFormData } from '@/lib/validations/auth.schema'
 import { createNewUser } from '@/services/user.service'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 interface UseRegisterReturn {
-  register: (data: RegisterFormDataSimple) => Promise<void>
+  register: (data: RegisterFormData) => Promise<void>
   isLoading: boolean
   error: string | null
   clearError: () => void
@@ -21,7 +21,7 @@ export function useRegister(): UseRegisterReturn {
 
   const clearError = () => setError(null)
 
-  const register = async (data: RegisterFormDataSimple) => {
+  const register = async (data: RegisterFormData) => {
     setIsLoading(true)
     setError(null)
 
