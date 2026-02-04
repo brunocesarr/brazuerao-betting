@@ -239,7 +239,7 @@ export function generateGroupPredictionsPDF(data: GroupPDFData): void {
     doc.setFontSize(10)
     doc.setFont('helvetica', 'italic')
     doc.setTextColor(107, 114, 128)
-    doc.text('Nenhuma previsão de classificação registrada', 14, yPosition)
+    doc.text('Nenhuma aposta de classificação registrada', 14, yPosition)
     yPosition += 15
   }
 
@@ -424,7 +424,7 @@ export function generatePredictionsComparisonPDF(data: GroupPDFData): void {
 
   if (maxPredictions === 0) {
     doc.setFontSize(12)
-    doc.text('Nenhuma previsão de classificação registrada', 14, 50)
+    doc.text('Nenhuma aposta de classificação registrada', 14, 50)
   } else {
     // Add current scores in header
     const userScores = sortedLeaderboard.map((entry) => {

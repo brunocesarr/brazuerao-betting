@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@/components/shared/Button'
 import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -146,6 +147,17 @@ export default function LoginPage() {
                 'Entrar'
               )}
             </button>
+
+            <div className="text-end hidden">
+              <Button variant="ghost" size="sm" className="-mt-4">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-medium text-primary-600 transition-colors hover:text-primary-700"
+                >
+                  Esqueceu sua senha?
+                </Link>
+              </Button>
+            </div>
           </form>
 
           <div className="mt-6 text-center">
