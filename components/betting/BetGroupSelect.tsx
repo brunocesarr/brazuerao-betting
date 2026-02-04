@@ -27,7 +27,7 @@ export function BetGroupSelectSimple({
 }: BetGroupSelectSimpleProps) {
   return (
     <div className="w-full">
-      <label className="mb-4 block text-md font-medium text-white">
+      <label className="mb-4 block text-md font-bold text-gray-400">
         Selecione um grupo
       </label>
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>

@@ -10,14 +10,6 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: process.env.NODE_ENV === 'development',
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/v1/:path*',
-        destination: 'https://brazuerao-next-app.vercel.app/api/v1/:path*',
-      },
-    ]
-  },
 }
 
 export default nextConfig

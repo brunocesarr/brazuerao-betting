@@ -1,7 +1,7 @@
 import { DefaultValues, RequestStatusEnum } from '@/constants/constants'
 import { LocalStorageKeysCache } from '@/constants/local-storage.constants'
 import { withAPIErrorHandling } from '@/lib/errors'
-import { apiBrazuerao, appBrazuerao } from '@/repositories/apiBrazuerao'
+import { appBrazuerao } from '@/repositories/apiBrazuerao'
 import localStorageService from '@/services/local-storage.service'
 import {
   TeamPositionAPIResponse,
@@ -28,6 +28,16 @@ function mapTeamPositionData(
     position: raw.position as number,
     played: raw.played as number,
     name: raw.team as string,
+    shield: raw.shield as string | undefined,
+  }
+}
+function mapTeamPositionDataGE(
+  raw: Record<string, unknown>
+): TeamPositionAPIResponse {
+  return {
+    position: raw.position as number,
+    played: raw.played as number,
+    name: raw.name as string,
     shield: raw.shield as string | undefined,
   }
 }
@@ -77,8 +87,9 @@ async function getBrazilianLeagueByGloboEsporte(): Promise<
   if (cacheRules && cacheRules.length > 0) return cacheRules
 
   return withAPIErrorHandling(async () => {
-    const { data } = await apiBrazuerao.get(`/api/v1/brazilian-league`)
-    const teams = (data ?? []).map(mapTeamPositionData)
+    const { data } = await appBrazuerao.get(`/brazilian-league`)
+    if (!data) return []
+    const teams = data.map(mapTeamPositionDataGE)
     localStorageService.setItem<TeamPositionAPIResponse[]>(
       `${LocalStorageKeysCache.GET_STANDINGS_BY_GLOBO_ESPORTE}_${new Date().getFullYear()}`,
       teams

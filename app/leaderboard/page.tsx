@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
     await fetchLeaderboard()
   }
 
-  if (loading && leaderboard.length === 0) {
+  if (loading && groups.length === 0) {
     return <LoadingState message="Carregando scores..." />
   }
 
@@ -77,13 +77,13 @@ export default function LeaderboardPage() {
             />
 
             <SummaryCards stats={myUserScore} rules={rules} />
+
+            <hr className="my-8 h-px border-0 bg-primary-700/50" />
           </>
         )}
 
-        {leaderboard.length > 0 ? (
+        {leaderboard.length > 0 || groups.length > 1 ? (
           <div className="space-y-4">
-            <hr className="my-8 h-px border-0 bg-primary-700/50" />
-
             {groups.length > 1 && (
               <BetGroupSelectSimple
                 groups={groups}
@@ -92,50 +92,61 @@ export default function LeaderboardPage() {
               />
             )}
 
-            <div className="flex flex-col md:flex-row items-end md:items-start justify-between space-y-2">
-              <PageHeader
-                title={`Grupo: ${groups.find((group) => group.groupId === selectedGroup)?.name}`}
-                description="Acompanhe seu desempenho e dos demais integrantes"
+            {loading ? (
+              <LoadingState
+                message="Carregando classificação..."
+                className="h-32"
               />
+            ) : (
+              <>
+                <div className="flex flex-col md:flex-row items-end md:items-start justify-between space-y-2">
+                  <PageHeader
+                    title={`Grupo: ${groups.find((group) => group.groupId === selectedGroup)?.name}`}
+                    description="Acompanhe seu desempenho e dos demais integrantes"
+                  />
 
-              <div className="flex flex-col items-end justify-end space-y-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="bg-green-600"
-                  onClick={forceRefreshTable}
-                >
-                  <RefreshCcw className="w-4 h-4 mx-2" />
-                </Button>
-              </div>
-            </div>
+                  <div className="flex flex-col items-end justify-end space-y-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="bg-green-600"
+                      onClick={forceRefreshTable}
+                    >
+                      <RefreshCcw className="w-4 h-4 mx-2" />
+                    </Button>
+                  </div>
+                </div>
 
-            <LeaderboardTable
-              leaderboard={leaderboard}
-              expandedRows={expandedRows}
-              selectedGroup={selectedGroup}
-              currentUsername={username}
-              onToggleRow={toggleRow}
-              getRuleByRuleId={getRuleByRuleId}
-            />
+                <LeaderboardTable
+                  leaderboard={leaderboard}
+                  expandedRows={expandedRows}
+                  selectedGroup={selectedGroup}
+                  currentUsername={username}
+                  onToggleRow={toggleRow}
+                  getRuleByRuleId={getRuleByRuleId}
+                />
 
-            <div className="flex flex-col items-end justify-end space-y-2">
-              <ExportGroupPDFDropdown
-                groupName={
-                  groups.find((group) => group.groupId === selectedGroup)
-                    ?.name ?? ''
-                }
-                deadline={deadline ? new Date(deadline) : new Date()}
-                leaderboard={leaderboard}
-                getRuleByRuleId={getRuleByRuleId}
-                disabled={!isExpired}
-              />
-              {!isExpired && (
-                <p className="text-xs text-gray-400/80">
-                  Funcão estará disponível após encerramento das apostas
-                </p>
-              )}
-            </div>
+                {leaderboard.length > 0 && (
+                  <div className="flex flex-col items-end justify-end space-y-2">
+                    <ExportGroupPDFDropdown
+                      groupName={
+                        groups.find((group) => group.groupId === selectedGroup)
+                          ?.name ?? ''
+                      }
+                      deadline={deadline ? new Date(deadline) : new Date()}
+                      leaderboard={leaderboard}
+                      getRuleByRuleId={getRuleByRuleId}
+                      disabled={!isExpired}
+                    />
+                    {!isExpired && (
+                      <p className="text-xs text-gray-400/80">
+                        Funcão estará disponível após encerramento das apostas
+                      </p>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
 
             <InfoCard rules={getRules()} />
           </div>
