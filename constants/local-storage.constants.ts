@@ -33,4 +33,9 @@ export class LocalStorageKeysCache {
     .NEXT_PUBLIC_AMBIENTE_BRAZUERAO_WEB_APP
     ? `get-standings_${process.env.NEXT_PUBLIC_AMBIENTE_BRAZUERAO_WEB_APP}`
     : 'get-standings'
+
+  static readonly GET_STANDINGS_BY_GLOBO_ESPORTE: string = process.env
+    .NEXT_PUBLIC_AMBIENTE_BRAZUERAO_WEB_APP
+    ? `get-standings-by-globo-esporte_${process.env.NEXT_PUBLIC_AMBIENTE_BRAZUERAO_WEB_APP}`
+    : 'get-standings-by-globo-esporte'
 }

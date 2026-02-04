@@ -1,7 +1,7 @@
 import { DefaultValues, RequestStatusEnum } from '@/constants/constants'
 import { LocalStorageKeysCache } from '@/constants/local-storage.constants'
 import { withAPIErrorHandling } from '@/lib/errors'
-import { appBrazuerao } from '@/repositories/apiBrazuerao'
+import { apiBrazuerao, appBrazuerao } from '@/repositories/apiBrazuerao'
 import localStorageService from '@/services/local-storage.service'
 import {
   TeamPositionAPIResponse,
@@ -63,6 +63,28 @@ async function getBrazilianLeague(
     )
     return teams
   }, `${API_SOURCE}/standings`)
+}
+
+/**
+ * Fetches Brazilian league Globo Esporte standings for a given year
+ */
+async function getBrazilianLeagueByGloboEsporte(): Promise<
+  TeamPositionAPIResponse[]
+> {
+  const cacheRules = localStorageService.getItem<TeamPositionAPIResponse[]>(
+    `${LocalStorageKeysCache.GET_STANDINGS_BY_GLOBO_ESPORTE}_${new Date().getFullYear()}`
+  )
+  if (cacheRules && cacheRules.length > 0) return cacheRules
+
+  return withAPIErrorHandling(async () => {
+    const { data } = await apiBrazuerao.get(`/v1/brazilian-league`)
+    const teams = (data ?? []).map(mapTeamPositionData)
+    localStorageService.setItem<TeamPositionAPIResponse[]>(
+      `${LocalStorageKeysCache.GET_STANDINGS_BY_GLOBO_ESPORTE}_${new Date().getFullYear()}`,
+      teams
+    )
+    return teams
+  }, `${API_SOURCE}/v1/brazilian-league`)
 }
 
 /**
@@ -240,6 +262,7 @@ export {
   getAllRequestStatus,
   getBetByUserId,
   getBrazilianLeague,
+  getBrazilianLeagueByGloboEsporte,
   getIndividualUserScore,
   getLeaderboardGroups,
   getScoreForLeaderboardGroup,
