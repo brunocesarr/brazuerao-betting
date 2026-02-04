@@ -28,7 +28,7 @@ import {
   existsUser,
   getUserById,
 } from '@/repositories/user.repository'
-import { getBrazilianLeague } from '@/services/brazuerao.service'
+import { getBrazilianLeagueByGloboEsporte } from '@/services/brazuerao.service'
 import { calculateScore } from '@/services/scoring.service'
 import { ScoreEntryAPIResponse } from '@/types/api'
 
@@ -44,7 +44,7 @@ const getUserScore = async (
     }
 
     const [brazilianLeague, rules] = await Promise.all([
-      getBrazilianLeague(),
+      getBrazilianLeagueByGloboEsporte(),
       getAllBetRules(),
     ])
 
@@ -70,7 +70,7 @@ const getLeaderboard = async (groupId: string, season: number) => {
     }
 
     const [brazilianLeague, rules, userInfos] = await Promise.all([
-      getBrazilianLeague(),
+      getBrazilianLeagueByGloboEsporte(),
       getAllBetRulesByGroupId(groupId),
       prisma.user.findMany({
         where: { id: { in: userBets.map((userBet) => userBet.userId) } },
