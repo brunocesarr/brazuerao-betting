@@ -93,6 +93,25 @@ const getLeaderboard = async (groupId: string, season: number) => {
         }
       })
       .filter((userBet) => userBet)
+      .sort((a, b) => {
+        // First, sort by totalScore (descending - highest first)
+        if (b!.totalScore !== a!.totalScore) {
+          return b!.totalScore - a!.totalScore
+        }
+
+        // If totalScore is equal, compare by individual scores according to priority
+        // Priority 0 (index 0) is highest priority
+        for (let i = 0; i < Math.max(a!.score.length, b!.score.length); i++) {
+          const scoreA = a!.score[i]?.score || 0
+          const scoreB = b!.score[i]?.score || 0
+
+          if (scoreA !== scoreB) {
+            return scoreB - scoreA // Descending order
+          }
+        }
+
+        return a!.username.localeCompare(b!.username) // All scores are equal
+      })
   } catch (error) {
     console.error('Get group score error:', error)
     throw error
