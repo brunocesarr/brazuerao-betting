@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/leaderboard/PageHeader'
 import { SummaryCards } from '@/components/leaderboard/SummaryCards'
 import { Button } from '@/components/shared/Button'
 import { LoadingState } from '@/components/shared/LoadingState'
+import { LocalStorageKeysCache } from '@/constants/local-storage.constants'
 import { useLeaderboard } from '@/lib/contexts/LeaderboardContext'
 import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
 import localStorageService from '@/services/local-storage.service'
@@ -56,7 +57,7 @@ export default function LeaderboardPage() {
 
   const forceRefreshTable = async () => {
     localStorageService.deleteItem(
-      `LocalStorageKeysCache.GET_STANDINGS_${new Date().getFullYear()}`
+      `${LocalStorageKeysCache.GET_STANDINGS}_${new Date().getFullYear()}`
     )
     await fetchLeaderboard()
   }

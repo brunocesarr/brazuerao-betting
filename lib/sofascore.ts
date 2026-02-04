@@ -5,7 +5,7 @@ let cachedSeasons: SeasonAPIResponse[] | null = null
 let cacheTimestamp: number | null = null
 const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
-const URL_BASE_SOFASCORE = 'https://api.sofascore.com/api'
+const URL_BASE_SOFASCORE = 'http://api.sofascore.com/api'
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9'
 
@@ -32,6 +32,7 @@ apiSofaScore.interceptors.request.use(
 export async function fetchBrasileiraoSeasons(): Promise<SeasonAPIResponse[]> {
   if (
     cachedSeasons &&
+    cachedSeasons.length > 0 &&
     cacheTimestamp &&
     Date.now() - cacheTimestamp < CACHE_DURATION
   ) {

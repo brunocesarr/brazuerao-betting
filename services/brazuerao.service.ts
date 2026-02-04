@@ -49,7 +49,7 @@ async function getBrazilianLeague(
   year?: number
 ): Promise<TeamPositionAPIResponse[]> {
   const cacheRules = localStorageService.getItem<TeamPositionAPIResponse[]>(
-    `LocalStorageKeysCache.GET_STANDINGS_${year ?? new Date().getFullYear()}`
+    `${LocalStorageKeysCache.GET_STANDINGS}_${year ?? new Date().getFullYear()}`
   )
   if (cacheRules && cacheRules.length > 0) return cacheRules
 
@@ -58,7 +58,7 @@ async function getBrazilianLeague(
     const { data } = await appBrazuerao.get(`/standings/${targetYear}`)
     const teams = (data?.data ?? []).map(mapTeamPositionData)
     localStorageService.setItem<TeamPositionAPIResponse[]>(
-      `LocalStorageKeysCache.GET_STANDINGS_${year ?? new Date().getFullYear()}`,
+      `${LocalStorageKeysCache.GET_STANDINGS}_${year ?? new Date().getFullYear()}`,
       teams
     )
     return teams

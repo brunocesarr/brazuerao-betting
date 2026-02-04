@@ -16,11 +16,7 @@ function ProvidersContent({ children }: { children: React.ReactNode }) {
   return (
     <ConfirmDialogProvider>
       <ToastProvider>
-        <SessionProvider
-          refetchInterval={5}
-          refetchOnWindowFocus
-          refetchWhenOffline={false}
-        >
+        <SessionProvider>
           <Navbar />
           {children}
           <Footer />
