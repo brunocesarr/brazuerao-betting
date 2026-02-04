@@ -77,7 +77,7 @@ async function getBrazilianLeagueByGloboEsporte(): Promise<
   if (cacheRules && cacheRules.length > 0) return cacheRules
 
   return withAPIErrorHandling(async () => {
-    const { data } = await apiBrazuerao.get(`/v1/brazilian-league`)
+    const { data } = await apiBrazuerao.get(`/api/v1/brazilian-league`)
     const teams = (data ?? []).map(mapTeamPositionData)
     localStorageService.setItem<TeamPositionAPIResponse[]>(
       `${LocalStorageKeysCache.GET_STANDINGS_BY_GLOBO_ESPORTE}_${new Date().getFullYear()}`,
