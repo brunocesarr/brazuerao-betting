@@ -14,7 +14,9 @@ export default function RootLayout({
   const router = useRouter()
 
   useEffect(() => {
-    if (status === 'authenticated') router.push('/user/profile')
+    if (status === 'authenticated') {
+      router.push('/user/profile')
+    }
   }, [status, router])
 
   if (status !== 'unauthenticated')

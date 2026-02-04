@@ -3,7 +3,6 @@
 import { LoadingState } from '@/components/shared/LoadingState'
 import { DefaultValues } from '@/constants/constants'
 import { useToast } from '@/lib/contexts/ToastContext'
-import { useRequireAuth } from '@/lib/hooks/useRequireAuth'
 import { useSessionRefresh } from '@/lib/hooks/useSessionRefresh'
 import {
   getBetByUserId,
@@ -43,7 +42,6 @@ interface AuthContextType {
   userGroups: UserBetGroup[]
   userBets: UserBetAPIResponse[]
   isLoading: boolean
-  isAuthenticated: boolean
 
   // User Actions
   updateProfile: (name: string) => Promise<boolean>
@@ -126,7 +124,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const { showToast } = useToast()
   const { refreshSession } = useSessionRefresh()
-  const { isAuthenticated } = useRequireAuth()
 
   // State
   const [user, setUser] = useState<UserProfile | null>(null)
@@ -480,12 +477,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const savedUserBet = await saveUserBet(predictions, groupId)
 
         if (savedUserBet) {
-          setUserBets([
-            ...userBets.filter(
-              (bet) => bet.groupId && bet.groupId !== savedUserBet.id
-            ),
-            savedUserBet,
-          ])
+          await fetchUserData()
 
           showToast({
             type: 'success',
@@ -507,7 +499,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false)
       }
     },
-    [showToast]
+    [showToast, fetchUserData, userBets]
   )
 
   // ============================================================================
@@ -559,7 +551,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       userGroups,
       userBets,
       isLoading,
-      isAuthenticated,
       updateProfile,
       createNewGroup,
       updateGroupInfo,
@@ -574,7 +565,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       userGroups,
       userBets,
       isLoading,
-      isAuthenticated,
       updateProfile,
       createNewGroup,
       updateGroupInfo,
@@ -589,9 +579,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (isLoading) return <LoadingState message="Carregando..." />
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {isAuthenticated ? children : null}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   )
 }
 

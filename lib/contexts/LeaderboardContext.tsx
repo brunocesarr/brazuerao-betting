@@ -83,7 +83,7 @@ export function LeaderboardProvider({
       setGroups(userGroups)
       setRules(rulesData)
 
-      if (userGroups.length > 0) {
+      if (userGroups && userGroups.length > 0) {
         setSelectedGroup(userGroups[0].groupId)
       }
     } catch (error) {
