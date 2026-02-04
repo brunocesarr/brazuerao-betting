@@ -9,7 +9,6 @@ import { useAuth } from '@/lib/contexts/AuthContext'
 import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
-import { useRequireAuth } from '@/lib/hooks/useRequireAuth'
 import { getBrazilianLeagueByGloboEsporte } from '@/services/brazuerao.service'
 import {
   TeamPositionAPIResponse,
@@ -37,7 +36,6 @@ import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export default function BettingPage() {
-  useRequireAuth()
   const { userBets, userGroups, isLoading: authLoading, saveMyBet } = useAuth()
   const { showToast } = useToast()
   const { confirm } = useConfirmDialog()

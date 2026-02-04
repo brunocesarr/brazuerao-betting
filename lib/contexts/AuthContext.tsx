@@ -31,6 +31,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { useRequireAuth } from '../hooks/useRequireAuth'
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -124,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const { showToast } = useToast()
   const { refreshSession } = useSessionRefresh()
+  useRequireAuth()
 
   // State
   const [user, setUser] = useState<UserProfile | null>(null)

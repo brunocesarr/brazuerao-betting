@@ -19,6 +19,7 @@ export function useRequireAuth(options: UseRequireAuthOptions = {}) {
   const { status } = useSession()
 
   useEffect(() => {
+    console.log('🔐 [useRequireAuth] status da sessão:', status)
     // Aguardar verificação de sessão
     if (status === 'loading') return
 

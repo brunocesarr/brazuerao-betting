@@ -6,17 +6,36 @@ import { LoadingState } from '@/components/shared/LoadingState'
 import { ConfirmDialogProvider } from '@/lib/contexts/DialogContext'
 import { ToastProvider } from '@/lib/contexts/ToastContext'
 import { Analytics } from '@vercel/analytics/next'
-import { SessionProvider, useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
+import { getSession, SessionProvider } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 
 function ProvidersContent({ children }: { children: React.ReactNode }) {
-  const { status } = useSession()
+  const [isLoading, setIsLoading] = useState(true)
+  const [session, setSession] = useState<Session | null>(null)
 
-  if (status === 'loading') return <LoadingState message="Carregando..." />
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        setIsLoading(true)
+        const session = await getSession()
+        setSession(session)
+      } catch (error) {
+        console.error('Erro ao buscar a sessão:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSession()
+  }, [])
+
+  if (isLoading) return <LoadingState message="Carregando..." />
 
   return (
     <ConfirmDialogProvider>
       <ToastProvider>
-        <SessionProvider>
+        <SessionProvider session={session}>
           <Navbar />
           {children}
           <Footer />
@@ -29,11 +48,7 @@ function ProvidersContent({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <SessionProvider>
-        <ProvidersContent cz-shortcut-listen="true">
-          {children}
-        </ProvidersContent>
-      </SessionProvider>
+      <ProvidersContent cz-shortcut-listen="true">{children}</ProvidersContent>
       <Analytics />
     </>
   )
