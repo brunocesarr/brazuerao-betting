@@ -114,7 +114,7 @@ export const LeaderboardExpandedDetails = ({
           {sections.length === 0 && (
             <div className="py-4 text-center">
               <p className="text-sm italic text-gray-500">
-                Nenhuma previsão registrada
+                Nenhuma aposta registrada
               </p>
             </div>
           )}

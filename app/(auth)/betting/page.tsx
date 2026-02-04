@@ -226,8 +226,8 @@ export default function BettingPage() {
     const result = await confirm({
       title: saveForAll
         ? 'Atenção'
-        : `Previsão: ${userGroups.find((userGroup) => userGroup.groupId === selectedGroupId)?.name}`,
-      message: `Prosseguir com o salvamento da previsão? ${saveForAll ? '(Somente atualizará aqueles grupos em que está dentro do prazo de apostar)' : ''}`,
+        : `Aposta: ${userGroups.find((userGroup) => userGroup.groupId === selectedGroupId)?.name}`,
+      message: `Prosseguir com o salvamento da aposta? ${saveForAll ? '(Somente atualizará aqueles grupos em que está dentro do prazo de apostar)' : ''}`,
       confirmText: 'Confirmar',
       cancelText: 'Cancelar',
       variant: 'info',
@@ -298,7 +298,7 @@ export default function BettingPage() {
       <div className="container mx-auto max-w-5xl px-4 space-y-8">
         {/* Header */}
         <h1 className="mb-8 text-4xl font-bold text-gray-50 text-center">
-          Sua previsão para o Brasileirão 2026
+          Sua aposta para o Brasileirão 2026
         </h1>
 
         {/* Loading State */}
@@ -362,13 +362,13 @@ export default function BettingPage() {
                             <path d="M9 2h6v2H9V2zm0 4h6v2H9V6zm0 4h6v2H9v-2zm0 4h6v2H9v-2zm0 4h6v2H9v-2z" />
                           </svg>
                         </th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold">
-                          Posição
+                        <th className="px-0 md:px-2 py-4 text-left text-sm font-semibold">
+                          <p className="hidden md:block">Posição</p>
                         </th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                        <th className="px-2 md:px-6 py-4 text-left text-sm font-semibold">
                           Time
                         </th>
-                        <th className="px-6 py-4 text-right text-sm font-semibold">
+                        <th className="px-6 py-4 text-center md:text-right text-sm font-semibold">
                           Mover
                         </th>
                       </tr>
@@ -401,7 +401,7 @@ export default function BettingPage() {
               <button
                 onClick={handleSubmit}
                 disabled={!hasChanges || isSaving || isExpired}
-                className="btn-primary relative px-12 py-4 text-lg hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full md:w-fit btn-primary relative px-12 py-4 text-lg hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSaving ? (
                   <span className="flex items-center justify-center">
@@ -429,7 +429,7 @@ export default function BettingPage() {
                   </span>
                 ) : (
                   <span>
-                    {isExpired ? 'Apostas Encerradas' : 'Salvar Previsão'}
+                    {isExpired ? 'Apostas Encerradas' : 'Salvar Aposta'}
                   </span>
                 )}
               </button>
@@ -437,7 +437,7 @@ export default function BettingPage() {
               {/* Deadline Info */}
               <p className="mt-4 text-sm text-gray-200/90">
                 {deadline
-                  ? `Você pode editar sua previsão até ${deadline.toLocaleDateString(
+                  ? `Você pode editar sua aposta até ${deadline.toLocaleDateString(
                       'pt-BR',
                       {
                         year: 'numeric',
@@ -447,7 +447,7 @@ export default function BettingPage() {
                         minute: '2-digit',
                       }
                     )}`
-                  : 'Você pode editar sua previsão a qualquer momento durante a temporada'}
+                  : 'Você pode editar sua aposta a qualquer momento durante a temporada'}
               </p>
             </div>
           </div>

@@ -9,7 +9,7 @@ export const PredictionsTable = ({ predictions }: PredictionsTableProps) => {
 
   return (
     <div className="mt-8 bg-[#242424] rounded-lg p-6">
-      <h2 className="text-xl font-bold text-white mb-4">Sua Previsão</h2>
+      <h2 className="text-xl font-bold text-white mb-4">Sua Aposta</h2>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

@@ -17,7 +17,7 @@ export const EmptyState = () => {
         href={username ? '/betting' : '/login'}
         className="mt-6 inline-block rounded-lg bg-gradient-to-r from-green-600 to-green-700 px-8 py-3 font-semibold text-white transition-all duration-300 hover:shadow-lg"
       >
-        Fazer Previsão
+        Fazer Aposta
       </Link>
     </div>
   )

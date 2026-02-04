@@ -128,7 +128,7 @@ export default function Home() {
                 <span className="text-4xl">📝</span>
               </div>
               <h3 className="mb-3 text-2xl font-bold text-gray-900">
-                1. Faça sua previsão
+                1. Faça sua aposta
               </h3>
               <p className="leading-relaxed text-gray-600">
                 Ordene os 20 times na ordem que você acha que vão terminar a

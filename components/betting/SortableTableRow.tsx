@@ -3,6 +3,7 @@
 import { TeamPrediction } from '@/types'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { Menu } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 
@@ -54,24 +55,12 @@ export default function SortableTableRow({
           className="flex cursor-grab items-center justify-center text-gray-400 hover:text-gray-600 active:cursor-grabbing"
           title="Arraste para reordenar"
         >
-          <svg
-            className="h-6 w-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 8h16M4 16h16"
-            />
-          </svg>
+          <Menu className="h-6 w-6 rounded-lg" />
         </div>
       </td>
 
       {/* Position */}
-      <td className="px-6 py-4">
+      <td className="px-0 md:px-6 py-4">
         <div className="flex items-center text-center">
           <span className="w-8 text-2xl font-bold text-gray-700">
             {pred.position}
@@ -80,7 +69,7 @@ export default function SortableTableRow({
       </td>
 
       {/* Team Name and Logo */}
-      <td className="px-6 py-4">
+      <td className="px-2 md:px-6 py-4">
         <div className="flex items-center">
           {imgSrc && (
             <Image
