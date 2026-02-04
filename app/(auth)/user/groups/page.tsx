@@ -110,8 +110,8 @@ export default function GroupManagementPage() {
     rules: string[]
   ) => {
     const result = await confirm({
-      title: 'Atencão',
-      message: `Prosseguir com a criacão do novo Grupo ${groupData.name}?`,
+      title: 'Atenção',
+      message: `Prosseguir com a criação do novo Grupo ${groupData.name}?`,
       confirmText: 'Confirmar',
       cancelText: 'Cancelar',
       variant: 'info',
@@ -134,8 +134,8 @@ export default function GroupManagementPage() {
     >
   ) => {
     const result = await confirm({
-      title: 'Atencão',
-      message: `Prosseguir com a atualizacao das informacões do Grupo ${groupData.name}?`,
+      title: 'Atenção',
+      message: `Prosseguir com a atualização das informações do Grupo ${groupData.name}?`,
       confirmText: 'Confirmar',
       cancelText: 'Cancelar',
       variant: 'info',

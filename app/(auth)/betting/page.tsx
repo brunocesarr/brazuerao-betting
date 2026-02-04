@@ -225,7 +225,7 @@ export default function BettingPage() {
     }
     const result = await confirm({
       title: saveForAll
-        ? 'Atencão'
+        ? 'Atenção'
         : `Previsão: ${userGroups.find((userGroup) => userGroup.groupId === selectedGroupId)?.name}`,
       message: `Prosseguir com o salvamento da previsão? ${saveForAll ? '(Somente atualizará aqueles grupos em que está dentro do prazo de apostar)' : ''}`,
       confirmText: 'Confirmar',
