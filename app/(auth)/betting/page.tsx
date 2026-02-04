@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/contexts/AuthContext'
 import { useConfirmDialog } from '@/lib/contexts/DialogContext'
 import { useToast } from '@/lib/contexts/ToastContext'
 import { useBetDeadline } from '@/lib/hooks/useBetDeadline'
-import { getBrazilianLeagueByGloboEsporte } from '@/services/brazuerao.service'
+import { getBrazilianLeague } from '@/services/brazuerao.service'
 import {
   TeamPositionAPIResponse,
   TeamPrediction,
@@ -115,7 +115,7 @@ export default function BettingPage() {
       try {
         setIsLoadingBet(true)
 
-        const brazilianTable = await getBrazilianLeagueByGloboEsporte()
+        const brazilianTable = await getBrazilianLeague()
         const userBet = findUserBet(userBets, groupId)
         const predictions = createPredictions(brazilianTable, userBet)
 

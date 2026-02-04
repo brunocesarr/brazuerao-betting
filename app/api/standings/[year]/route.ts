@@ -1,30 +1,26 @@
 import { getSeasonIdByYear } from '@/lib/sofascore'
-import axios, { AxiosRequestConfig } from 'axios'
 import { NextResponse } from 'next/server'
 
-const URL_BASE_SOFASCORE = 'https://api.sofascore.com/api'
+const URL_BASE_SOFASCORE =
+  process.env.NEXT_PUBLIC_SOFASCORE_API_URL || 'https://api.sofascore.com/api'
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9'
 
-const defaultOptions: AxiosRequestConfig = {
-  baseURL: URL_BASE_SOFASCORE,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-}
+async function fetchSofaScore(endpoint: string) {
+  const response = await fetch(`${URL_BASE_SOFASCORE}${endpoint}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': USER_AGENT,
+    },
+    next: { revalidate: 3600 }, // Cache for 1 hour
+  })
 
-const apiSofaScore = axios.create(defaultOptions)
-
-apiSofaScore.interceptors.request.use(
-  function (config) {
-    config.headers['User-Agent'] = USER_AGENT
-    return config
-  },
-  function (error) {
-    console.error(JSON.stringify(error))
-    return Promise.reject(error)
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
-)
+
+  return response.json()
+}
 
 export async function GET(
   request: Request,
@@ -54,7 +50,7 @@ export async function GET(
       )
     }
 
-    const { data } = await apiSofaScore.get(
+    const data = await fetchSofaScore(
       `/v1/unique-tournament/325/season/${seasonId}/standings/total`
     )
 
@@ -92,13 +88,22 @@ export async function GET(
       })
     )
 
-    return NextResponse.json({
-      success: true,
-      year,
-      seasonId,
-      data: standings,
-      lastUpdated: new Date().toISOString(),
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        year,
+        seasonId,
+        data: standings,
+        lastUpdated: new Date().toISOString(),
+      },
+      {
+        headers: {
+          'Access-Control-Allow-Origin': 'https://brazuerao-betting.vercel.app',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      }
+    )
   } catch (error) {
     console.error('Error fetching standings:', error)
     return NextResponse.json(
@@ -108,14 +113,13 @@ export async function GET(
   }
 }
 
-// Handle preflight OPTIONS request
 export async function OPTIONS(request: Request) {
   return new Response(null, {
     status: 200,
     headers: {
-      'Access-Control-Allow-Origin': 'https://api.sofascore.com',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Origin': 'https://brazuerao-betting.vercel.app',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
     },
   })
 }

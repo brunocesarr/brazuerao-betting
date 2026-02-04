@@ -1,35 +1,32 @@
 import { SeasonAPIResponse } from '@/types/api'
-import axios, { AxiosRequestConfig } from 'axios'
 
 let cachedSeasons: SeasonAPIResponse[] | null = null
 let cacheTimestamp: number | null = null
 const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
-const URL_BASE_SOFASCORE = 'http://api.sofascore.com/api'
+const URL_BASE_SOFASCORE =
+  process.env.NEXT_PUBLIC_SOFASCORE_API_URL || 'https://api.sofascore.com/api'
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9'
 
-const defaultOptions: AxiosRequestConfig = {
-  baseURL: URL_BASE_SOFASCORE,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+async function fetchSofaScore<T>(endpoint: string): Promise<T> {
+  const response = await fetch(`${URL_BASE_SOFASCORE}${endpoint}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': USER_AGENT,
+    },
+    next: { revalidate: 86400 }, // Cache for 24 hours (Next.js caching)
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return response.json()
 }
 
-const apiSofaScore = axios.create(defaultOptions)
-
-apiSofaScore.interceptors.request.use(
-  function (config) {
-    config.headers.setUserAgent(USER_AGENT)
-    return config
-  },
-  function (error) {
-    console.error(JSON.stringify(error))
-    return Promise.reject(error)
-  }
-)
-
 export async function fetchBrasileiraoSeasons(): Promise<SeasonAPIResponse[]> {
+  // Check in-memory cache first
   if (
     cachedSeasons &&
     cachedSeasons.length > 0 &&
@@ -40,8 +37,9 @@ export async function fetchBrasileiraoSeasons(): Promise<SeasonAPIResponse[]> {
   }
 
   try {
-    const { data }: { data: { seasons: SeasonAPIResponse[] } } =
-      await apiSofaScore.get('/v1/unique-tournament/325/seasons')
+    const data = await fetchSofaScore<{ seasons: SeasonAPIResponse[] }>(
+      '/v1/unique-tournament/325/seasons'
+    )
 
     cachedSeasons = data.seasons
     cacheTimestamp = Date.now()
@@ -49,9 +47,13 @@ export async function fetchBrasileiraoSeasons(): Promise<SeasonAPIResponse[]> {
     return data.seasons
   } catch (error) {
     console.error('Error fetching seasons:', error)
+
+    // Return stale cache if available
     if (cachedSeasons) {
+      console.warn('Returning stale cache due to fetch error')
       return cachedSeasons
     }
+
     throw error
   }
 }
