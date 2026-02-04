@@ -5,12 +5,15 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const URL_BASE_GLOBOESPORTE = 'http://globoesporte.globo.com'
 const USER_AGENT =
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9'
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 const defaultOptions: AxiosRequestConfig = {
   baseURL: URL_BASE_GLOBOESPORTE,
   headers: {
-    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'User-Agent': USER_AGENT,
+    'sec-ch-ua':
+      '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
   },
 }
 

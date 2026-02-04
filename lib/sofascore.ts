@@ -7,13 +7,15 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 const URL_BASE_SOFASCORE =
   process.env.NEXT_PUBLIC_SOFASCORE_API_URL || 'https://api.sofascore.com/api'
 const USER_AGENT =
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9'
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 async function fetchSofaScore<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${URL_BASE_SOFASCORE}${endpoint}`, {
     headers: {
-      'Content-Type': 'application/json',
+      Accept: 'application/json',
       'User-Agent': USER_AGENT,
+      'sec-ch-ua':
+        '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
     },
     next: { revalidate: 86400 }, // Cache for 24 hours (Next.js caching)
   })

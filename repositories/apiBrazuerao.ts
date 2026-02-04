@@ -26,9 +26,7 @@ const createDefaultConfig = (baseURL: string): AxiosRequestConfig => ({
 /**
  * Brazuerao API client - for raw API calls
  */
-const apiBrazuerao = createApiClient(
-  createDefaultConfig('')
-)
+const apiBrazuerao = createApiClient(createDefaultConfig(''))
 
 /**
  * Brazuerao App client - for authenticated app endpoints
