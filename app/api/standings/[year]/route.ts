@@ -17,7 +17,7 @@ const apiSofaScore = axios.create(defaultOptions)
 
 apiSofaScore.interceptors.request.use(
   function (config) {
-    config.headers.setUserAgent(USER_AGENT)
+    config.headers['User-Agent'] = USER_AGENT
     return config
   },
   function (error) {
@@ -106,6 +106,18 @@ export async function GET(
       { status: 500 }
     )
   }
+}
+
+// Handle preflight OPTIONS request
+export async function OPTIONS(request: Request) {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': 'https://api.sofascore.com',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
 }
 
 function getTeamLogoUrl(teamId: number): string {
