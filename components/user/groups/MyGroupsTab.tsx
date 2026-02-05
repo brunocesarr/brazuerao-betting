@@ -70,17 +70,19 @@ export default function MyGroupsTab({
       {/* Groups List */}
       {groups.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {groups.map((group) => (
-            <GroupCard
-              key={group.groupId}
-              group={group}
-              isSelected={group.groupId === selectedGroupId}
-              variant="my-group"
-              onDeleteGroup={handleDeleteGroup}
-              onExitGroup={handleDeleteGroup}
-              onSelectGroup={handleSelectGroup}
-            />
-          ))}
+          {groups
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((group) => (
+              <GroupCard
+                key={group.groupId}
+                group={group}
+                isSelected={group.groupId === selectedGroupId}
+                variant="my-group"
+                onDeleteGroup={handleDeleteGroup}
+                onExitGroup={handleDeleteGroup}
+                onSelectGroup={handleSelectGroup}
+              />
+            ))}
         </div>
       ) : (
         <EmptyState

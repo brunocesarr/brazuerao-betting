@@ -426,184 +426,190 @@ export default function MyGroupRequestTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {requests.map((request) => (
-                <tr
-                  key={`${request.userId}-${request.groupId}`}
-                  className="transition-colors hover:bg-gray-50"
-                >
-                  {/* User Info */}
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <div className="flex items-center">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-200">
-                        <span className="text-sm font-medium text-gray-600">
-                          {request.username?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm font-medium text-gray-900">
-                            {request.username}
+              {requests
+                .sort((a, b) =>
+                  (a.username || '').localeCompare(b.username || '')
+                )
+                .map((request) => (
+                  <tr
+                    key={`${request.userId}-${request.groupId}`}
+                    className="transition-colors hover:bg-gray-50"
+                  >
+                    {/* User Info */}
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-200">
+                          <span className="text-sm font-medium text-gray-600">
+                            {request.username?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="ml-4">
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-medium text-gray-900">
+                              {request.username}
+                            </div>
+                            {isRequestAdmin(request) && (
+                              <span className="rounded bg-primary-300 px-2 py-0.5 text-xs font-medium text-white">
+                                Admin
+                              </span>
+                            )}
                           </div>
-                          {isRequestAdmin(request) && (
-                            <span className="rounded bg-primary-300 px-2 py-0.5 text-xs font-medium text-white">
-                              Admin
-                            </span>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Email */}
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <div className="text-sm text-gray-900">{request.email}</div>
-                  </td>
-
-                  {/* Date */}
-                  <td className="hidden whitespace-nowrap px-6 py-4 sm:table-cell">
-                    {isRequestApproved(request) ? (
-                      <span className="text-sm text-gray-400">—</span>
-                    ) : (
+                    {/* Email */}
+                    <td className="whitespace-nowrap px-6 py-4">
                       <div className="text-sm text-gray-900">
-                        {formatDate(request.createdAt)}
+                        {request.email}
                       </div>
-                    )}
-                  </td>
+                    </td>
 
-                  {/* Status */}
-                  <td className="whitespace-nowrap px-6 py-4">
-                    {getStatusBadge(request)}
-                  </td>
+                    {/* Date */}
+                    <td className="hidden whitespace-nowrap px-6 py-4 sm:table-cell">
+                      {isRequestApproved(request) ? (
+                        <span className="text-sm text-gray-400">—</span>
+                      ) : (
+                        <div className="text-sm text-gray-900">
+                          {formatDate(request.createdAt)}
+                        </div>
+                      )}
+                    </td>
 
-                  {/* Actions */}
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                    {isRequestPending(request) ? (
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          className="text-xs font-medium"
-                          type="button"
-                          variant="primary"
-                          onClick={() => handleApprove(request)}
-                          disabled={isLoading || isPending}
-                        >
-                          {isLoading || isPending ? (
-                            <svg
-                              className="h-4 w-4 animate-spin"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              />
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              />
-                            </svg>
-                          ) : (
-                            <>
+                    {/* Status */}
+                    <td className="whitespace-nowrap px-6 py-4">
+                      {getStatusBadge(request)}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                      {isRequestPending(request) ? (
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            className="text-xs font-medium"
+                            type="button"
+                            variant="primary"
+                            onClick={() => handleApprove(request)}
+                            disabled={isLoading || isPending}
+                          >
+                            {isLoading || isPending ? (
                               <svg
-                                className="mr-1 h-4 w-4"
+                                className="h-4 w-4 animate-spin"
+                                xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
-                                stroke="currentColor"
                                 viewBox="0 0 24 24"
                               >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                />
                                 <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 13l4 4L19 7"
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                 />
                               </svg>
-                              Aprovar
-                            </>
-                          )}
-                        </Button>
+                            ) : (
+                              <>
+                                <svg
+                                  className="mr-1 h-4 w-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                                Aprovar
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            className="text-xs font-medium"
+                            type="button"
+                            variant="danger"
+                            onClick={() => handleReject(request)}
+                            disabled={isLoading || isPending}
+                          >
+                            {isLoading || isPending ? (
+                              <svg
+                                className="h-4 w-4 animate-spin"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                />
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                />
+                              </svg>
+                            ) : (
+                              <>
+                                <svg
+                                  className="mr-1 h-4 w-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                                Rejeitar
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      ) : isRequestApproved(request) &&
+                        !isRequestAdmin(request) ? (
                         <Button
                           className="text-xs font-medium"
                           type="button"
                           variant="danger"
-                          onClick={() => handleReject(request)}
+                          onClick={() => handleRemove(request)}
                           disabled={isLoading || isPending}
                         >
-                          {isLoading || isPending ? (
-                            <svg
-                              className="h-4 w-4 animate-spin"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              />
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              />
-                            </svg>
-                          ) : (
-                            <>
-                              <svg
-                                className="mr-1 h-4 w-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
-                              Rejeitar
-                            </>
-                          )}
+                          <svg
+                            className="mr-1 h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                          Remover
                         </Button>
-                      </div>
-                    ) : isRequestApproved(request) &&
-                      !isRequestAdmin(request) ? (
-                      <Button
-                        className="text-xs font-medium"
-                        type="button"
-                        variant="danger"
-                        onClick={() => handleRemove(request)}
-                        disabled={isLoading || isPending}
-                      >
-                        <svg
-                          className="mr-1 h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                        Remover
-                      </Button>
-                    ) : (
-                      <span className="text-xs text-gray-400">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

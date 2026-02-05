@@ -95,7 +95,7 @@ export default function LeaderboardPage() {
             {loading ? (
               <LoadingState
                 message="Carregando classificação..."
-                className="h-32"
+                className="min-h-[400px]"
               />
             ) : (
               <>
@@ -126,7 +126,7 @@ export default function LeaderboardPage() {
                   getRuleByRuleId={getRuleByRuleId}
                 />
 
-                {leaderboard.length > 0 && (
+                {username && leaderboard.length > 0 && (
                   <div className="flex flex-col items-end justify-end space-y-2">
                     <ExportGroupPDFDropdown
                       groupName={

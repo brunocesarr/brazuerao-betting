@@ -34,12 +34,12 @@ export default function GroupCard({
 
   return (
     <div
-      className={`rounded-lg border border-gray-300/80 p-5 hover:shadow-md transition-shadow ${
+      className={`rounded-lg border border-gray-300/80 p-5 hover:shadow-md transition-shadow flex flex-col gap-4 ${
         isMyGroup ? 'bg-gradient-to-r from-white to-gray-100' : 'bg-white'
       } ${isAdmin ? 'hover:cursor-pointer hover:ring-1 hover:ring-primary-100' : ''} ${isSelected ? 'ring-1 ring-primary-100' : ''}`}
       onClick={() => onSelectGroup?.(group.groupId)}
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           {group.isPrivate ? (
             <Lock className="w-4 h-4 text-gray-500" />
@@ -56,7 +56,7 @@ export default function GroupCard({
       </div>
 
       {group.challenge && (
-        <p className="text-sm text-gray-600 mb-4">{group.challenge}</p>
+        <p className="text-sm text-gray-600">{group.challenge}</p>
       )}
 
       <div className="flex items-center justify-between text-xs">
@@ -89,7 +89,7 @@ export default function GroupCard({
 
       {isMyGroup && (
         <Button
-          className="w-full mt-4"
+          className="w-full mt-auto"
           type="button"
           variant="danger"
           onClick={() => {

@@ -59,12 +59,20 @@ export default function Home() {
 
             <div className="mb-16 flex flex-col justify-center gap-4 sm:flex-row">
               {status === 'authenticated' ? (
-                <Link
-                  href="/betting"
-                  className="flex-1 transform rounded-xl border-1 border-white/10 bg-transparent px-8 py-4 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-2xl"
-                >
-                  Continue apostando
-                </Link>
+                <>
+                  <Link
+                    href="/betting"
+                    className="flex-1 transform rounded-xl border-1 border-white/10 bg-transparent px-8 py-4 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-2xl"
+                  >
+                    Continue apostando
+                  </Link>
+                  <Link
+                    href="/user/groups?activeTab=find-groups"
+                    className="flex-1 transform rounded-xl border-1 border-white/10 bg-transparent px-8 py-4 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-2xl"
+                  >
+                    Participe de grupos
+                  </Link>
+                </>
               ) : (
                 <Link
                   href="/register"

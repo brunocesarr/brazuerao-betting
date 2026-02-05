@@ -48,14 +48,16 @@ export default function FindGroupsTab({
       {/* Available Groups */}
       {groups.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {groups.map((group) => (
-            <GroupCard
-              key={group.groupId}
-              group={group}
-              variant="available"
-              onJoinRequest={handleJoinGroup}
-            />
-          ))}
+          {groups
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((group) => (
+              <GroupCard
+                key={group.groupId}
+                group={group}
+                variant="available"
+                onJoinRequest={handleJoinGroup}
+              />
+            ))}
         </div>
       ) : (
         <EmptyState
