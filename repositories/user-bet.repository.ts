@@ -125,10 +125,6 @@ const handleBetCreationOrUpdate = async (
   validatedData: { predictions: string[]; season: number },
   existingBets: UserBetDBModel[]
 ): Promise<UserBetDBModel[]> => {
-  if (existingBets.length === 0) {
-    return [await createBet(userId, groupId, validatedData)]
-  }
-
   if (groupId) {
     return [await handleGroupBet(userId, groupId, validatedData, existingBets)]
   }
