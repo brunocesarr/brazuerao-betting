@@ -273,7 +273,7 @@ export default function MyGroupRequestTable({
   // RENDER - LOADING STATE
   // ============================================================================
 
-  if (isLoading && requests.length === 0) {
+  if ((isLoading && requests.length === 0) || isLoading) {
     return (
       <div className="rounded-lg bg-white p-8 shadow">
         <div className="flex items-center justify-center">

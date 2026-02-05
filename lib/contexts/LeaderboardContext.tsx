@@ -66,20 +66,6 @@ export function LeaderboardProvider({
         getAllBetRules(),
       ])
 
-      if (status === 'authenticated') {
-        const userScore = await getIndividualUserScore()
-        if (userScore.length > 0) {
-          if (userGroups.length > 0) {
-            const myInitialScore = userScore.find(
-              (score) => score.groupId === userGroups[0].groupId
-            )
-            setMyUserScore(myInitialScore?.score ?? [])
-          } else {
-            setMyUserScore(userScore[0].score)
-          }
-        }
-      }
-
       setGroups(userGroups)
       setRules(rulesData)
 
@@ -98,6 +84,15 @@ export function LeaderboardProvider({
 
     try {
       setLoading(true)
+
+      if (status === 'authenticated') {
+        const userScores = await getIndividualUserScore()
+        const myScore: ScoreEntry[] =
+          userScores?.find((score) => score.groupId === selectedGroup)?.score ??
+          []
+        setMyUserScore(myScore)
+      }
+
       const leaderboard = await getScoreForLeaderboardGroup(selectedGroup)
       setLeaderboard(leaderboard)
     } catch (error) {

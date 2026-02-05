@@ -66,7 +66,7 @@ export const SummaryCards = ({ stats, rules }: SummaryCardsProps) => {
 
         const value =
           rule.ruleType === RuleTypeEnum.champion
-            ? stat
+            ? stat?.teams.length === 1
               ? 'SIM'
               : 'NÃO'
             : (stat?.teams.length ?? 0)
