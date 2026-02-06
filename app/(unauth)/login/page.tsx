@@ -148,7 +148,7 @@ export default function LoginPage() {
               )}
             </button>
 
-            <div className="text-end hidden">
+            <div className="text-end">
               <Button variant="ghost" size="sm" className="-mt-4">
                 <Link
                   href="/forgot-password"
