@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server'
 // CONFIGURAÇÃO
 // ============================================================================
 
-const PROTECTED_ROUTES = ['/betting', '/user'] as const
+const PROTECTED_ROUTES = ['/betting', '/user', '/user/groups'] as const
 
 const PUBLIC_ROUTES = [
   '/',

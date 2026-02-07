@@ -310,7 +310,7 @@ export default function BettingPage() {
 
         {/* Group Selection */}
         {userGroups.length > 1 && (
-          <div className="w-full from-primary-700 to-white bg-gradient-to-b p-4 rounded-lg space-y-4">
+          <div className="w-full from-primary-900 via-primary-700 to-primary-50 bg-gradient-to-b p-4 rounded-lg space-y-4">
             <BetGroupSelectSimple
               groups={userGroups}
               onValueChange={handleSelectGroupId}

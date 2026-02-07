@@ -1,26 +1,12 @@
 'use client'
 
-import { LoadingState } from '@/components/shared/LoadingState'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useRequireAuth } from '@/lib/hooks/useRequireAuth'
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { status } = useSession()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (status === 'authenticated') {
-      router.push('/user/profile')
-    }
-  }, [status, router])
-
-  if (status !== 'unauthenticated')
-    return <LoadingState message="Carregando..." />
-
+  useRequireAuth({ redirectTo: '/user/profile', redirectIfFound: true })
   return children
 }

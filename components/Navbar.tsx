@@ -4,7 +4,7 @@ import { Group, Menu, X } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, useTransition } from 'react'
 
 // ============================================================================
@@ -62,6 +62,7 @@ const USER_MENU_ITEMS: UserMenuItem[] = [
 export default function Navbar() {
   const { data: session } = useSession()
   const pathname = usePathname()
+  const router = useRouter()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [, startTransition] = useTransition()
@@ -125,6 +126,11 @@ export default function Navbar() {
     startTransition(() => {
       setIsMobileMenuOpen(false)
     })
+  }
+
+  const handleLogoutClick = async () => {
+    await signOut()
+    router.push('/login')
   }
 
   const isActive = (path: string) => pathname === path
@@ -365,7 +371,7 @@ export default function Navbar() {
                   {/* Logout Button */}
                   <button
                     type="button"
-                    onClick={() => signOut()}
+                    onClick={handleLogoutClick}
                     className="flex items-center gap-3 rounded-md px-4 py-3 text-red-300 transition-all duration-200 hover:bg-red-500/20"
                   >
                     <svg

@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface UseRequireAuthOptions {
   redirectTo?: string
@@ -17,6 +17,7 @@ export function useRequireAuth(options: UseRequireAuthOptions = {}) {
   const { redirectTo = '/login', redirectIfFound = false } = options
   const router = useRouter()
   const { status } = useSession()
+  const hasRedirected = useRef(false)
 
   useEffect(() => {
     console.log('🔐 [useRequireAuth] status da sessão:', status)
@@ -29,7 +30,14 @@ export function useRequireAuth(options: UseRequireAuthOptions = {}) {
 
     if (shouldRedirect) {
       console.log('🔄 [useRequireAuth] Redirecionando para:', redirectTo)
-      router.push(redirectTo)
+      hasRedirected.current = true
+
+      router.replace(redirectTo)
+      setTimeout(() => {
+        if (hasRedirected.current) {
+          window.location.href = redirectTo
+        }
+      }, 100)
     }
   }, [status, redirectTo, redirectIfFound, router])
 

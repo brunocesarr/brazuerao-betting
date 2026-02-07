@@ -58,7 +58,7 @@ export default function LeaderboardDetailsPage() {
 
         <PredictionsTable predictions={scoreDetails.predictions} />
 
-        {username && (
+        {username && scoreDetails.username == username && (
           <Button
             className="flex-1 mt-8 flex gap-4 w-full h-14"
             type="button"

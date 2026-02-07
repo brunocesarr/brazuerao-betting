@@ -67,14 +67,12 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex flex-col rounded-lg bg-white p-6 shadow">
-            <h2 className="mb-4 text-lg font-semibold text-black">
-              Meus Grupos
-            </h2>
+            <h2 className="text-lg font-semibold text-black">Meus Grupos</h2>
             {userGroups.length > 0 ? (
               userGroups.map((userGroup, index) => (
                 <div
                   key={index}
-                  className="p-2 bg-gray-50/80 rounded-md border border-gray-100"
+                  className="p-2 bg-gray-50/80 rounded-md border border-gray-100 mt-4 min-h-[60px] items-start flex flex-col justify-center"
                 >
                   <p className="text-md">
                     <b>Nome:</b> {userGroup.name}
@@ -99,7 +97,9 @@ export default function ProfilePage() {
                 variant="secondary"
                 onClick={() => router.push('/user/groups')}
               >
-                Criar um grupo
+                {userGroups.length === 0
+                  ? 'Criar um grupo'
+                  : 'Gerenciar meus grupos'}
               </Button>
               <Button
                 className="flex-1"
