@@ -77,7 +77,7 @@ const getLeaderboard = async (groupId: string, season: number) => {
       }),
     ])
 
-    return userBets
+    const mapped = userBets
       .map((userBet) => {
         const predictions = predictionSchema.parse(userBet.predictions)
         const score = calculateScore(predictions, rules, brazilianLeague)
@@ -92,26 +92,60 @@ const getLeaderboard = async (groupId: string, season: number) => {
           score,
         }
       })
-      .filter((userBet) => userBet)
-      .sort((a, b) => {
-        // First, sort by totalScore (descending - highest first)
-        if (b!.totalScore !== a!.totalScore) {
-          return b!.totalScore - a!.totalScore
-        }
+      .filter((userBet) => userBet) as Array<{
+      userId: string
+      username: string
+      groupId: string
+      predictions: string[]
+      totalScore: number
+      score: { ruleId: string; score: number; teams: string[] }[]
+    }>
 
-        // If totalScore is equal, compare by individual scores according to priority
-        // Priority 0 (index 0) is highest priority
-        for (let i = 0; i < Math.max(a!.score.length, b!.score.length); i++) {
-          const scoreA = a!.score[i]?.score || 0
-          const scoreB = b!.score[i]?.score || 0
+    mapped.sort((a, b) => {
+      if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore
 
-          if (scoreA !== scoreB) {
-            return scoreB - scoreA // Descending order
-          }
-        }
+      for (let i = 0; i < Math.max(a.score.length, b.score.length); i++) {
+        const scoreA = a.score[i]?.score || 0
+        const scoreB = b.score[i]?.score || 0
+        if (scoreA !== scoreB) return scoreB - scoreA
+      }
 
-        return a!.username.localeCompare(b!.username) // All scores are equal
-      })
+      return a.username.localeCompare(b.username)
+    })
+
+    const results: Array<{
+      userId: string
+      username: string
+      groupId: string
+      predictions: string[]
+      totalScore: number
+      score: { ruleId: string; score: number; teams: string[] }[]
+      position: number
+    }> = []
+
+    let currentPosition = 1
+    let prevTotal: number | null = null
+    let prevCoreScore: number | null = null
+
+    for (let i = 0; i < mapped.length; i++) {
+      const item = mapped[i]
+      const coreScore = item.score[0]?.score || 0
+
+      if (
+        prevTotal !== null &&
+        item.totalScore === prevTotal &&
+        coreScore === prevCoreScore
+      ) {
+        results.push({ ...item, position: currentPosition })
+      } else {
+        currentPosition = i + 1
+        results.push({ ...item, position: currentPosition })
+        prevTotal = item.totalScore
+        prevCoreScore = coreScore
+      }
+    }
+
+    return results
   } catch (error) {
     console.error('Get group score error:', error)
     throw error

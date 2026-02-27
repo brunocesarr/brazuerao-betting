@@ -61,6 +61,7 @@ export interface LeaderboardEntry {
   predictions: string[]
   totalScore: number
   score: ScoreEntry[]
+  position: number
 }
 
 /**

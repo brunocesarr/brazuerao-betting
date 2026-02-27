@@ -30,7 +30,7 @@ export const LeaderboardTableRow = ({
   onToggle,
   getRuleByRuleId,
 }: LeaderboardRowProps) => {
-  const position = index + 1
+  const position = entry.position
   const championScore = entry.score.find(
     (s) => getRuleByRuleId(s.ruleId)?.ruleType === RuleTypeEnum.champion
   )
@@ -48,7 +48,12 @@ export const LeaderboardTableRow = ({
         <div className="grid grid-cols-12 gap-2 px-4 py-4 text-white xl:gap-4">
           {/* Rank & Username */}
           <div className="col-span-3 flex items-center gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-green-600 text-sm font-bold text-white shadow-md">
+            <div
+              className={
+                'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-green-600 font-bold text-white shadow-md' +
+                (position <= 3 ? ' text-3xl' : 'text-xs')
+              }
+            >
               {getRankDisplay(position)}
             </div>
             <div className="min-w-0 flex-1">
