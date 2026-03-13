@@ -26,6 +26,7 @@ export const LeaderboardTableRow = ({
   index,
   isExpanded,
   isCurrentUser,
+  isExpired,
   selectedGroup,
   onToggle,
   getRuleByRuleId,
@@ -81,7 +82,7 @@ export const LeaderboardTableRow = ({
                     : 'bg-gray-500/20 text-gray-400'
                 }`}
               >
-                {championScore.score > 0 ? '✓ Sim' : '✗ Não'}
+                {championScore.teams.length > 0 ? '✓ Sim' : '✗ Não'}
               </span>
             )}
           </div>
@@ -89,14 +90,14 @@ export const LeaderboardTableRow = ({
           {/* Exact Positions */}
           <div className="col-span-2 flex items-center justify-center">
             <span className="text-lg font-semibold">
-              {exactPositionsScore?.score ?? 0}
+              {exactPositionsScore?.teams.length ?? 0}
             </span>
           </div>
 
           {/* Correct Zones */}
           <div className="col-span-2 flex items-center justify-center">
             <span className="text-lg font-semibold">
-              {correctZonesScore?.score ?? 0}
+              {correctZonesScore?.teams.length ?? 0}
             </span>
           </div>
 
@@ -119,7 +120,7 @@ export const LeaderboardTableRow = ({
             >
               {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
             </button>
-            {isCurrentUser && (
+            {isCurrentUser && !isExpired && (
               <Link
                 href={`/betting?groupId=${selectedGroup}`}
                 className="rounded-lg p-2 text-blue-400 transition-colors hover:bg-blue-500/10 hover:text-blue-300"
@@ -160,19 +161,19 @@ export const LeaderboardTableRow = ({
           <div className="text-center">
             <p className="text-xs text-gray-400">Campeão</p>
             <p className="mt-1 text-sm font-semibold text-white">
-              {championScore && championScore.score > 0 ? '✓' : '✗'}
+              {championScore && championScore.teams.length > 0 ? '✓' : '✗'}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-gray-400">Pos. Exatas</p>
             <p className="mt-1 text-sm font-semibold text-white">
-              {exactPositionsScore?.score ?? 0}
+              {exactPositionsScore?.teams.length ?? 0}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-gray-400">Zonas</p>
             <p className="mt-1 text-sm font-semibold text-white">
-              {correctZonesScore?.score ?? 0}
+              {correctZonesScore?.teams.length ?? 0}
             </p>
           </div>
         </div>

@@ -11,6 +11,7 @@ export interface LeaderboardRowProps {
   entry: LeaderboardEntry
   index: number
   isExpanded: boolean
+  isExpired: boolean
   isCurrentUser: boolean
   selectedGroup: string
   onToggle: (userId: string) => void

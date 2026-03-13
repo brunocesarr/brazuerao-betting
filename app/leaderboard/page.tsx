@@ -122,6 +122,7 @@ export default function LeaderboardPage() {
                   expandedRows={expandedRows}
                   selectedGroup={selectedGroup}
                   currentUsername={username}
+                  isExpired={isExpired}
                   onToggleRow={toggleRow}
                   getRuleByRuleId={getRuleByRuleId}
                 />

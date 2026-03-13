@@ -8,6 +8,7 @@ interface LeaderboardTableProps {
   expandedRows: Set<string>
   selectedGroup: string
   currentUsername?: string | null
+  isExpired: boolean
   onToggleRow: (userId: string) => void
   getRuleByRuleId: (ruleId: string) => RuleBet | undefined
 }
@@ -17,6 +18,7 @@ export const LeaderboardTable = ({
   expandedRows,
   selectedGroup,
   currentUsername,
+  isExpired,
   onToggleRow,
   getRuleByRuleId,
 }: LeaderboardTableProps) => {
@@ -40,6 +42,7 @@ export const LeaderboardTable = ({
               isExpanded={expandedRows.has(entry.userId)}
               isCurrentUser={currentUsername === entry.username}
               selectedGroup={selectedGroup}
+              isExpired={isExpired}
               onToggle={onToggleRow}
               getRuleByRuleId={getRuleByRuleId}
             />
