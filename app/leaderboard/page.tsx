@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
           </>
         )}
 
-        {leaderboard.length > 0 || groups.length > 1 ? (
+        {leaderboard.length > 0 || (groups && groups.length > 1) ? (
           <div className="space-y-4">
             {groups.length > 1 && (
               <BetGroupSelectSimple
